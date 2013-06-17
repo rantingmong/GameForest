@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestCore", "GameFores
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestConsole", "GameForestConsole\GameForestConsole.csproj", "{8139216D-4DF4-467D-B3B1-9CFA9720221B}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "GameForestDatabase", "GameForestDatabase\GameForestDatabase.sqlproj", "{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,12 @@ Global
 		{8139216D-4DF4-467D-B3B1-9CFA9720221B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8139216D-4DF4-467D-B3B1-9CFA9720221B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8139216D-4DF4-467D-B3B1-9CFA9720221B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E5B778D-4B7A-42B1-8BFC-0620C89AB2CA}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

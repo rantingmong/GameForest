@@ -64,6 +64,8 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\GFXDatabaseHelper.cs" />
+    <Compile Include="Common\GFXRestResponse.cs" />
     <Compile Include="Services\GFXLoginService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
