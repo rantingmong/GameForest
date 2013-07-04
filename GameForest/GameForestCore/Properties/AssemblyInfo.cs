@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GameForestCore")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Game Forest")]
+[assembly: AssemblyDescription("Server binaries for Game Forest")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("GameForestCore")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCompany("DLSU Game Development Laboratory")]
+[assembly: AssemblyProduct("Game Forest")]
+[assembly: AssemblyCopyright("Copyright © 2013 David Marquez, Jonathan Cardenas, and Michael Ong")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
