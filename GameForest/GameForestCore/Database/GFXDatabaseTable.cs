@@ -18,7 +18,7 @@ namespace GameForestCore.Database
 
         private readonly GFXDatabaseTranslator<T>   translator; 
 
-        public GFXDatabaseTable                     (GFXDatabaseTranslator<T> translator)
+        public GFXDatabaseTable             (GFXDatabaseTranslator<T> translator)
         {
             this.translator = translator;
 
@@ -39,7 +39,7 @@ namespace GameForestCore.Database
             columnValue += columns[columns.Count - 1];
         }
 
-        ~GFXDatabaseTable                           ()
+        ~GFXDatabaseTable                   ()
         {
             commandIns.Dispose();
             commandRem.Dispose();
