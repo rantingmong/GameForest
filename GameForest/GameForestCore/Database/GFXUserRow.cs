@@ -19,9 +19,15 @@ namespace GameForestCore.Database
 
     public sealed class GFXUserTranslator : GFXDatabaseTranslator<GFXUserRow>
     {
-        public string TableName { get { return "RegisteredUsers"; } }
+        public string TableName
+        {
+            get { return "RegisteredUsers"; }
+        }
 
-        public IEnumerable<string> TableColumns { get { return new[] { "UserId", "UserName", "Password", "FirstName", "LastName", "Description" }; } }
+        public IEnumerable<string> TableColumns
+        {
+            get { return new[] { "UserId", "UserName", "Password", "FirstName", "LastName", "Description" }; }
+        }
 
         public IEnumerable<string> ToStringValues(GFXUserRow data)
         {

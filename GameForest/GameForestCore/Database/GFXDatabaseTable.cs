@@ -108,6 +108,8 @@ namespace GameForestCore.Database
             }
             catch (Exception exp)
             {
+                // TODO: log the exception
+                
                 return null;
             }
             finally

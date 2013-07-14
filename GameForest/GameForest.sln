@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20617.1 PREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestCore", "GameForestCore\GameForestCore.csproj", "{95B76B85-36C6-424A-A6E9-7F7EBB0230B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestConsole", "GameForestConsole\GameForestConsole.csproj", "{8139216D-4DF4-467D-B3B1-9CFA9720221B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameForestDatabase", "GameForestDatabase", "{E48E1F02-5C87-45D1-9BB2-1E44294BBF21}"
+	ProjectSection(SolutionItems) = preProject
+		GameForestDatabase\GameForest.mwb = GameForestDatabase\GameForest.mwb
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

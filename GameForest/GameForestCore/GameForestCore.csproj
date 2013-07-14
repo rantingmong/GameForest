@@ -83,6 +83,7 @@
     <Compile Include="Database\GFXDatabaseCore.cs" />
     <Compile Include="Database\GFXDatabaseTable.cs" />
     <Compile Include="Database\GFXDatabaseTranslator.cs" />
+    <Compile Include="Database\GFXGameRow.cs" />
     <Compile Include="Database\GFXLoginRow.cs" />
     <Compile Include="Database\GFXUserRow.cs" />
     <Compile Include="Services\GFXLobbyService.cs" />
