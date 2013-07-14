@@ -28,6 +28,8 @@ namespace GameForestCore.Services
             lobbySessionTable = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
         }
 
+        // ----------------------------------------------------------------------------------------------------------------
+
         public GFXRestResponse          GetLobbies          (int maxcount)
         {
             try
@@ -141,6 +143,8 @@ namespace GameForestCore.Services
         {
             return constructResponse(GFXResponseType.NotSupported, "");
         }
+
+        // ----------------------------------------------------------------------------------------------------------------
 
         private static GFXRestResponse  constructResponse   (GFXResponseType responseType, string payload)
         {
