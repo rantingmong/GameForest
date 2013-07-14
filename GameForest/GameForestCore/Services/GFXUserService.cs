@@ -19,21 +19,8 @@ namespace GameForestCore.Services
 
         public GFXUserService           ()
         {
-            var strings = System.Configuration.ConfigurationManager.ConnectionStrings;
-
-            if (strings["GameForestConnection"] != null)
-                GFXDatabaseCore.Initialize(strings["GameForestConnection"].ConnectionString);
-
-            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserTranslator());
-            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginTranslator());
-        }
-
-        public GFXUserService           (string connectionString)
-        {
-            GFXDatabaseCore.Initialize(connectionString);
-            
-            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserTranslator());
-            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginTranslator());
+            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
         }
 
         // ----------------------------------------------------------------------------------------------------------------

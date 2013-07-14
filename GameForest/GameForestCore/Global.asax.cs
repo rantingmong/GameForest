@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ServiceModel.Activation;
 using System.Web.Routing;
+
 using GameForestCore.Services;
+using GameForestCore.Database;
 
 namespace GameForestCore
 {
@@ -9,7 +11,12 @@ namespace GameForestCore
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXUserService)));
+            var strings = System.Configuration.ConfigurationManager.ConnectionStrings;
+
+            if (strings["GameForestConnection"] != null)
+                GFXDatabaseCore.Initialize(strings["GameForestConnection"].ConnectionString);
+
+            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXUserService)));            
         }
 
         protected void Session_Start(object sender, EventArgs e)

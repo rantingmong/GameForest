@@ -17,7 +17,7 @@ namespace GameForestCore.Database
         public string   Description { get; set; }
     }
 
-    public sealed class GFXUserTranslator : GFXDatabaseTranslator<GFXUserRow>
+    public sealed class GFXUserRowTranslator : GFXDatabaseTranslator<GFXUserRow>
     {
         public string TableName
         {

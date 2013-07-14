@@ -92,9 +92,11 @@ namespace GameForestCore.Database
             commandUpt.ExecuteNonQuery();
         }
 
-        public IEnumerable<T>   Select      (string condition)
+        public IEnumerable<T>   Select      (string condition, int maxRows = int.MaxValue)
         {
-            this.commandSel.CommandText = string.IsNullOrEmpty(condition) ? string.Format("SELECT * FROM {0}", this.translator.TableName) : string.Format("SELECT * FROM {0} WHERE {1}", this.translator.TableName, condition);
+            this.commandSel.CommandText = string.IsNullOrEmpty(condition) ?
+                string.Format("SELECT * FROM {0} LIMIT {1}", this.translator.TableName, maxRows) : 
+                string.Format("SELECT * FROM {0} WHERE {1} LIMIT {2}", this.translator.TableName, condition, maxRows);
 
             var reader = commandSel.ExecuteReader();
             var rtlist = new List<T>();

@@ -13,7 +13,7 @@ namespace GameForestCore.Database
         public DateTime LastHeartbeat   { get; set; }
     }
 
-    public sealed class GFXLoginTranslator : GFXDatabaseTranslator<GFXLoginRow>
+    public sealed class GFXLoginRowTranslator : GFXDatabaseTranslator<GFXLoginRow>
     {
         public string TableName
         {

@@ -13,10 +13,10 @@ namespace GameForestCore.Database
 
         public Guid SessionID   { get; set; }
 
-        public Guid UserId      { get; set; }
+        public Guid UserID      { get; set; }
     }
 
-    public class GFXLobbySessionTranslator : GFXDatabaseTranslator<GFXLobbySessionRow>
+    public class GFXLobbySessionRowTranslator : GFXDatabaseTranslator<GFXLobbySessionRow>
     {
 
         public string TableName
@@ -36,7 +36,7 @@ namespace GameForestCore.Database
             returnData[0] = GFXDatabaseCore.ToSQLString(data.LobbyID.ToString());
             returnData[1] = GFXDatabaseCore.ToSQLString(data.GameID.ToString());
             returnData[2] = GFXDatabaseCore.ToSQLString(data.SessionID.ToString());
-            returnData[3] = GFXDatabaseCore.ToSQLString(data.UserId.ToString());
+            returnData[3] = GFXDatabaseCore.ToSQLString(data.UserID.ToString());
 
             return returnData;
         }
@@ -48,7 +48,7 @@ namespace GameForestCore.Database
                 LobbyID     = Guid.Parse(reader.GetString(0)),
                 GameID      = Guid.Parse(reader.GetString(1)),
                 SessionID   = Guid.Parse(reader.GetString(2)),
-                UserId      = Guid.Parse(reader.GetString(3)),
+                UserID      = Guid.Parse(reader.GetString(3)),
             };
         }
     }
