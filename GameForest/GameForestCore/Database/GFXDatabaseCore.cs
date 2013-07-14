@@ -37,5 +37,10 @@ namespace GameForestCore.Database
             Instance.Close();
             Instance.Dispose();
         }
+
+        public static string            ToSQLString (string value)
+        {
+            return string.Format("'{0}'", value);
+        }
     }
 }
