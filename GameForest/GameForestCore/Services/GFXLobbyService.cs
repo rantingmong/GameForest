@@ -127,7 +127,13 @@ namespace GameForestCore.Services
         {
             try
             {
+                List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
                 lobbySessionTable.Remove(string.Format("SessionId = '{0}'", usersessionid));
+
+                if (lobbySessionTable.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
+                {
+                    lobbyTable.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
+                }
 
                 return constructResponse(GFXResponseType.Normal, "");
             }

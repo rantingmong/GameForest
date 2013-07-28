@@ -18,29 +18,29 @@ namespace GameForestCore.Database
 
     public class GFXGameRowTranslator : GFXDatabaseTranslator<GFXGameRow>
     {
-        public string TableName
+        public string               TableName
         {
             get { return "GameList"; }
         }
 
-        public IEnumerable<string> TableColumns
+        public IEnumerable<string>  TableColumns
         {
             get { return new[] { "GameID", "Name", "Description", "RelativeLink" }; }
         }
 
-        public IEnumerable<string> ToStringValues(GFXGameRow data)
+        public IEnumerable<string>  ToStringValues  (GFXGameRow data)
         {
             var returnData = new string[4];
 
-            returnData[0] = string.Format("'{0}'", data.GameID);
-            returnData[1] = string.Format("'{0}'", data.Name);
-            returnData[2] = string.Format("'{0}'", data.Description);
-            returnData[3] = string.Format("'{0}'", data.RelativeLink);
+            returnData[0] = GFXDatabaseCore.ToSQLString(data.GameID.ToString());
+            returnData[1] = GFXDatabaseCore.ToSQLString(data.Name);
+            returnData[2] = GFXDatabaseCore.ToSQLString(data.Description);
+            returnData[3] = GFXDatabaseCore.ToSQLString(data.RelativeLink.ToString());
 
             return returnData;
         }
 
-        public GFXGameRow ToNativeData(MySqlDataReader reader)
+        public GFXGameRow           ToNativeData    (MySqlDataReader reader)
         {
             return new GFXGameRow
             {

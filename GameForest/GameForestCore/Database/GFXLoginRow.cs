@@ -15,28 +15,28 @@ namespace GameForestCore.Database
 
     public sealed class GFXLoginRowTranslator : GFXDatabaseTranslator<GFXLoginRow>
     {
-        public string TableName
+        public string               TableName
         {
             get { return "LoggedInUsers"; }
         }
 
-        public IEnumerable<string> TableColumns
+        public IEnumerable<string>  TableColumns
         {
             get { return new[] { "SessionId", "UserId", "LastHeartbeat" }; }
         }
 
-        public IEnumerable<string> ToStringValues(GFXLoginRow data)
+        public IEnumerable<string>  ToStringValues  (GFXLoginRow data)
         {
             var returnData = new string[3];
 
-            returnData[0] = string.Format("'{0}'", data.UserSessionId.ToString());
-            returnData[1] = string.Format("'{0}'", data.UserId.ToString());
-            returnData[2] = data.LastHeartbeat.ToFileTime().ToString(CultureInfo.InvariantCulture);
+            returnData[0] = GFXDatabaseCore.ToSQLString(data.UserSessionId.ToString());
+            returnData[1] = GFXDatabaseCore.ToSQLString(data.UserId.ToString());
+            returnData[2] = GFXDatabaseCore.ToSQLString(data.LastHeartbeat.ToFileTime().ToString(CultureInfo.InvariantCulture));
 
             return returnData;
         }
 
-        public GFXLoginRow ToNativeData(MySqlDataReader reader)
+        public GFXLoginRow          ToNativeData    (MySqlDataReader reader)
         {
             return new GFXLoginRow
             {

@@ -19,31 +19,31 @@ namespace GameForestCore.Database
 
     public sealed class GFXUserRowTranslator : GFXDatabaseTranslator<GFXUserRow>
     {
-        public string TableName
+        public string               TableName
         {
             get { return "RegisteredUsers"; }
         }
 
-        public IEnumerable<string> TableColumns
+        public IEnumerable<string>  TableColumns
         {
             get { return new[] { "UserId", "UserName", "Password", "FirstName", "LastName", "Description" }; }
         }
 
-        public IEnumerable<string> ToStringValues(GFXUserRow data)
+        public IEnumerable<string>  ToStringValues  (GFXUserRow data)
         {
             var returnData = new string[6];
 
-            returnData[0] = string.Format("'{0}'", data.UserId);
-            returnData[1] = string.Format("'{0}'", data.Username);
-            returnData[2] = string.Format("'{0}'", data.Password);
-            returnData[3] = string.Format("'{0}'", data.FirstName);
-            returnData[4] = string.Format("'{0}'", data.LastName);
-            returnData[5] = string.Format("'{0}'", data.Description);
+            returnData[0] = GFXDatabaseCore.ToSQLString(data.UserId.ToString());
+            returnData[1] = GFXDatabaseCore.ToSQLString(data.Username.ToString());
+            returnData[2] = GFXDatabaseCore.ToSQLString(data.Password);
+            returnData[3] = GFXDatabaseCore.ToSQLString(data.FirstName);
+            returnData[4] = GFXDatabaseCore.ToSQLString(data.LastName);
+            returnData[5] = GFXDatabaseCore.ToSQLString(data.Description);
 
             return returnData;
         }
 
-        public GFXUserRow ToNativeData(MySqlDataReader reader)
+        public GFXUserRow           ToNativeData    (MySqlDataReader reader)
         {
             return new GFXUserRow
             {

@@ -84,6 +84,7 @@
     <Compile Include="Database\GFXDatabaseTable.cs" />
     <Compile Include="Database\GFXDatabaseTranslator.cs" />
     <Compile Include="Database\GFXGameRow.cs" />
+    <Compile Include="Database\GFXGameSessionRow.cs" />
     <Compile Include="Database\GFXLobbyRow.cs" />
     <Compile Include="Database\GFXLobbySessionRow.cs" />
     <Compile Include="Database\GFXLoginRow.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Services\IGFXGameService.cs" />
     <Compile Include="Services\IGFXLobbyService.cs" />
     <Compile Include="Services\IGFXUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
