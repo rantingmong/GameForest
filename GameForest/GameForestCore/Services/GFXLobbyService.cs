@@ -145,11 +145,6 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          KickLobby           (string usersessionid, string usertokick)
-        {
-            return constructResponse(GFXResponseType.NotSupported, "");
-        }
-
         // ----------------------------------------------------------------------------------------------------------------
 
         private static GFXRestResponse  constructResponse   (GFXResponseType responseType, string payload)
