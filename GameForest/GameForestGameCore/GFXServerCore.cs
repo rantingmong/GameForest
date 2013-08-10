@@ -99,7 +99,7 @@ namespace GameForestCoreWebSocket
                                 {
                                     if (info.Message == listener.Subject)
                                     {
-                                        socket.Send(JsonConvert.SerializeObject(listener.DoMessage(info)));
+                                        socket.Send(JsonConvert.SerializeObject(listener.DoMessage(info, socket)));
                                         break;
                                     }
                                 }

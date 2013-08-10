@@ -1,5 +1,6 @@
 ﻿/// <reference path="promise.js" />
 /// <reference path="jquery.js" />
+"use strict";
 
 var INIT_CONNECTION = "GFX_INIT_CONNECTION";
 var STOP_CONNECTION = "GFX_STOP_CONNECTION";
@@ -17,7 +18,7 @@ var GameForest = function (lobbyId, sessionId)
     
     this.start              = function ()
     {
-        this.wsConnection.onopen = function ()
+        this.wsConnection.onopen    = function ()
         {
 
         };
@@ -35,6 +36,10 @@ var GameForest = function (lobbyId, sessionId)
                     break;
             }
         };
+    };
+    this.stop               = function ()
+    {
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, STOP_CONNECTION, "");
     };
 
     this.onGameStart        = function ()
@@ -121,7 +126,7 @@ var GameForest = function (lobbyId, sessionId)
 
     // ------------------------------------------------------------------------------------------------
 
-    function sendRequest    (url, onSuccess, onError)
+    function sendRequest        (url, onSuccess, onError)
     {
         $.ajax({
             url:        url,
@@ -129,5 +134,16 @@ var GameForest = function (lobbyId, sessionId)
             success:    onSuccess,
             error:      function (a, b, c) { onError(b, c);}
         });
+    }
+
+    function constructWSRequest (ws, cid, sid, subject, payload)
+    {
+        ws.send(JSON.stringify(
+            {
+                "ConnectionId": cid,
+                "SessionId":    sid,
+                "Subject":      subject,
+                "Message":      payload
+            }));
     }
 };

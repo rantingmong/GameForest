@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fleck;
+using System;
 
 namespace GameForestCoreWebSocket
 {
@@ -6,7 +7,7 @@ namespace GameForestCoreWebSocket
     {
         public abstract string              Subject             { get; }
 
-        public abstract GFXSocketResponse   DoMessage           (GFXSocketInfo info);
+        public abstract GFXSocketResponse   DoMessage           (GFXSocketInfo info, IWebSocketConnection ws);
 
         protected       GFXSocketResponse   constructResponse   (GFXResponseType response, string payload)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fleck;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,16 @@ namespace GameForestCoreWebSocket.Messages
     /// <summary>
     /// Message sent by the client informing the game state data should be updated.
     /// </summary>
-    class GFXGameSendData
+    public class GFXGameSendData : GFXSocketListener
     {
+        public override string Subject
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override GFXSocketResponse DoMessage(GFXSocketInfo info, IWebSocketConnection ws)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

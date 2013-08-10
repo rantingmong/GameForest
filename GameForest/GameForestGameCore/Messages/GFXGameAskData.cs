@@ -9,7 +9,16 @@ namespace GameForestCoreWebSocket.Messages
     /// <summary>
     /// Message sent by the client asking for the current data.
     /// </summary>
-    class GFXGameAskData
+    public class GFXGameAskData : GFXSocketListener
     {
+        public override string Subject
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override GFXSocketResponse DoMessage(GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

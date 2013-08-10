@@ -9,7 +9,16 @@ namespace GameForestCoreWebSocket.Messages
     /// <summary>
     /// Message sent by the client informing the game is finished!
     /// </summary>
-    class GFXGameFinish
+    public class GFXGameFinish : GFXSocketListener
     {
+        public override string Subject
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override GFXSocketResponse DoMessage(GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

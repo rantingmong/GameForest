@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fleck;
+using System;
 using System.Collections.Generic;
 
 namespace GameForestCoreWebSocket.Messages
@@ -13,7 +14,7 @@ namespace GameForestCoreWebSocket.Messages
             get { return "GFX_GAME_START"; }
         }
 
-        public override GFXSocketResponse   DoMessage   (GFXSocketInfo info)
+        public override GFXSocketResponse   DoMessage   (GFXSocketInfo info, IWebSocketConnection ws)
         {
             // send message to other connected players
 
