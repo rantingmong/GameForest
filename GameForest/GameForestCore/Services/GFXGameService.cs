@@ -41,7 +41,7 @@ namespace GameForestCore.Services
         {
             try
             {
-                List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = {0}", gameId));
+                List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = {0}", gameId)));
 
                 return new GFXRestResponse
                 {

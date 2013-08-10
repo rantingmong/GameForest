@@ -15,7 +15,9 @@ When a player joins a lobby:
 When the "host" sends the message GFX_START_GAME to the server:
 
 - the server sends GFX_START_GAME to other clients
-- other clients will send GFX_START_GAME_CONFIRM indicating they've received the GFX_GAME_START message
+- other clients will send GFX_START_GAME_CONFIRM indicating they've received the GFX_START_GAME message
+- if all clients has sent a GFX_START_GAME_CONFIRM, the server will send a GFX_START to indicate the clients
+  the game has started
 
 The game will then start with the "host" as the first player playing the game.
 
@@ -54,8 +56,7 @@ Game data locking:
 
 Game turn processing:
 
-- the game cannot change the game order, whoever goes in the lobby first will be the next player to play
-  after the owner
+- the game will first process the player's turn before going to the actual 
 
 Client disconnections:
 
@@ -66,4 +67,4 @@ Client disconnections:
 
 Making the javascript SDK synchronous:
 
-- the hell should I know... ugh D:
+- PROMISES!!! >:)

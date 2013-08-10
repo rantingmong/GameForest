@@ -30,7 +30,12 @@ namespace GameForestCoreWebSocket
                             Guid guid = Guid.NewGuid();
 
                             verifyList.Add(guid);
-                            socket.Send(guid.ToString());
+                            socket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                                {
+                                    Message         = guid.ToString(),
+                                    ResponseCode    = GFXResponseType.Normal,
+                                    Subject         = INIT_CONNECTION
+                                }));
                         };
                     socket.OnClose      = () =>
                         {

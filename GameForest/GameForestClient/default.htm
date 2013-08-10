@@ -5,6 +5,23 @@
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
+
+    <script src="promise.js"></script>
+    <script src="jquery.js"></script>
+    <script src="GameForest.js"></script>
+
+    <script>
+
+        var gf = new GameForest("hehe", "haha");
+
+        gf.onReady = function ()
+        {
+            console.log("ready!");
+        };
+
+        gf.start();
+
+    </script>
 </head>
 <body>
     <h1>TypeScript HTML App</h1>
