@@ -13,13 +13,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GameForestCore</RootNamespace>
     <AssemblyName>GameForestCore</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,31 +39,20 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\MySQL\Connector NET 6.6.5\Assemblies\v4.0\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data.Entity, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\MySQL\Connector NET 6.6.5\Assemblies\v4.0\MySql.Data.Entity.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Web, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\MySQL\Connector NET 6.6.5\Assemblies\v4.0\MySql.Web.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
@@ -80,15 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\GFXRestResponse.cs" />
-    <Compile Include="Database\GFXDatabaseCore.cs" />
-    <Compile Include="Database\GFXDatabaseTable.cs" />
-    <Compile Include="Database\GFXDatabaseTranslator.cs" />
-    <Compile Include="Database\GFXGameRow.cs" />
-    <Compile Include="Database\GFXGameSessionRow.cs" />
-    <Compile Include="Database\GFXLobbyRow.cs" />
-    <Compile Include="Database\GFXLobbySessionRow.cs" />
-    <Compile Include="Database\GFXLoginRow.cs" />
-    <Compile Include="Database\GFXUserRow.cs" />
     <Compile Include="Services\GFXLobbyService.cs" />
     <Compile Include="Services\GFXUserService.cs" />
     <Compile Include="Global.asax.cs">
@@ -110,6 +92,12 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameForestDatabaseConnector\GameForestDatabaseConnector.csproj">
+      <Project>{4d8182b9-0284-4c28-829e-652d2d4297d7}</Project>
+      <Name>GameForestDatabaseConnector</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
