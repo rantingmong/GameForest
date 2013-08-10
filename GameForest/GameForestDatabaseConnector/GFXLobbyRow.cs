@@ -5,21 +5,29 @@ using System.Collections.Generic;
 
 namespace GameForestCore.Database
 {
+    public enum GFXLobbyStatus : int
+    {
+        Waiting = 0,
+        Playing = 1
+    }
+
     public struct GFXLobbyRow
     {
-        public Guid     LobbyID     { get; set; }
+        public Guid             LobbyID     { get; set; }
 
-        public Guid     GameID      { get; set; }
+        public Guid             GameID      { get; set; }
 
-        public string   Name        { get; set; }
+        public string           Name        { get; set; }
 
-        public string   Password    { get; set; }
+        public string           Password    { get; set; }
 
-        public bool     Private     { get; set; }
+        public bool             Private     { get; set; }
 
-        public int      MaxPlayers  { get; set; }
+        public int              MaxPlayers  { get; set; }
 
-        public int      MinPlayers  { get; set; }
+        public int              MinPlayers  { get; set; }
+
+        public GFXLobbyStatus   Status      { get; set; }
     }
 
     public class GFXLobbyRowTranslator : GFXDatabaseTranslator<GFXLobbyRow>
@@ -31,7 +39,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "GameId", "Name", "Password", "Private", "MaxPlayers", "MinPlayers" }; }
+            get { return new[] { "LobbyId", "GameId", "Name", "Password", "Private", "MaxPlayers", "MinPlayers", "Status" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbyRow data)
@@ -45,6 +53,7 @@ namespace GameForestCore.Database
             returnString[4] = data.Private.ToString();
             returnString[5] = data.MaxPlayers.ToString();
             returnString[6] = data.MinPlayers.ToString();
+            returnString[7] = ((int)data.Status).ToString();
 
             return returnString;
         }
@@ -59,7 +68,8 @@ namespace GameForestCore.Database
                 Password    = reader.GetString(3),
                 Private     = reader.GetBoolean(4),
                 MaxPlayers  = reader.GetInt32(5),
-                MinPlayers  = reader.GetInt32(6)
+                MinPlayers  = reader.GetInt32(6),
+                Status      = (GFXLobbyStatus)reader.GetInt32(7)
             };
         }
     }
