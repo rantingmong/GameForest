@@ -1,0 +1,69 @@
+﻿When a player creates a lobby:
+
+- the server will give the player a turn number
+- the player will be added to the LobbySession table of the database with the owner property set to 'true'.
+
+-----------------------------------------------------------------------------------------------------------
+
+When a player joins a lobby:
+
+- the server will give the player a turn number
+- the player will be added to the LobbySession table of the database but with the owner property set to 'false'.
+
+-----------------------------------------------------------------------------------------------------------
+
+When the "host" sends the message GFX_START_GAME to the server:
+
+- the server sends GFX_START_GAME to other clients
+- other clients will send GFX_START_GAME_CONFIRM indicating they've received the GFX_GAME_START message
+
+The game will then start with the "host" as the first player playing the game.
+
+-----------------------------------------------------------------------------------------------------------
+
+When the "player" sends the message GFX_NEXT_TURN to the server:
+
+- the server finds the next player
+- the server locks the last player from uploading data (uploading data should be before sending GFX_NEXT_TURN
+  which should be automatically handled by the SDK's API.)
+- the server grants the next player access to modifying the data of the game.
+
+This will be the flow of the game until someone sends a GFX_GAME_FINISH to the server.
+
+-----------------------------------------------------------------------------------------------------------
+
+When a "player" sends the message GFX_GAME_FINISH to the server:
+
+- the server will send back a GFX_GAME_FINISH_TALLY message to the client informing the client should start
+  computing who won the game.
+- the server will grant the client access to the game data for score tallying
+- the client should compute for who won the game and will send a GFX_GAME_FINISH_TALLY to the server
+- the server will send a GFX_GAME_FINISH to other clients (along with the score tally data) informing
+  the game has finished.
+
+-----------------------------------------------------------------------------------------------------------
+
+
+Game data locking:
+
+- the game data is locked to players that is not currently their turn
+- although a player can send and read his own data to the server
+- the server will send a GFX_GAME_DATA_UPDATED message to all clients (not including the callee) should a
+  client send a GFX_SEND_DATA or a GFX_SEND_PLAYER_DATA message to the server
+
+
+Game turn processing:
+
+- the game cannot change the game order, whoever goes in the lobby first will be the next player to play
+  after the owner
+
+Client disconnections:
+
+- a client can reconnect to a game provided the client has the UserSessionId and LobbySessionId stored in
+  the browser's database
+- upon reconnection, the client will send a GFX_CLIENT_RECONNECTED message to the server
+- the server will then send a GFX_GAME_DATA_UPDATED to the client
+
+Making the javascript SDK synchronous:
+
+- the hell should I know... ugh D:

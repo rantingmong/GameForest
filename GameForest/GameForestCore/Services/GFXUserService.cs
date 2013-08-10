@@ -181,7 +181,8 @@ namespace GameForestCore.Services
                 {
                     LastHeartbeat   = DateTime.Now,
                     UserId          = userId,
-                    UserSessionId   = sessionId
+                    UserSessionId   = sessionId,
+                    UserStatus      = GFXLoginStatus.MENU,
                 });
 
                 return constructResponse(GFXResponseType.Normal, sessionId.ToString());

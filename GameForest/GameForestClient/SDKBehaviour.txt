@@ -1,0 +1,25 @@
+﻿The game forest SDK will run when it has both UserSessionId and LobbySessionId stored in the local
+database of the browser.
+
+The SDK will have function delegates for the developer to place in their code. The delegates are:
+
+gfxOnGameStart();                           called when the game is started
+gfxOnTurnStart();                           called when the player's turn has started
+gfxOnUpdateData(gameData: GFXGameData);     called when the game's data is updated
+gfxOnGameFinish();                          called when the game is finished
+gfxOnGameTally(tallyInfo: GFXTallyInfo);    called when the game's score should be computed
+
+In addition, the SDK will have functions for the developer to get information from:
+
+gfxGetUserList() : GFXUserInfo[];           returns the list of players playing the game
+gfxGetUserInfo() : GFXUserInfo;             returns a user information of a player playing the game
+gfxGetGameInfo() : GFXGameInfo;             returns a descriptive information of the game being played
+
+gfxAskGameData() : String;                  returns the current data state of the game
+gfxAskUserGameData() : String;              returns the current user data state of a player
+
+The SDK will also have functions to place information to the server:
+
+gfxFinishGame();                            function to inform the server the game has ended
+gfxSendGameData(payload: String);           function to send game data to the server
+gfxSendUserData(payload: String);           function to send user game data to the server

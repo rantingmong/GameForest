@@ -78,7 +78,8 @@ namespace GameForestCore.Services
                     Password    = password,
                     Private     = isprivate,
                     MinPlayers  = minplayers,
-                    MaxPlayers  = maxplayers
+                    MaxPlayers  = maxplayers,
+                    Status      = GFXLobbyStatus.Waiting
                 };
 
                 lobbyTable.Insert(session);
@@ -113,6 +114,12 @@ namespace GameForestCore.Services
 
                 lobbySessionTable.Insert(session);
 
+                GFXLoginRow loginRow = new List<GFXLoginRow>(loginTable.Select(string.Format("UserSessionId = {0}", usersessionid), 1))[0];
+
+                loginRow.UserStatus = GFXLoginStatus.LOBBY;
+
+                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
+
                 return constructResponse(GFXResponseType.Normal, "");
             }
             catch (Exception exp)
@@ -135,7 +142,29 @@ namespace GameForestCore.Services
                     lobbyTable.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
                 }
 
+                GFXLoginRow loginRow = new List<GFXLoginRow>(loginTable.Select(string.Format("UserSessionId = {0}", usersessionid), 1))[0];
+
+                loginRow.UserStatus = GFXLoginStatus.MENU;
+
+                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
+
                 return constructResponse(GFXResponseType.Normal, "");
+            }
+            catch (Exception exp)
+            {
+                Console.Error.WriteLine("[Lobby|LeaveLobby] " + exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse          GetUserList         (string lobbyid, string usersessionid)
+        {
+            try
+            {
+                List<GFXLobbySessionRow> userList = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = {0}", lobbyid)));
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userList));
             }
             catch (Exception exp)
             {

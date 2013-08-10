@@ -31,7 +31,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|GetLobbies] " + exp.Message);
+                Console.Error.WriteLine("[Game|GameGameList] " + exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -51,7 +51,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|GetLobbies] " + exp.Message);
+                Console.Error.WriteLine("[Game|GetGameInfo] " + exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }

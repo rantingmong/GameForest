@@ -22,5 +22,8 @@ namespace GameForestCore.Services
 
         [OperationContract, WebInvoke(UriTemplate = "/lobby/join?usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "DELETE")]
         GFXRestResponse LeaveLobby  (string usersessionid);
+
+        [OperationContract, WebInvoke(UriTemplate = "/lobby/users?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        GFXRestResponse GetUserList (string lobbyid, string usersessionid);
     }
 }

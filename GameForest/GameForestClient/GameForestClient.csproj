@@ -18,6 +18,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="default.htm" />
+    <Content Include="SDKBehaviour.txt" />
     <TypeScriptCompile Include="GameForest.ts" />
   </ItemGroup>
   <PropertyGroup>
