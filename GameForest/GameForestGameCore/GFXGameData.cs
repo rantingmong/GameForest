@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace GameForestCoreWebSocket
 {
+    public struct GFXGameDataEntry
+    {
+        public string Key;
+        public string Data;
+    }
+
     public class GFXGameData
     {
         public Guid                         LobbySessionId

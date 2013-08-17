@@ -1,5 +1,4 @@
-﻿using Fleck;
-using GameForestCore.Database;
+﻿using GameForestCore.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,16 +9,16 @@ using System.Threading.Tasks;
 namespace GameForestCoreWebSocket.Messages
 {
     /// <summary>
-    /// Message sent by the client informing the game state data should be updated.
+    /// Message sent by the client informing there will be a game state modification/addition.
     /// </summary>
-    public class GFXGameSendData : GFXSocketListener
+    public class GFXGameSendUserData : GFXSocketListener
     {
         public override string              Subject
         {
-            get { return "GFX_SEND_DATA"; }
+            get { return "GFX_SEND_USER_DATA"; }
         }
 
-        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, IWebSocketConnection ws)
+        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             try
             {
@@ -28,17 +27,15 @@ namespace GameForestCoreWebSocket.Messages
 
                 if (lobby.Count <= 0)
                     return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
-                
+
                 GFXLobbySessionRow ownerPlayer = lobby[0];
 
                 // get the data store
                 GFXGameData dataStore = server.GameDataList[ownerPlayer.LobbyID];
 
-                if (dataStore.CurrentUserSession == ownerPlayer.SessionID)
+                if (dataStore.UserData.ContainsKey(ownerPlayer.SessionID))
                 {
-                    GFXGameDataEntry entry = JsonConvert.DeserializeObject<GFXGameDataEntry>(info.Message);
-
-                    dataStore.Data[entry.Key] = entry.Data;
+                    dataStore.UserData[ownerPlayer.SessionID] = info.Message;
 
                     // send message to other connected players
                     List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0}", lobby[0].SessionID)));
@@ -55,7 +52,7 @@ namespace GameForestCoreWebSocket.Messages
                 }
                 else
                 {
-                    return constructResponse(GFXResponseType.InvalidInput, "This player cannot modify the game data store.");
+                    return constructResponse(GFXResponseType.DoesNotExist, "User is not in this lobby!");
                 }
 
                 return constructResponse(GFXResponseType.Normal, "");

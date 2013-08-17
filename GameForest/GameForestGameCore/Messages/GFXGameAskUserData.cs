@@ -1,4 +1,5 @@
 ﻿using GameForestCore.Database;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +9,16 @@ using System.Threading.Tasks;
 namespace GameForestCoreWebSocket.Messages
 {
     /// <summary>
-    /// Message sent by the client informing the server to go to the next player.
+    /// Message sent by the client asking his/her game lobby data.
     /// </summary>
-    public class GFXGameNextTurn : GFXSocketListener
+    public class GFXGameAskUserData : GFXSocketListener
     {
-        public override string              Subject
+        public override string Subject
         {
-            get { return "GFX_NEXT_TURN"; }
+            get { return "GFX_ASK_USER_DATA"; }
         }
 
-        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             try
             {
@@ -29,9 +30,18 @@ namespace GameForestCoreWebSocket.Messages
 
                 GFXLobbySessionRow ownerPlayer = lobby[0];
 
-                // do a SQL query with order by of column 'order' in ascending order and greater than ownerPlayer.Order
+                // get the data store
+                GFXGameData dataStore = server.GameDataList[ownerPlayer.LobbyID];
 
-                // send GFX_TURN_START to the client and send GFX_TURN_CHANGED to other clients
+                if (dataStore.UserData.ContainsKey(ownerPlayer.SessionID))
+                {
+                    string returnData = JsonConvert.SerializeObject(dataStore.UserData[ownerPlayer.SessionID]);
+                    server.WebSocketList[ownerPlayer.SessionID].Send("TODO: SEND THE GAME DATA.");
+                }
+                else
+                {
+                    return constructResponse(GFXResponseType.DoesNotExist, "User is not in this lobby!");
+                }
 
                 return constructResponse(GFXResponseType.Normal, "");
             }

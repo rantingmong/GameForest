@@ -19,6 +19,7 @@
     <Content Include="app.css" />
     <Content Include="default.htm" />
     <Content Include="GameForest.js" />
+    <Content Include="guid.js" />
     <Content Include="jquery.js" />
     <Content Include="promise.js" />
     <Content Include="SDKBehaviour.txt" />

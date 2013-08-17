@@ -49,11 +49,14 @@
     <Compile Include="GFXSocketInfo.cs" />
     <Compile Include="GFXSocketListener.cs" />
     <Compile Include="GFXSocketResponse.cs" />
+    <Compile Include="Messages\GFXConfirmTurn.cs" />
     <Compile Include="Messages\GFXGameAskData.cs" />
+    <Compile Include="Messages\GFXGameAskUserData.cs" />
     <Compile Include="Messages\GFXGameFinish.cs" />
     <Compile Include="Messages\GFXGameFinishTally.cs" />
     <Compile Include="Messages\GFXGameNextTurn.cs" />
     <Compile Include="Messages\GFXGameSendData.cs" />
+    <Compile Include="Messages\GFXGameSendUserData.cs" />
     <Compile Include="Messages\GFXGameStart.cs" />
     <Compile Include="Messages\GFXGameStartConfirm.cs" />
     <Compile Include="Messages\GFXStart.cs" />

@@ -111,6 +111,7 @@ namespace GameForestCore.Database
             catch (Exception exp)
             {
                 // TODO: log the exception
+                Console.WriteLine(exp.Message);
                 
                 return null;
             }
