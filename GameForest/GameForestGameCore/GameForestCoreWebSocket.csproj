@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GFXGameData.cs" />
     <Compile Include="GFXSocketInfo.cs" />
     <Compile Include="GFXSocketListener.cs" />
     <Compile Include="GFXSocketResponse.cs" />

@@ -16,6 +16,10 @@ namespace GameForestCore.Database
         public Uri      RelativeLink    { get; set; }
 
         public Guid     Creator         { get; set; }
+
+        public int      MinPlayers      { get; set; }
+
+        public int      MaxPlayers      { get; set; }
     }
 
     public class GFXGameRowTranslator : GFXDatabaseTranslator<GFXGameRow>
@@ -27,7 +31,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "GameID", "Creator", "Name", "Description", "RelativeLink" }; }
+            get { return new[] { "GameID", "Creator", "Name", "Description", "RelativeLink", "MinPlayers", "MaxPlayers" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXGameRow data)
@@ -39,6 +43,8 @@ namespace GameForestCore.Database
             returnData[2] = GFXDatabaseCore.ToSQLString(data.Name);
             returnData[3] = GFXDatabaseCore.ToSQLString(data.Description);
             returnData[4] = GFXDatabaseCore.ToSQLString(data.RelativeLink.ToString());
+            returnData[5] = data.MinPlayers.ToString();
+            returnData[6] = data.MaxPlayers.ToString();
 
             return returnData;
         }
@@ -52,6 +58,8 @@ namespace GameForestCore.Database
                 Name            = reader.GetString(2),
                 Description     = reader.GetString(3),
                 RelativeLink    = new Uri(reader.GetString(4)),
+                MinPlayers      = reader.GetInt32(5),
+                MaxPlayers      = reader.GetInt32(6)
             };
         }
     }

@@ -16,7 +16,7 @@ namespace GameForestCoreWebSocket.Messages
             get { throw new NotImplementedException(); }
         }
 
-        public override GFXSocketResponse DoMessage(GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             throw new NotImplementedException();
         }

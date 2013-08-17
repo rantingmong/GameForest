@@ -1,4 +1,5 @@
 ﻿using Fleck;
+using GameForestCore.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,36 @@ namespace GameForestCoreWebSocket.Messages
             get { throw new NotImplementedException(); }
         }
 
-        public override GFXSocketResponse DoMessage(GFXSocketInfo info, IWebSocketConnection ws)
+        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, IWebSocketConnection ws)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // get the lobby the player is in
+                List<GFXLobbySessionRow> lobby = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = {0}", info.SessionId)));
+
+                if (lobby.Count <= 0)
+                    return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
+                
+                GFXLobbySessionRow ownerPlayer = lobby[0];
+
+                // get the data store
+                GFXGameData dataStore = server.GameDataList[ownerPlayer.LobbyID];
+
+                if (dataStore.CurrentUserSession == ownerPlayer.SessionID)
+                {
+
+                }
+                else
+                {
+                    return constructResponse(GFXResponseType.InvalidInput, "This player cannot modify the game data store.");
+                }
+
+                return constructResponse(GFXResponseType.Normal, "");
+            }
+            catch (Exception exp)
+            {
+                return constructResponse(GFXResponseType.FatalError, exp.Message);
+            }
         }
     }
 }

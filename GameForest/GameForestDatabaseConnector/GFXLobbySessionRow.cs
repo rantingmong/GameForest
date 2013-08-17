@@ -7,6 +7,8 @@ namespace GameForestCore.Database
 {
     public struct GFXLobbySessionRow
     {
+        public int  RowId       { get; set; }
+
         public Guid LobbyID     { get; set; }
 
         public Guid GameID      { get; set; }
@@ -16,6 +18,10 @@ namespace GameForestCore.Database
         public Guid UserID      { get; set; }
 
         public bool Owner       { get; set; }
+
+        public int  Order       { get; set; }
+
+        public bool Ready       { get; set; }
     }
 
     public class GFXLobbySessionRowTranslator : GFXDatabaseTranslator<GFXLobbySessionRow>
@@ -28,7 +34,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "GameId", "SessionId", "UserId", "Owner" }; }
+            get { return new[] { "LobbyId", "GameId", "SessionId", "UserId", "Owner", "Order", "Ready", "RowId" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbySessionRow data)
@@ -40,6 +46,9 @@ namespace GameForestCore.Database
             returnData[2] = GFXDatabaseCore.ToSQLString(data.SessionID.ToString());
             returnData[3] = GFXDatabaseCore.ToSQLString(data.UserID.ToString());
             returnData[4] = Convert.ToString(data.Owner);
+            returnData[5] = Convert.ToString(data.Order);
+            returnData[6] = Convert.ToString(data.Ready);
+            returnData[7] = Convert.ToString(data.RowId);
 
             return returnData;
         }
@@ -52,7 +61,10 @@ namespace GameForestCore.Database
                 GameID      = Guid.Parse(reader.GetString(1)),
                 SessionID   = Guid.Parse(reader.GetString(2)),
                 UserID      = Guid.Parse(reader.GetString(3)),
-                Owner       = reader.GetBoolean(4)
+                Owner       = reader.GetBoolean(4),
+                Order       = reader.GetInt32(5),
+                Ready       = reader.GetBoolean(6),
+                RowId       = reader.GetInt32(7)
             };
         }
     }

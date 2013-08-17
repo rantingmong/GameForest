@@ -60,7 +60,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          CreateLobby         (string lobbyname, string gameid, string password, string usersessionid, bool isprivate, int maxplayers, int minplayers)
+        public GFXRestResponse          CreateLobby         (string lobbyname, string gameid, string password, string usersessionid, bool isprivate)
         {
             try
             {
@@ -77,8 +77,6 @@ namespace GameForestCore.Services
                     Name        = lobbyname,
                     Password    = password,
                     Private     = isprivate,
-                    MinPlayers  = minplayers,
-                    MaxPlayers  = maxplayers,
                     Status      = GFXLobbyStatus.Waiting
                 };
 

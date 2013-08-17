@@ -95,8 +95,8 @@ namespace GameForestCore.Database
         public IEnumerable<T>   Select      (string condition, int maxRows = int.MaxValue)
         {
             this.commandSel.CommandText = string.IsNullOrEmpty(condition) ?
-                string.Format("SELECT * FROM {0} LIMIT {1}", this.translator.TableName, maxRows) : 
-                string.Format("SELECT * FROM {0} WHERE {1} LIMIT {2}", this.translator.TableName, condition, maxRows);
+                string.Format("SELECT ({2}) FROM {0} LIMIT {1}", this.translator.TableName, maxRows, this.translator.TableColumns) : 
+                string.Format("SELECT ({3}) FROM {0} WHERE {1} LIMIT {2}", this.translator.TableName, condition, maxRows, this.translator.TableColumns);
 
             var reader = commandSel.ExecuteReader();
             var rtlist = new List<T>();
@@ -117,7 +117,7 @@ namespace GameForestCore.Database
             finally
             {
                 reader.Close();
-                reader.Dispose();    
+                reader.Dispose();
             }
             
             return rtlist.ToArray();

@@ -7,7 +7,7 @@ namespace GameForestCoreWebSocket
     {
         public abstract string              Subject             { get; }
 
-        public abstract GFXSocketResponse   DoMessage           (GFXSocketInfo info, IWebSocketConnection ws);
+        public abstract GFXSocketResponse   DoMessage           (GFXServerCore server, GFXSocketInfo info, IWebSocketConnection ws);
 
         protected       GFXSocketResponse   constructResponse   (GFXResponseType response, string payload)
         {

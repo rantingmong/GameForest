@@ -5,8 +5,12 @@
 var INIT_CONNECTION = "GFX_INIT_CONNECTION";
 var STOP_CONNECTION = "GFX_STOP_CONNECTION";
 
-var GameForest = function (lobbyId, sessionId)
+var cloudURL        = "game-forest.cloudapp.net";
+var cloudPRT        = 1193;
+
+var GameForest      = function (gameId, lobbyId, sessionId)
 {
+    this.gameId             = gameId;
     this.lobbyId            = lobbyId;
     this.sessionId          = sessionId;
 
@@ -42,34 +46,18 @@ var GameForest = function (lobbyId, sessionId)
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, STOP_CONNECTION, "");
     };
 
-    this.onGameStart        = function ()
-    {
-
-    };
-    this.onTurnStart        = function ()
-    {
-
-    };
-    this.onUpdateData       = function (data)
-    {
-
-    };
-    this.onGameFinish       = function (tallyList)
-    {
-
-    };
-    this.onGameTally        = function (tallyList)
-    {
-
-    };
-
     // ------------------------------------------------------------------------------------------------
+
+    this.confirmTurn        = function (originalTurn, changedTurn)
+    {
+
+    };
 
     this.getUserInfo        = function (username)
     {
         var p = new promise.Promise();
 
-        sendRequest("http://localhost:1193/user/" + username,
+        sendRequest("/user/" + username,
             function (result)
             {
                 p.done(null, result);
@@ -85,7 +73,7 @@ var GameForest = function (lobbyId, sessionId)
     {
         var p = new promise.Promise();
 
-        sendRequest("http://localhost:1193/lobby/users?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
+        sendRequest("/lobby/users?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
             function (result)
             {
                 p.done(null, result);
@@ -99,7 +87,17 @@ var GameForest = function (lobbyId, sessionId)
     };
     this.getGameInfo        = function ()
     {
+        var p = new promise.Promise();
 
+        sendRequest("/game/" + this.gameId,
+            function (result)
+            {
+                p.done(null, result);
+            },
+            function (status, why)
+            {
+                p.done(status + ": " + why, null);
+            });
     };
 
     this.askGameData        = function ()
@@ -129,7 +127,7 @@ var GameForest = function (lobbyId, sessionId)
     function sendRequest        (url, onSuccess, onError)
     {
         $.ajax({
-            url:        url,
+            url:        "http://" + cloudURL + ":" + cloudPRT + url,
             async:      false,
             success:    onSuccess,
             error:      function (a, b, c) { onError(b, c);}
@@ -146,4 +144,29 @@ var GameForest = function (lobbyId, sessionId)
                 "Message":      payload
             }));
     }
+};
+
+GameForest.prototype.onGameStart    = function ()
+{
+
+};
+GameForest.prototype.onTurnStart    = function ()
+{
+
+};
+GameForest.prototype.onTurnSelect   = function (originalTurn)
+{
+
+};
+GameForest.prototype.onUpdateData   = function (data)
+{
+
+};
+GameForest.prototype.onGameFinish   = function (tallyList)
+{
+
+};
+GameForest.prototype.onGameTally    = function (tallyList)
+{
+
 };
