@@ -11,14 +11,18 @@ namespace GameForestCoreWebSocket.Messages
     /// </summary>
     public class GFXConfirmTurn : GFXSocketListener
     {
-        public override string Subject
+        public override string              Subject
         {
             get { return "GFX_CONFIRM_TURN"; }
         }
 
-        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
-            throw new NotImplementedException();
+            // modify this user's status to 2
+
+            // if all user's status are 2, change lobby state to playing
+
+            return constructResponse(GFXResponseType.Normal, "");
         }
     }
 }

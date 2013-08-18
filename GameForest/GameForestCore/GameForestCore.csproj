@@ -71,6 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\GFXRestResponse.cs" />
+    <Compile Include="Services\GFXFileUpload.ashx.cs">
+      <DependentUpon>GFXFileUpload.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Services\GFXGameService.cs" />
     <Compile Include="Services\GFXLobbyService.cs" />
     <Compile Include="Services\GFXUserService.cs" />
@@ -85,6 +88,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Services\GFXFileUpload.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

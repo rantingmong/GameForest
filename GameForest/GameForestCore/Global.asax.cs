@@ -16,7 +16,9 @@ namespace GameForestCore
             if (strings["GameForestConnection"] != null)
                 GFXDatabaseCore.Initialize(strings["GameForestConnection"].ConnectionString);
 
-            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXUserService)));            
+            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXUserService)));
+            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXLobbyService)));
+            RouteTable.Routes.Add(new ServiceRoute("", new WebServiceHostFactory(), typeof(GFXGameService)));
         }
 
         protected void Session_Start(object sender, EventArgs e)

@@ -46,9 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GFXGameData.cs" />
-    <Compile Include="GFXSocketInfo.cs" />
+    <Compile Include="GFXSocketRequest.cs" />
     <Compile Include="GFXSocketListener.cs" />
     <Compile Include="GFXSocketResponse.cs" />
+    <Compile Include="GFXSocketSend.cs" />
     <Compile Include="Messages\GFXConfirmTurn.cs" />
     <Compile Include="Messages\GFXGameAskData.cs" />
     <Compile Include="Messages\GFXGameAskUserData.cs" />

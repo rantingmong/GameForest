@@ -6,33 +6,19 @@
     <title>TypeScript HTML App</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
 
+    <script src="guid.js"></script>
     <script src="promise.js"></script>
     <script src="jquery.js"></script>
-    <script src="guid.js"></script>
+    <script src="ajaxfileupload.js"></script>
     <script src="GameForest.js"></script>
 
     <script>
 
         GameForestCloudUrl          = "localhost";
-        GameForestVerboseMessaging  = true;
-
-        var gameForest = new GameForest("", "", "");
-
-        $(document).ready(function ()
-        {
-            gameForest.start();
-        });
-
-        $(document).unload(function ()
-        {
-            gameForest.stop();
-        });
+        GameForestVerboseMessaging = true;
 
     </script>
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
-
-    <div id="content"></div>
 </body>
 </html>

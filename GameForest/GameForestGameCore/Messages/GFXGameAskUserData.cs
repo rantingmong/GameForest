@@ -13,12 +13,12 @@ namespace GameForestCoreWebSocket.Messages
     /// </summary>
     public class GFXGameAskUserData : GFXSocketListener
     {
-        public override string Subject
+        public override string              Subject
         {
             get { return "GFX_ASK_USER_DATA"; }
         }
 
-        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             try
             {
@@ -35,15 +35,12 @@ namespace GameForestCoreWebSocket.Messages
 
                 if (dataStore.UserData.ContainsKey(ownerPlayer.SessionID))
                 {
-                    string returnData = JsonConvert.SerializeObject(dataStore.UserData[ownerPlayer.SessionID]);
-                    server.WebSocketList[ownerPlayer.SessionID].Send("TODO: SEND THE GAME DATA.");
+                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(dataStore.UserData[ownerPlayer.SessionID]));
                 }
                 else
                 {
                     return constructResponse(GFXResponseType.DoesNotExist, "User is not in this lobby!");
                 }
-
-                return constructResponse(GFXResponseType.Normal, "");
             }
             catch (Exception exp)
             {

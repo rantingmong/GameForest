@@ -16,6 +16,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="ajaxfileupload.js" />
     <Content Include="app.css" />
     <Content Include="default.htm" />
     <Content Include="GameForest.js" />

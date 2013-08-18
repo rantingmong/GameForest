@@ -11,12 +11,12 @@ namespace GameForestCoreWebSocket.Messages
     /// </summary>
     public class GFXGameFinishTally : GFXSocketListener
     {
-        public override string Subject
+        public override string              Subject
         {
-            get { throw new NotImplementedException(); }
+            get { return "GFX_TALLY"; }
         }
 
-        public override GFXSocketResponse DoMessage(GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
+        public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             throw new NotImplementedException();
         }
