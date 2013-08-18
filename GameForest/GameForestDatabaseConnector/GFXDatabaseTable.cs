@@ -20,6 +20,14 @@ namespace GameForestCore.Database
 
         public GFXDatabaseTable             (GFXDatabaseTranslator<T> translator)
         {
+            if (GFXDatabaseCore.Instance == null)
+            {
+                var strings = System.Configuration.ConfigurationManager.ConnectionStrings;
+
+                if (strings["GameForestConnection"] != null)
+                    GFXDatabaseCore.Initialize(strings["GameForestConnection"].ConnectionString);
+            }
+
             this.translator = translator;
 
             commandIns = new MySqlCommand { Connection = GFXDatabaseCore.Instance };

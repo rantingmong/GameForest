@@ -21,6 +21,9 @@ namespace GameForestCore.Database
 
         public int  Order       { get; set; }
 
+        /// <summary>
+        /// Gets or sets the status of the player playing (ready, choosing, playing)
+        /// </summary>
         public int  Status      { get; set; }
     }
 

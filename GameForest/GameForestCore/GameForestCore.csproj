@@ -66,23 +66,28 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Global.asax" />
+    <Content Include="Services\GFXUserService.svc" />
+    <Content Include="Services\GFXLobbyService.svc" />
+    <Content Include="Services\GFXGameService.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\GFXRestResponse.cs" />
+    <Compile Include="Services\GFXUserService.svc.cs">
+      <DependentUpon>GFXUserService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\IGFXUserService.cs" />
+    <Compile Include="Services\GFXLobbyService.svc.cs">
+      <DependentUpon>GFXLobbyService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\IGFXLobbyService.cs" />
+    <Compile Include="Services\GFXGameService.svc.cs">
+      <DependentUpon>GFXGameService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\IGFXGameService.cs" />
     <Compile Include="Services\GFXFileUpload.ashx.cs">
       <DependentUpon>GFXFileUpload.ashx</DependentUpon>
     </Compile>
-    <Compile Include="Services\GFXGameService.cs" />
-    <Compile Include="Services\GFXLobbyService.cs" />
-    <Compile Include="Services\GFXUserService.cs" />
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Services\IGFXGameService.cs" />
-    <Compile Include="Services\IGFXLobbyService.cs" />
-    <Compile Include="Services\IGFXUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

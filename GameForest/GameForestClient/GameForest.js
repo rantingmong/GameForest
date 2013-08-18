@@ -37,18 +37,23 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     var GFX_ASK_DATA            = "GFX_ASK_DATA";           // message to ask for the game's data
     var GFX_ASK_USER_DATA       = "GFX_ASK_USER_DATA";      // message to ask for the user's game data
-    var GFX_FINISH              = "GFX_GAME_FINISH";        // message to inform the server the game is finished
-    var GFX_TALLY               = "GFX_GAME_TALLY";         // message to inform the server the game's scores are tallied and ready to be shown to players
-    var GFX_NEXT_TURN           = "GFX_NEXT_TURN";          // message to inform the server that its the next player's turn
+    
     var GFX_SEND_DATA           = "GFX_SEND_DATA";          // message to send game data
     var GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA";     // message to send user game data
+    
+    var GFX_FINISH              = "GFX_GAME_FINISH";        // message to inform the server the game is finished
+    var GFX_TALLY               = "GFX_GAME_TALLY";         // message to inform the server the game's scores are tallied and ready to be shown to players
+
     var GFX_GAME_START          = "GFX_GAME_START";         // message to inform the server the game should start
     var GFX_GAME_START_CONFIRM  = "GFX_GAME_START_CONFIRM"; // message to inform the server the client has acknowledged the GFX_GAME_START message
+
+    var GFX_NEXT_TURN           = "GFX_NEXT_TURN";          // message to inform the server that its the next player's turn
     var GFX_CONFIRM_TURN        = "GFX_CONFIRM_TURN";       // message to change the player's order
 
-    // message the client will receive from the server
+    // messages the client will receive from the server
 
-    var GFX_START               = "GFX_START";              // message to inform the client the game has started
+    var GFX_START_GAME          = "GFX_START_GAME";         // message to inform the client the game has started
+    var GFX_START_CHOICE        = "GFX_START_CHOICE";       // message to inform the client the game should display the order choose screen
     var GFX_GAME_TALLIED        = "GFX_GAME_TALLIED";       // message to inform the client the game's scores are tallied
     var GFX_GAME_FINISHED       = "GFX_GAME_FINISHED";      // message to inform the client the game has finished
     var GFX_TURN_START          = "GFX_TURN_START";         // message to inform the client its the player's turn
@@ -98,9 +103,24 @@ var GameForest = function (gameId, lobbyId, sessionId)
         {
             var parse = JSON.parse(message.data);
 
-            switch(parse.Subject)
+            switch (parse.Subject)
             {
-
+                case GFX_START_GAME:
+                    break
+                case GFX_START_CHOICE:
+                    break
+                case GFX_GAME_TALLIED:
+                    break
+                case GFX_GAME_FINISHED:
+                    break
+                case GFX_TURN_START:
+                    break
+                case GFX_TURN_CHANGED:
+                    break
+                case GFX_TURN_RESOLVE:
+                    break
+                case GFX_DATA_CHANGED:
+                    break
             }
         };
     };
@@ -121,7 +141,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
         return wsPromise;
     };
-    // function to inform the server this players turn should be changed
+    // function to inform the server the next player's turn has come
     this.confirmTurn            = function (changedTurn)
     {
         wsPromise = new promise.Promise();
@@ -129,6 +149,11 @@ var GameForest = function (gameId, lobbyId, sessionId)
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_CONFIRM_TURN, changedTurn);
 
         return wsPromise;
+    };
+    // function to inform the server the game's scores are tallied
+    this.sendTallyResult        = function (tallyResult)
+    {
+
     };
 
     // function to get the user's information
@@ -275,8 +300,20 @@ GameForest.prototype.onGameStart    = function ()
 
 };
 
+// method to override when the game should display the choose screen
+GameForest.prototype.onGameChoose   = function ()
+{
+
+};
+
 // method to override when its the player's turn
 GameForest.prototype.onTurnStart    = function ()
+{
+
+};
+
+// method to override when its the other player's turn
+GameForest.prototype.onTurnChange   = function ()
 {
 
 };

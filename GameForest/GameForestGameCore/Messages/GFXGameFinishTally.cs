@@ -18,6 +18,8 @@ namespace GameForestCoreWebSocket.Messages
 
         public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
+            // send GFX_GAME_TALLIED with the tally data to all players 
+
             throw new NotImplementedException();
         }
     }

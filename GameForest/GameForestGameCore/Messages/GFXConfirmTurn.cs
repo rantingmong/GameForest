@@ -20,7 +20,13 @@ namespace GameForestCoreWebSocket.Messages
         {
             // modify this user's status to 2
 
+            // send a GFX_TURN_RESOLVE to the next player
+
             // if all user's status are 2, change lobby state to playing
+
+            // send a GFX_START_GAME to all clients
+
+            // send a GFX_TURN_START to the first player and GFX_TURN_CHANGED to other players
 
             return constructResponse(GFXResponseType.Normal, "");
         }

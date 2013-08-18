@@ -3,31 +3,29 @@ using GameForestCore.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.ServiceModel.Activation;
 
 namespace GameForestCore.Services
 {
     public class GFXGameService : IGFXGameService
     {
-        private         GFXDatabaseTable<GFXGameRow>    gameTable;
+        private GFXDatabaseTable<GFXGameRow> gameTable;
 
-        public          GFXGameService                  ()
+        public GFXGameService()
         {
             gameTable = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
         }
 
-        public          GFXRestResponse                 GetGameList         (int maxCount)
+        public GFXRestResponse GetGameList(int maxCount)
         {
             try
             {
                 List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select("", maxCount));
 
                 return new GFXRestResponse
-                    {
-                        ResponseType    = GFXResponseType.Normal,
-                        AdditionalData  = JsonConvert.SerializeObject(gameList)
-                    };
+                {
+                    ResponseType = GFXResponseType.Normal,
+                    AdditionalData = JsonConvert.SerializeObject(gameList)
+                };
             }
             catch (Exception exp)
             {
@@ -37,7 +35,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public          GFXRestResponse                 GetGameInfo         (string gameId)
+        public GFXRestResponse GetGameInfo(string gameId)
         {
             try
             {
@@ -45,8 +43,8 @@ namespace GameForestCore.Services
 
                 return new GFXRestResponse
                 {
-                    ResponseType    = GFXResponseType.Normal,
-                    AdditionalData  = JsonConvert.SerializeObject(gameList)
+                    ResponseType = GFXResponseType.Normal,
+                    AdditionalData = JsonConvert.SerializeObject(gameList)
                 };
             }
             catch (Exception exp)
@@ -57,7 +55,7 @@ namespace GameForestCore.Services
             }
         }
 
-        private static  GFXRestResponse                 constructResponse   (GFXResponseType responseType, string payload)
+        private static GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }

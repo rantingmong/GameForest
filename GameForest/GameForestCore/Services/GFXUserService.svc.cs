@@ -1,39 +1,36 @@
-﻿using System;
+﻿using GameForestCore.Common;
+using GameForestCore.Database;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-
 using System.ServiceModel;
 using System.ServiceModel.Activation;
-
-using GameForestCore.Common;
-using GameForestCore.Database;
-
-using Newtonsoft.Json;
 
 namespace GameForestCore.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single), AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class GFXUserService : IGFXUserService
     {
-        private readonly GFXDatabaseTable<GFXUserRow>       userTable;
-        private readonly GFXDatabaseTable<GFXLoginRow>      loginTable; 
+        private readonly GFXDatabaseTable<GFXUserRow> userTable;
+        private readonly GFXDatabaseTable<GFXLoginRow> loginTable;
 
-        public GFXUserService           ()
+        public GFXUserService()
         {
-            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
-            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+            userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+            loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
         }
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        public GFXRestResponse          GetUserInfo         (string username)
+        public GFXRestResponse GetUserInfo(string username)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username or user id cannot be found.");
 
             try
             {
-                Guid    userId;
-                string  returnJSON;
+                Guid userId;
+                string returnJSON;
 
                 if (Guid.TryParse(username, out userId))
                 {
@@ -58,7 +55,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          SetUserInfo         (string username, string firstname, string lastname, string description, string usersessionid)
+        public GFXRestResponse SetUserInfo(string username, string firstname, string lastname, string description, string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User not logged in.");
@@ -70,15 +67,15 @@ namespace GameForestCore.Services
             {
                 // get the user's data, then update.
                 Guid userId;
-            
+
                 if (Guid.TryParse(username, out userId))
                 {
                     var result = new List<GFXUserRow>(userTable.Select(string.Format("userid = '{0}'", userId)))[0];
 
-                    result.FirstName    = firstname;
-                    result.LastName     = lastname;
-                    result.Description  = description;
-                    result.Username     = username;
+                    result.FirstName = firstname;
+                    result.LastName = lastname;
+                    result.Description = description;
+                    result.Username = username;
 
                     userTable.Update(string.Format("userid = '{0}'", userId), result);
                 }
@@ -86,9 +83,9 @@ namespace GameForestCore.Services
                 {
                     var result = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", username)))[0];
 
-                    result.FirstName    = firstname;
-                    result.LastName     = lastname;
-                    result.Description  = description;
+                    result.FirstName = firstname;
+                    result.LastName = lastname;
+                    result.Description = description;
 
                     userTable.Update(string.Format("username = '{0}'", username), result);
                 }
@@ -99,11 +96,11 @@ namespace GameForestCore.Services
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
-            
+
             return constructResponse(GFXResponseType.Normal, "Success!");
         }
 
-        public GFXRestResponse          Register            (string username, string password)
+        public GFXRestResponse Register(string username, string password)
         {
             if (userExists(username))
                 return constructResponse(GFXResponseType.DuplicateEntry, "Username already exists!");
@@ -119,11 +116,11 @@ namespace GameForestCore.Services
                 userTable.Insert(new GFXUserRow
                 {
                     Description = "",
-                    FirstName   = "GameForest",
-                    LastName    = "User",
-                    Username    = username,
-                    Password    = password,
-                    UserId      = Guid.NewGuid()
+                    FirstName = "GameForest",
+                    LastName = "User",
+                    Username = username,
+                    Password = password,
+                    UserId = Guid.NewGuid()
                 });
 
                 return constructResponse(GFXResponseType.Normal, "Success!");
@@ -136,7 +133,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          Unregister          (string username, string password)
+        public GFXRestResponse Unregister(string username, string password)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username not found!");
@@ -147,7 +144,7 @@ namespace GameForestCore.Services
                 {
                     return constructResponse(GFXResponseType.InvalidInput, "Passwords does not match!");
                 }
-                
+
                 Guid userId;
                 this.userTable.Remove(Guid.TryParse(username, out userId) ? string.Format("userid = '{0}'", userId) : string.Format("username = '{0}'", username));
 
@@ -161,7 +158,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          Login               (string username, string password)
+        public GFXRestResponse Login(string username, string password)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username or user id not found!");
@@ -179,10 +176,10 @@ namespace GameForestCore.Services
 
                 loginTable.Insert(new GFXLoginRow
                 {
-                    LastHeartbeat   = DateTime.Now,
-                    UserId          = userId,
-                    UserSessionId   = sessionId,
-                    UserStatus      = GFXLoginStatus.MENU,
+                    LastHeartbeat = DateTime.Now,
+                    UserId = userId,
+                    UserSessionId = sessionId,
+                    UserStatus = GFXLoginStatus.MENU,
                 });
 
                 return constructResponse(GFXResponseType.Normal, sessionId.ToString());
@@ -195,7 +192,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          Logout              (string usersessionid)
+        public GFXRestResponse Logout(string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -214,7 +211,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          Heartbeat           (string usersessionid, string heartbeattime)
+        public GFXRestResponse Heartbeat(string usersessionid, string heartbeattime)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -237,7 +234,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse          ChangePassword      (string usersessionid, string oldpassword, string newpassword)
+        public GFXRestResponse ChangePassword(string usersessionid, string oldpassword, string newpassword)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -271,22 +268,22 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        private bool                    userExists          (string user)
+        private bool userExists(string user)
         {
             Guid userId;
-            
+
             if (Guid.TryParse(user, out userId))
                 return userTable.Count(string.Format("userid = '{0}'", userId)) == 1;
-            
+
             return this.userTable.Count(string.Format("username = '{0}'", user)) == 1;
         }
 
-        private bool                    sessionExists       (string sessionid)
+        private bool sessionExists(string sessionid)
         {
             return loginTable.Count(string.Format("sessionid = '{0}'", sessionid)) == 1;
         }
 
-        private bool                    passwordMatch       (string username, string password)
+        private bool passwordMatch(string username, string password)
         {
             var asd = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", username)));
 
@@ -298,7 +295,7 @@ namespace GameForestCore.Services
             return false;
         }
 
-        private Guid                    getUserId           (string input)
+        private Guid getUserId(string input)
         {
             Guid sessionId;
 
@@ -316,7 +313,7 @@ namespace GameForestCore.Services
             }
         }
 
-        private static GFXRestResponse  constructResponse   (GFXResponseType responseType, string payload)
+        private static GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }

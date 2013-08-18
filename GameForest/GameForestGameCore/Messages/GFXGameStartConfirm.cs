@@ -69,7 +69,7 @@ namespace GameForestCoreWebSocket.Messages
                         gameData.UserData.Add(player.SessionID, "");
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
                             {
-                                Message = "GFX_START",
+                                Message = "GFX_START_CHOOSE",
                                 Payload = ""
                             }));
 
