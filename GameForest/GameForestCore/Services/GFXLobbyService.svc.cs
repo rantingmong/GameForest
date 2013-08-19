@@ -11,11 +11,11 @@ namespace GameForestCore.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single), AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class GFXLobbyService : IGFXLobbyService
     {
-        private readonly GFXDatabaseTable<GFXUserRow> userTable;
-        private readonly GFXDatabaseTable<GFXGameRow> gameTable;
-        private readonly GFXDatabaseTable<GFXLoginRow> loginTable;
-        private readonly GFXDatabaseTable<GFXLobbyRow> lobbyTable;
-        private readonly GFXDatabaseTable<GFXLobbySessionRow> lobbySessionTable;
+        private readonly GFXDatabaseTable<GFXUserRow>           userTable;
+        private readonly GFXDatabaseTable<GFXGameRow>           gameTable;
+        private readonly GFXDatabaseTable<GFXLoginRow>          loginTable;
+        private readonly GFXDatabaseTable<GFXLobbyRow>          lobbyTable;
+        private readonly GFXDatabaseTable<GFXLobbySessionRow>   lobbySessionTable;
 
         public GFXLobbyService()
         {
@@ -34,7 +34,7 @@ namespace GameForestCore.Services
         {
             try
             {
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(lobbyTable.Select(string.Empty, maxcount)));
+                return constructResponse(GFXResponseType.Normal, lobbyTable.Select(string.Empty, maxcount));
             }
             catch (Exception exp)
             {
@@ -49,6 +49,11 @@ namespace GameForestCore.Services
             try
             {
                 var lobby = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
+
+                if (lobby.Count <= 0)
+                {
+                    return constructResponse(GFXResponseType.NotFound, "Lobby ID cannot be found!");
+                }
 
                 return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(lobby[0]));
             }
@@ -72,15 +77,34 @@ namespace GameForestCore.Services
 
                 GFXLobbyRow session = new GFXLobbyRow
                 {
-                    GameID = Guid.Parse(gameid),
-                    LobbyID = Guid.NewGuid(),
-                    Name = lobbyname,
-                    Password = password,
-                    Private = isprivate,
-                    Status = GFXLobbyStatus.Waiting
+                    GameID      = Guid.Parse(gameid),
+                    LobbyID     = Guid.NewGuid(),
+                    Name        = lobbyname,
+                    Password    = password,
+                    Private     = isprivate,
+                    Status      = GFXLobbyStatus.Waiting
                 };
 
                 lobbyTable.Insert(session);
+                
+                // create the owner's session
+                GFXLobbySessionRow playerSession = new GFXLobbySessionRow
+                {
+                    LobbyID     = session.LobbyID,
+                    SessionID   = Guid.Parse(usersessionid),
+                    Order       = 1,
+                    Owner       = true,
+                    Status      = 0,
+                    RowId       = lobbySessionTable.Count()
+                };
+
+                lobbySessionTable.Insert(playerSession);
+
+                GFXLoginRow loginRow = new List<GFXLoginRow>(loginTable.Select(string.Format("UserSessionId = {0}", usersessionid), 1))[0];
+
+                loginRow.UserStatus = GFXLoginStatus.LOBBY;
+
+                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
 
                 return constructResponse(GFXResponseType.Normal, session.LobbyID.ToString());
             }
@@ -104,10 +128,12 @@ namespace GameForestCore.Services
 
                 GFXLobbySessionRow session = new GFXLobbySessionRow
                 {
-                    LobbyID = Guid.Parse(lobbyid),
-                    GameID = getGameIdFromLobby(Guid.Parse(lobbyid)),
-                    UserID = getUserId(usersessionid),
-                    SessionID = Guid.Parse(usersessionid)
+                    LobbyID     = Guid.Parse(lobbyid),
+                    SessionID   = Guid.Parse(usersessionid),
+                    Order       = lobbySessionTable.Count(string.Format("LobbyID = {0}", lobbyid)) + 1,
+                    Owner       = false,
+                    Status      = 0,
+                    RowId       = lobbySessionTable.Count()
                 };
 
                 lobbySessionTable.Insert(session);
@@ -160,6 +186,11 @@ namespace GameForestCore.Services
         {
             try
             {
+                if (new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionID = {0} AND LobbyID = {1}", usersessionid, lobbyid))).Count <= 0)
+                {
+                    return constructResponse(GFXResponseType.NotFound, "User session specified is not in the lobby.");
+                }
+
                 List<GFXLobbySessionRow> userList = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = {0}", lobbyid)));
 
                 return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userList));
@@ -174,7 +205,7 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        private static GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
+        private static GFXRestResponse constructResponse(GFXResponseType responseType, object payload)
         {
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }

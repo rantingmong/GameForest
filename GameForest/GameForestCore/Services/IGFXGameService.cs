@@ -7,10 +7,10 @@ namespace GameForestCore.Services
     [ServiceContract]
     interface IGFXGameService
     {
-        [OperationContract, WebInvoke(UriTemplate = "/game?maxcount={maxCount}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        [OperationContract, WebInvoke(UriTemplate = "?maxcount={maxCount}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetGameList(int maxCount);
 
-        [OperationContract, WebInvoke(UriTemplate = "/game/{gameId}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        [OperationContract, WebInvoke(UriTemplate = "/{gameId}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetGameInfo(string gameId);
     }
 }

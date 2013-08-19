@@ -17,6 +17,6 @@
     public struct GFXRestResponse
     {
         public GFXResponseType  ResponseType    { get; set; }
-        public string           AdditionalData  { get; set; }
+        public object           AdditionalData  { get; set; }
     }
 }

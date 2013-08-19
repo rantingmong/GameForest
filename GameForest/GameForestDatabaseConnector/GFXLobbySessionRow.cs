@@ -11,11 +11,7 @@ namespace GameForestCore.Database
 
         public Guid LobbyID     { get; set; }
 
-        public Guid GameID      { get; set; }
-
         public Guid SessionID   { get; set; }
-
-        public Guid UserID      { get; set; }
 
         public bool Owner       { get; set; }
 
@@ -37,21 +33,19 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "GameId", "SessionId", "UserId", "Owner", "Order", "Status", "RowId" }; }
+            get { return new[] { "LobbyId", "SessionId", "Owner", "Order", "Status", "RowId" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbySessionRow data)
         {
-            var returnData = new string[4];
+            var returnData = new string[6];
 
             returnData[0] = GFXDatabaseCore.ToSQLString(data.LobbyID.ToString());
-            returnData[1] = GFXDatabaseCore.ToSQLString(data.GameID.ToString());
-            returnData[2] = GFXDatabaseCore.ToSQLString(data.SessionID.ToString());
-            returnData[3] = GFXDatabaseCore.ToSQLString(data.UserID.ToString());
-            returnData[4] = Convert.ToString(data.Owner);
-            returnData[5] = Convert.ToString(data.Order);
-            returnData[6] = Convert.ToString(data.Status);
-            returnData[7] = Convert.ToString(data.RowId);
+            returnData[1] = GFXDatabaseCore.ToSQLString(data.SessionID.ToString());
+            returnData[2] = Convert.ToString(data.Owner);
+            returnData[3] = Convert.ToString(data.Order);
+            returnData[4] = Convert.ToString(data.Status);
+            returnData[5] = Convert.ToString(data.RowId);
 
             return returnData;
         }
@@ -61,13 +55,11 @@ namespace GameForestCore.Database
             return new GFXLobbySessionRow
             {
                 LobbyID     = Guid.Parse(reader.GetString(0)),
-                GameID      = Guid.Parse(reader.GetString(1)),
-                SessionID   = Guid.Parse(reader.GetString(2)),
-                UserID      = Guid.Parse(reader.GetString(3)),
-                Owner       = reader.GetBoolean(4),
-                Order       = reader.GetInt32(5),
-                Status      = reader.GetInt32(6),
-                RowId       = reader.GetInt32(7)
+                SessionID   = Guid.Parse(reader.GetString(1)),
+                Owner       = reader.GetBoolean(2),
+                Order       = reader.GetInt32(3),
+                Status      = reader.GetInt32(4),
+                RowId       = reader.GetInt32(5)
             };
         }
     }

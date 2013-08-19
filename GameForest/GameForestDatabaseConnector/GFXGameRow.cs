@@ -36,7 +36,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  ToStringValues  (GFXGameRow data)
         {
-            var returnData = new string[4];
+            var returnData = new string[7];
 
             returnData[0] = GFXDatabaseCore.ToSQLString(data.GameID.ToString());
             returnData[1] = GFXDatabaseCore.ToSQLString(data.Creator.ToString());

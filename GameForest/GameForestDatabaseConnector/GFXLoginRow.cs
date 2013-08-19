@@ -36,7 +36,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  ToStringValues  (GFXLoginRow data)
         {
-            var returnData = new string[3];
+            var returnData = new string[4];
 
             returnData[0] = GFXDatabaseCore.ToSQLString(data.UserSessionId.ToString());
             returnData[1] = GFXDatabaseCore.ToSQLString(data.UserId.ToString());

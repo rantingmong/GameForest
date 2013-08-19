@@ -18,7 +18,7 @@ namespace GameForestCore.Database
 
         private readonly GFXDatabaseTranslator<T>   translator; 
 
-        public GFXDatabaseTable             (GFXDatabaseTranslator<T> translator)
+        public GFXDatabaseTable                     (GFXDatabaseTranslator<T> translator)
         {
             if (GFXDatabaseCore.Instance == null)
             {
@@ -47,7 +47,7 @@ namespace GameForestCore.Database
             columnValue += columns[columns.Count - 1];
         }
 
-        ~GFXDatabaseTable                   ()
+        ~GFXDatabaseTable                           ()
         {
             commandIns.Dispose();
             commandRem.Dispose();
@@ -55,7 +55,7 @@ namespace GameForestCore.Database
             commandSel.Dispose();
         }
 
-        public void             Insert      (T data)
+        public void             Insert              (T data)
         {
             var builder = new StringBuilder();
             var svalues = new List<string>(translator.ToStringValues(data));
@@ -71,13 +71,13 @@ namespace GameForestCore.Database
             commandIns.ExecuteNonQuery();
         }
 
-        public void             Remove      (string condition)
+        public void             Remove              (string condition)
         {
             commandRem.CommandText = string.Format("DELETE FROM {0} WHERE {1}", translator.TableName, condition);
             commandRem.ExecuteNonQuery();
         }
 
-        public void             Update      (string condition, T data)
+        public void             Update              (string condition, T data)
         {
             var values = new List<string>(translator.ToStringValues(data));
             var column = new List<string>(translator.TableColumns);
@@ -100,11 +100,11 @@ namespace GameForestCore.Database
             commandUpt.ExecuteNonQuery();
         }
 
-        public IEnumerable<T>   Select      (string condition, int maxRows = int.MaxValue)
+        public IEnumerable<T>   Select              (string condition, int maxRows = int.MaxValue)
         {
-            this.commandSel.CommandText = string.IsNullOrEmpty(condition) ?
-                string.Format("SELECT ({2}) FROM {0} LIMIT {1}", this.translator.TableName, maxRows, this.translator.TableColumns) : 
-                string.Format("SELECT ({3}) FROM {0} WHERE {1} LIMIT {2}", this.translator.TableName, condition, maxRows, this.translator.TableColumns);
+            commandSel.CommandText = string.IsNullOrEmpty(condition) ?
+                string.Format("SELECT * FROM {0} LIMIT {1}", translator.TableName, maxRows) :
+                string.Format("SELECT * FROM {0} WHERE {1} LIMIT {2}", translator.TableName, condition, maxRows);
 
             var reader = commandSel.ExecuteReader();
             var rtlist = new List<T>();
@@ -132,7 +132,7 @@ namespace GameForestCore.Database
             return rtlist.ToArray();
         }
 
-        public int              Count       (string condition)
+        public int              Count               (string condition = "")
         {
             if (string.IsNullOrEmpty(condition))
             {
@@ -146,6 +146,21 @@ namespace GameForestCore.Database
             var result = commandNum.ExecuteScalar();
 
             return int.Parse(result.ToString());
+        }
+
+        private string          ColumnsString       (IEnumerable<string> columns)
+        {
+            string          rs = "";
+            List<string>    cc = new List<string>(columns);
+
+            for (int i = 0; i < cc.Count - 1; i++)
+            {
+                rs += cc[i] + ", ";
+            }
+
+            rs += cc[cc.Count - 1];
+
+            return rs;
         }
     }
 }
