@@ -15,7 +15,7 @@ namespace GameForestCore.Database
     public struct GFXLoginRow
     {
         public Guid                 UserId          { get; set; }
-        public Guid                 UserSessionId   { get; set; }
+        public Guid                 SessionId       { get; set; }
 
         public DateTime             LastHeartbeat   { get; set; }
 
@@ -38,7 +38,7 @@ namespace GameForestCore.Database
         {
             var returnData = new string[4];
 
-            returnData[0] = GFXDatabaseCore.ToSQLString(data.UserSessionId.ToString());
+            returnData[0] = GFXDatabaseCore.ToSQLString(data.SessionId.ToString());
             returnData[1] = GFXDatabaseCore.ToSQLString(data.UserId.ToString());
             returnData[2] = GFXDatabaseCore.ToSQLString(data.LastHeartbeat.ToFileTime().ToString(CultureInfo.InvariantCulture));
             returnData[3] = ((int)data.UserStatus).ToString();
@@ -50,7 +50,7 @@ namespace GameForestCore.Database
         {
             return new GFXLoginRow
             {
-                UserSessionId   = Guid.Parse(reader.GetString(0)),
+                SessionId       = Guid.Parse(reader.GetString(0)),
                 UserId          = Guid.Parse(reader.GetString(1)),
                 LastHeartbeat   = DateTime.FromFileTime(reader.GetInt64(2)),
                 UserStatus      = (GFXLoginStatus)reader.GetInt32(3)

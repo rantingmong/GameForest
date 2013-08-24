@@ -4,10 +4,10 @@
 "use strict";
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
-var GameForestVerboseMessaging = false;
+var GameForestVerboseMessaging  = false;
 
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-var GameForestCloudUrl = "game-forest.cloudapp.net";
+var GameForestCloudUrl          = "game-forest.cloudapp.net";
 
 // Game Forest client API
 var GameForest = function (gameId, lobbyId, sessionId)
@@ -156,6 +156,16 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     };
 
+    // function to get the current active player
+    this.getCurrentPlayer       = function ()
+    {
+    };
+    // function to get the next player "steps" from the player calling this function
+    this.getNextPlayer          = function (steps)
+    {
+
+    };
+
     // function to get the user's information
     this.getUserInfo            = function (username)
     {
@@ -293,6 +303,8 @@ var GameForest = function (gameId, lobbyId, sessionId)
             }));
     }
 };
+
+// override these methods in your game
 
 // method to override when the game has started
 GameForest.prototype.onGameStart    = function ()

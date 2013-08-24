@@ -24,5 +24,11 @@ namespace GameForestCore.Services
 
         [OperationContract, WebInvoke(UriTemplate = "/users?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetUserList(string lobbyid, string usersessionid);
+
+        [OperationContract, WebInvoke(UriTemplate = "/currentplayer?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        GFXRestResponse GetCurrentPlayer(string lobbyid, string usersessionid);
+
+        [OperationContract, WebInvoke(UriTemplate = "/nextplayer?lobbyid={lobbyid}&usersessionid={usersessionid}&steps={steps}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        GFXRestResponse GetNextPlayer(string lobbyid, string usersessionid, string steps);
     }
 }
