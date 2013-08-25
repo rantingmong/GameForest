@@ -85,6 +85,8 @@ var GameForest = function (gameId, lobbyId, sessionId)
     // function to start the game forest client
     this.start                  = function ()
     {
+        var pGfxObject = this;
+
         this.wsConnection.onopen    = function ()
         {
             if (GameForestVerboseMessaging)
@@ -101,26 +103,69 @@ var GameForest = function (gameId, lobbyId, sessionId)
         };
         this.wsConnection.onmessage = function (message)
         {
+            if (Guid.isGuid(message.data))
+            {
+                pGfxObject.connectionId = message.data;
+            }
+
             var parse = JSON.parse(message.data);
+
+            console.log(parse);
 
             switch (parse.Subject)
             {
                 case GFX_START_GAME:
+
+                    GameForest.prototype.onGameStart();
                     break
                 case GFX_START_CHOICE:
+
+                    GameForest.prototype.onGameChoose();
                     break
                 case GFX_GAME_TALLIED:
+
+                    GameForest.prototype.onGameTally(parse.Payload);
                     break
                 case GFX_GAME_FINISHED:
+
+                    GameForest.prototype.onGameFinish();
                     break
                 case GFX_TURN_START:
+
+                    GameForest.prototype.onTurnStart();
                     break
                 case GFX_TURN_CHANGED:
+
+                    GameForest.prototype.onTurnChange();
                     break
                 case GFX_TURN_RESOLVE:
+
+                    GameForest.prototype.onTurnSelect();
                     break
                 case GFX_DATA_CHANGED:
+
+                    GameForest.prototype.onUpdateData(JSON.parse(parse.Message));
                     break
+                case GFX_ASK_DATA:
+                case GFX_ASK_USER_DATA:
+                case GFX_SEND_DATA:
+                case GFX_SEND_USER_DATA:
+                case GFX_FINISH:
+                case GFX_TALLY:
+                case GFX_GAME_START:
+                case GFX_GAME_START_CONFIRM:
+                case GFX_NEXT_TURN:
+                case GFX_CONFIRM_TURN:
+
+                    if (parse.ResponseCode == 0)
+                    {
+                        wsPromise.done(null, parse);
+                    }
+                    else
+                    {
+                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
+                    }
+                    break;
             }
         };
     };
@@ -153,17 +198,56 @@ var GameForest = function (gameId, lobbyId, sessionId)
     // function to inform the server the game's scores are tallied
     this.sendTallyResult        = function (tallyResult)
     {
+        wsPromise = new promise.Promise();
 
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_TALLY, tallyResult);
+
+        return wsPromise;
     };
 
     // function to get the current active player
     this.getCurrentPlayer       = function ()
     {
+        var p = new promise.Promise();
+
+        sendRequest("/user/currentplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
+            function (result)
+            {
+                p.done(null, result);
+            },
+            function (status, why)
+            {
+                p.done(status + ": " + why, null);
+
+                if (GameForestVerboseMessaging)
+                {
+                    alert("Error in getCurrentPlayer function: [status=" + status + "] [reason=" + why + "]");
+                }
+            });
+
+        return p;
     };
     // function to get the next player "steps" from the player calling this function
     this.getNextPlayer          = function (steps)
     {
+        var p = new promise.Promise();
 
+        sendRequest("/user/nextplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId + "&steps=" + this.steps,
+            function (result)
+            {
+                p.done(null, result);
+            },
+            function (status, why)
+            {
+                p.done(status + ": " + why, null);
+
+                if (GameForestVerboseMessaging)
+                {
+                    alert("Error in getCurrentPlayer function: [status=" + status + "] [reason=" + why + "]");
+                }
+            });
+
+        return p;
     };
 
     // function to get the user's information

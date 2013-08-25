@@ -176,10 +176,10 @@ namespace GameForestCore.Services
 
                 loginTable.Insert(new GFXLoginRow
                 {
-                    LastHeartbeat = DateTime.Now,
-                    UserId = userId,
-                    UserSessionId = sessionId,
-                    UserStatus = GFXLoginStatus.MENU,
+                    LastHeartbeat   = DateTime.Now,
+                    UserId          = userId,
+                    SessionId       = sessionId,
+                    UserStatus      = GFXLoginStatus.MENU,
                 });
 
                 return constructResponse(GFXResponseType.Normal, sessionId.ToString());
