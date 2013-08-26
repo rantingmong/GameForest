@@ -1,105 +1,184 @@
 <!DOCTYPE html>
-<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<html>
 <head>
-  <meta charset="utf-8" />
+  <title>GameForest | Games</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width" />
-
-  <title>Game Forest</title>
-
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/foundation.css">
-
-  <script src="js/vendor/custom.modernizr.js"></script>
-
+  <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
+  <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-	<div class="row">
-	    <div class="large-12 columns">
-	    
-	    <div class="row">
-	    	<div class="large-12 columns">
-	    	<div class="panel">
-	    		<h3><a href="index.html">GAME FOREST</a></h3>
-	    	</div>
-	    	</div>
-	    </div>
-		
-		<div class="row">
-			<div class="large-2 columns">
-			    <div class="docs section-container accordion" data-section data-options="one_up: false">
-	
-				  <section class="section ">					  
-				    <p class="title"><a href="main.html">Home</a></p>
-				  </section>
-				  
-				  <section class="section active">					  
-				    <p class="title"><a href="games.html">Games</a></p>
-				  </section>
-				  
-				  <section class="section ">					  
-				    <p class="title"><a href="dev.html">Developer</a></p>
-				  </section>
-				  
-				</div>
-			</div>
-			
-			<div class="large-10 columns">
-	          <div class="row">
-	
-	            <div class="large-4 small-6 columns">
-	              <a href="lobby.html">
-	              	<img src="http://placehold.it/1000x1000&text=Dota 2">
-	              </a>
-	
-	              <div class="panel">
-	                <h5><a href="lobby.html">Dota 2</a></h5>
-	                <h6 class="subheader"><b>23</b> people playing</h6>
-	              </div>
-	            </div>
-	
-	            <div class="large-4 small-6 columns">
-	              <a href="lobby.html">
-	              	<img src="http://placehold.it/500x500&text=StarCraft 2">
-	              </a>
-	              
-	              <div class="panel">
-	                <h5><a href="lobby.html">StarCraft 2</a></h5>
-	                <h6 class="subheader"><b>31</b> people playing</h6>
-	              </div>
-	            </div>
-	
-	            <div class="large-4 small-6 columns">
-	              <a href="lobby.html">
-	              	<img src="http://placehold.it/500x500&text=CubeWorld">
-	              </a>
-	
-	              <div class="panel">
-	                <h5><a href="lobby.html">Cube World</a></h5>
-	                <h6 class="subheader"><b>6</b> people playing</h6>
-	              </div>
-	            </div>
-	        </div>
-		</div>
-    	
-	    </div>
-	  </div>
-  
-  <script>
-  document.write('<script src=js/vendor/' +
-  ('__proto__' in {} ? 'zepto' : 'jquery') +
-  '.js><\/script>')
-  </script>
-  <script src="js/foundation.min.js"></script>
-  <script>
-    $(document).foundation();
-  </script>
-  <script type="text/javascript">
-    $(window).load(function() {
-      $('#featured').orbit({ fluid: '2x1' });
-    });
-  </script>
-  
+  <div class="container">
+    <br>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">GameForest</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="index.html">Home</a></li>
+          <li class="dropdown">
+            <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="news.html">News</a></li>
+              <li><a href="games.html">Games</a></li>
+              <li><a href="dev.html">Developer</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="index.html">Login</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- END OF NAVBAR -->
+
+    <!-- FIRST ROW -->
+    
+    <div class="row">
+      <div class="col-sm-2">
+        <ul class="nav nav-pills nav-stacked">
+         <li><a href="news.html">News</a></li>
+         <li class="active"><a href="games.html">Games</a></li>
+         <li><a href="dev.html">Developer</a></li>
+       </ul>
+     </div>
+
+     <!-- GAMES LIST DIV -->
+
+     <div class="col-sm-10">
+      <div class="page-header">
+        <h1>Games <small>List</small></h1>
+      </div>
+      <form>
+        <div class="input-group">
+          <input type="text" class="form-control" id="focusedInput" placeholder="Search games">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button">Search</button>
+          </span>
+        </div>
+      </form>
+
+      <br>
+
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <img class="img-responsive" src="http://placehold.it/250x250&text=G1" />
+            </div>
+            <div class="panel-footer">Game 1</div>
+          </div>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <img class="img-responsive" src="http://placehold.it/250x250&text=G2" />
+            </div>
+            <div class="panel-footer">Game 2</div>
+          </div>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <img class="img-responsive" src="http://placehold.it/250x250&text=G3" />
+            </div>
+            <div class="panel-footer">Game 3</div>
+          </div>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <img class="img-responsive" src="http://placehold.it/250x250&text=G4" />
+            </div>
+            <div class="panel-footer">Game 4</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="pager">
+        <li class="previous disabled"><a href="#">&larr; Previous</a></li>
+        <li class="next"><a href="#">Newer &rarr;</a></li>
+      </ul>
+      
+      <!-- END OF GAMES LIST DIV -->
+
+      <!-- LOBBY DIV -->
+
+      <div class="page-header">
+        <h1>Lobby <small>Game 1</small></h1>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <ul class="pager">
+            <li class="previous"><a href="#">Back</a></li>
+            <li class="next"><a href="#">Start game</a></li>
+          </ul>
+        </div>
+
+        <br>
+
+        <div class="col-sm-8">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span class="glyphicon glyphicon-user"></span> Player 1 <em><a href="#">Leave slot</a></em>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span class="glyphicon glyphicon-user"></span> Player 2 <em><a href="#">Join slot</a></em>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span class="glyphicon glyphicon-user"></span> Player 3 <em><a href="#">Join slot</a></em>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="well">
+            <textarea class="form-control chat" rows="8"></textarea>
+
+            <br>
+
+            <form>
+              <div class="input-group">
+                <input type="text" class="form-control" id="focusedInput" placeholder="Chat">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button">Chat</button>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- END OF LOBBY DIV -->
+    </div>
+
+    <!-- END OF FIRST ROW -->
+
+  </div>
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
