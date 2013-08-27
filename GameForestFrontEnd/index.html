@@ -6,6 +6,54 @@
 
   <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
   <link href="css/style.css" rel="stylesheet">
+  <script type="text/javascript">
+
+      function signInClick() {
+
+        var error = false;
+
+        var varEmail = $("#inputEmail1").val();
+        var varPword = $("#inputPassword1").val();
+
+        if (varEmail.length == 0 || varEmail == null)
+          error = true;
+
+        if (varPword.length == 0 || varPword == null)
+          error = true;
+
+        if (error)
+        {
+          alert("Invalid username or password!");
+        }
+        else
+        {
+          $.ajax({
+              url:        "http://localhost:17049/Services/GFXUserService.svc/user/login?username=" + varEmail + "&password=" + varPword,
+              async:      true,
+              error:      onFail,
+              type:       "POST"
+          }).done(function(msg){
+
+              if (msg.ResponseType != 0) {
+
+                  // show error (maybe in an error div?)
+                  $("#alertDialog").css("visibility", "visible");
+                  $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+              }
+              else {
+
+                  // store session ID to local storage
+              }
+          });
+        }
+      }
+
+      function onFail(x, s, w) {
+
+        alert(x + " " + s + " " + w);
+      }
+
+  </script>
 </head>
 <body>
   <div class="container">
@@ -49,6 +97,8 @@
     <!-- FIRST ROW -->
     
     <div class="row">
+
+      <div id="alertDialog" class="alert alert-danger" style="visibility:hidden;position:relative"></div>
       <div class="col-sm-8">
         <div class="jumbotron">
           <h1>Game Forest</h1>
@@ -57,7 +107,6 @@
       </div>
       <div class="col-sm-4">
         <div class="well" id="login-well">
-          <form class="form-horizontal" role="form">
             <div class="form-group">
               <div class="col-lg-12">
                 <input type="email" class="form-control" id="inputEmail1" placeholder="Email">
@@ -79,10 +128,9 @@
             </div>
             <div class="form-group">
               <div class="col-lg-12">
-                <button type="submit" class="btn btn-default">Sign in</button>
+                <button class="btn btn-default" onclick="signInClick();">Sign in</button>
               </div>
             </div>
-          </form>
         </div>
       </div>
     </div>
@@ -129,7 +177,7 @@
     <!-- END OF SECOND ROW -->
 
   </div>
-  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="js/jquery.js"></script>
   <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
