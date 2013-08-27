@@ -6,71 +6,6 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
-
-    <script type="text/javascript">
-
-        function onRegisterClick() {
-
-            $("#alertDialog").hide();
-
-            var error = false;
-
-            var varUrname = $("#username").val();
-            var varPword1 = $("#password1").val();
-            var varPword2 = $("#password2").val();
-
-            if (varUrname.length == 0 || varUrname == null)
-                error = true;
-
-            if (varPword1.length == 0 || varPword1 == null)
-                error = true;
-
-            if (varPword2.length == 0 || varPword2 == null)
-                error = true;
-
-            if (varPword1 != varPword2)
-                error = true;
-
-            if (error) {
-                alert("Invalid username or password!");
-            }
-            else {
-                var request = $.ajax({
-                    url: "http://localhost:1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
-                    async: true,
-                    type: "POST"
-                });
-
-                request.done(function (msg) {
-
-                    if (msg.ResponseType != 0) {
-
-                        $("#alertDialog").show();
-
-                        $("#alertDialog").css("class", "alert alert-danger");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                    }
-                    else {
-
-                        $("#alertDialog").show();
-
-                        $("#alertDialog").css("class", "alert alert-success");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered!");
-                    }
-                });
-
-                request.fail(function (nothing, textStatus, something) {
-
-                    $("#alertDialog").show();
-
-                    $("#alertDialog").css("class", "alert alert-danger");
-                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-                });
-            }
-        }
-
-    </script>
-
 </head>
 <body>
     <div class="container">
@@ -109,12 +44,11 @@
         </nav>
 
         <!-- END OF NAVBAR -->
-
         <!-- FIRST ROW -->
 
         <div class="row">
 
-            <div id="alertDialog" class="alert alert-danger" style="visibility: hidden; position: relative"></div>
+            <div id="alertDialog" class="alert alert-danger"></div>
             <div class="col-sm-8 col-sm-offset-2">
                 <div class="page-header">
                     <h1>Register User</h1>
@@ -143,5 +77,75 @@
     </div>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function()
+        {
+            $("#alertDialog").hide();
+        })
+
+        function onRegisterClick()
+        {
+            $("#alertDialog").hide();
+
+            var error = false;
+
+            var varUrname = $("#username").val();
+            var varPword1 = $("#password1").val();
+            var varPword2 = $("#password2").val();
+
+            if (varUrname.length == 0 || varUrname == null)
+                error = true;
+
+            if (varPword1.length == 0 || varPword1 == null)
+                error = true;
+
+            if (varPword2.length == 0 || varPword2 == null)
+                error = true;
+
+            if (varPword1 != varPword2)
+                error = true;
+
+            if (error)
+            {
+                $("#alertDialog").show();
+                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+            }
+            else
+            {
+                var request = $.ajax({
+                    url: "http://localhost:1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
+                    async: true,
+                    type: "POST"
+                });
+
+                request.done(function (msg)
+                {
+                    $("#alertDialog").show();
+
+                    if (msg.ResponseType != 0)
+                    {
+
+                        $("#alertDialog").css("class", "alert alert-danger");
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                    }
+                    else
+                    {
+                        $("#alertDialog").css("class", "alert alert-success");
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered!");
+                    }
+                });
+
+                request.fail(function (nothing, textStatus, something)
+                {
+                    $("#alertDialog").show();
+
+                    $("#alertDialog").css("class", "alert alert-danger");
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+                });
+            }
+        }
+
+    </script>
 </body>
 </html>

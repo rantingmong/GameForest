@@ -23,7 +23,7 @@ namespace GameForestCoreWebSocket.Messages
             try
             {
                 // get the lobby the player is in
-                var lobbySessions   = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = {0}", info.SessionId)));
+                var lobbySessions   = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = '{0}'", info.SessionId)));
 
                 if (lobbySessions.Count <= 0)
                     return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
@@ -32,8 +32,8 @@ namespace GameForestCoreWebSocket.Messages
                 var currentPlayer   = lobbySessions[0];
 
                 // do a SQL query with order by of column 'order' in ascending order and greater than currentPlayer.Order
-                var lobbies         = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = {0}", currentPlayer.LobbyID)));
-                var nextPlayers     = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0} AND Order > {1} ORDER BY Order ASC", currentPlayer.LobbyID, currentPlayer.Order)));
+                var lobbies         = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
+                var nextPlayers     = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND Order > {1} ORDER BY Order ASC", currentPlayer.LobbyID, currentPlayer.Order)));
 
                 var lobby           = lobbies[0];
 
@@ -41,7 +41,7 @@ namespace GameForestCoreWebSocket.Messages
                 if (nextPlayers.Count <= 0)
                 {
                     // get the first person
-                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0} ORDER BY Order ASC", currentPlayer.LobbyID)));
+                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", currentPlayer.LobbyID)));
 
                     if (nextPlayers.Count <= 0)
                     {
@@ -52,10 +52,10 @@ namespace GameForestCoreWebSocket.Messages
                 nextPlayer          = nextPlayers[0];
                 lobby.CurrentPlayer = nextPlayer.SessionID;
 
-                server.LobbyList.Update(string.Format("LobbyId = {0}", lobby.LobbyID), lobby);
+                server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
                 // send GFX_TURN_START to the next client and send GFX_TURN_CHANGED to other clients
-                var players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0}", currentPlayer.LobbyID)));
+                var players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
 
                 foreach (var player in players)
                 {

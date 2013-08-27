@@ -33,15 +33,15 @@ namespace GameForestCoreWebSocket.Messages
                 GFXLobbySessionRow currentPlayer = lobbySessions[0];
                 currentPlayer.Status = 2;
 
-                server.LobbySessionList.Update(string.Format("RowId = {0}", currentPlayer.RowId), currentPlayer);
+                server.LobbySessionList.Update(string.Format("RowId = '{0}'", currentPlayer.RowId), currentPlayer);
                 
                 // send a GFX_TURN_RESOLVE to the next player
-                var nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0} AND Order > {1} ORDER BY Order ASC", currentPlayer.LobbyID, currentPlayer.Order)));
+                var nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND Order > {1} ORDER BY Order ASC", currentPlayer.LobbyID, currentPlayer.Order)));
 
                 if (nextPlayers.Count <= 0)
                 {
                     // get the first person
-                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0} ORDER BY Order ASC", currentPlayer.LobbyID)));
+                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", currentPlayer.LobbyID)));
 
                     if (nextPlayers.Count <= 0)
                     {
@@ -57,7 +57,7 @@ namespace GameForestCoreWebSocket.Messages
                         Payload = ""
                     }));
 
-                var checkPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0}", nextPlayer.LobbyID)));
+                var checkPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", nextPlayer.LobbyID)));
 
                 bool allOkay = true;
 
@@ -72,11 +72,11 @@ namespace GameForestCoreWebSocket.Messages
                 if (allOkay)
                 {
                     // if all user's status are 2, change lobby state to playing
-                    var lobby = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = {0}", nextPlayer.LobbyID)))[0];
+                    var lobby = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", nextPlayer.LobbyID)))[0];
 
                     lobby.Status = GFXLobbyStatus.Playing;
 
-                    server.LobbyList.Update(string.Format("LobbyId = {0}", lobby.LobbyID), lobby);
+                    server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
                     // send a GFX_START_GAME to all clients
                     foreach (var player in checkPlayers)
@@ -89,7 +89,7 @@ namespace GameForestCoreWebSocket.Messages
                     }
 
                     // send a GFX_TURN_START to the first player and GFX_TURN_CHANGED to other players
-                    var order = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0} ORDER BY Order ASC", currentPlayer.LobbyID)));
+                    var order = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", currentPlayer.LobbyID)));
 
                     server.WebSocketList[order[0].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
                         {

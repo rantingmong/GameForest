@@ -21,7 +21,7 @@ namespace GameForestCoreWebSocket.Messages
             try
             {
                 // get the lobby the player is in
-                List<GFXLobbySessionRow> lobbySessions = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = {0}", info.SessionId)));
+                List<GFXLobbySessionRow> lobbySessions = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = '{0}'", info.SessionId)));
 
                 if (lobbySessions.Count <= 0)
                     return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
@@ -29,11 +29,11 @@ namespace GameForestCoreWebSocket.Messages
                 GFXLobbySessionRow currentPlayer = lobbySessions[0];
                 currentPlayer.Status = 1;
 
-                server.LobbySessionList.Update(string.Format("RowId = {0}", currentPlayer.RowId), currentPlayer);
+                server.LobbySessionList.Update(string.Format("RowId = '{0}'", currentPlayer.RowId), currentPlayer);
 
                 // send message to other connected players
                 bool gameReallyStart = true;
-                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0}", currentPlayer.SessionID)));
+                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.SessionID)));
 
                 foreach (var player in players)
                 {
@@ -47,7 +47,7 @@ namespace GameForestCoreWebSocket.Messages
                 // send a GFX_START message to all clients
                 if (gameReallyStart)
                 {
-                    List<GFXLobbyRow> lobbies = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = {0}",currentPlayer.LobbyID)));
+                    List<GFXLobbyRow> lobbies = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'",currentPlayer.LobbyID)));
 
                     if (lobbies.Count <= 0)
                     {
@@ -57,7 +57,7 @@ namespace GameForestCoreWebSocket.Messages
                     GFXLobbyRow lobby = lobbies[0];
                     lobby.Status = GFXLobbyStatus.ChoosingTurn;
 
-                    server.LobbyList.Update(string.Format("LobbyId = {0}", lobby.LobbyID), lobby);
+                    server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
                     GFXGameData gameData = new GFXGameData(Guid.Empty);
 

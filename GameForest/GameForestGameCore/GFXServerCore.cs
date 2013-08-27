@@ -54,15 +54,17 @@ namespace GameForestCoreWebSocket
 
         public GFXServerCore                            ()
         {
+            listenerList.Add(new GFXConfirmTurn());
+            listenerList.Add(new GFXGameAskUserData());
             listenerList.Add(new GFXGameAskData());
             listenerList.Add(new GFXGameFinish());
             listenerList.Add(new GFXGameFinishTally());
             listenerList.Add(new GFXGameNextTurn());
             listenerList.Add(new GFXGameSendData());
+            listenerList.Add(new GFXGameSendUserData());
             listenerList.Add(new GFXGameStart());
             listenerList.Add(new GFXGameStartConfirm());
-            listenerList.Add(new GFXGameStart());
-
+            
             server = new WebSocketServer(1193, "ws://localhost");
 
             server.Start(socket =>

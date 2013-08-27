@@ -21,12 +21,12 @@ namespace GameForestCoreWebSocket.Messages
         public override GFXSocketResponse   DoMessage   (GFXServerCore server, GFXSocketInfo info, Fleck.IWebSocketConnection ws)
         {
             // get user's lobbyid
-            List<GFXLobbySessionRow> sessions = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = {0}", info.SessionId)));
+            List<GFXLobbySessionRow> sessions = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = '{0}'", info.SessionId)));
 
             if (sessions.Count <= 0)
                 return constructResponse(GFXResponseType.DoesNotExist, "User is not playing any games!");
 
-            List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = {0}", sessions[0].LobbyID)));
+            List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", sessions[0].LobbyID)));
 
             foreach (var player in players)
             {
@@ -38,7 +38,7 @@ namespace GameForestCoreWebSocket.Messages
                 }));
             }
 
-            throw new NotImplementedException();
+            return constructResponse(GFXResponseType.Normal, "");
         }
     }
 }

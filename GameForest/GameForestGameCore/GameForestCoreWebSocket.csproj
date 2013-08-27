@@ -61,7 +61,6 @@
     <Compile Include="Messages\GFXGameSendUserData.cs" />
     <Compile Include="Messages\GFXGameStart.cs" />
     <Compile Include="Messages\GFXGameStartConfirm.cs" />
-    <Compile Include="Messages\GFXStart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GFXServerCore.cs" />
   </ItemGroup>

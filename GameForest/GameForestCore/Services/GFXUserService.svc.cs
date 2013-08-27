@@ -67,6 +67,30 @@ namespace GameForestCore.Services
             }
         }
 
+        public GFXRestResponse GetUserInfoFromSession(string usersessionid)
+        {
+            if (!sessionExists(usersessionid))
+                return constructResponse(GFXResponseType.NotFound, "Session cannot be found.");
+
+            try
+            {// get user id from session id
+                var users = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
+
+                if (users.Count <= 0)
+                    return constructResponse(GFXResponseType.NotFound, "There are no users with that session id.");
+
+                var userInfos = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", users[0].UserId)));
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfos[0]));
+            }
+            catch (Exception exp)
+            {
+                Console.Error.WriteLine("[User|GetUserInfoFromSession] " + exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
         public GFXRestResponse SetUserInfo(string username, string firstname, string lastname, string description, string usersessionid)
         {
             if (!sessionExists(usersessionid))
@@ -223,18 +247,23 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse Heartbeat(string usersessionid, string heartbeattime)
+        public GFXRestResponse Heartbeat(string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
 
             try
             {
-                var result = new List<GFXLoginRow>(loginTable.Select(string.Format("usersessionid = '{0}'", usersessionid)))[0];
+                var result = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
 
-                result.LastHeartbeat = DateTime.Parse(heartbeattime);
+                if (result.Count <= 0)
+                    return constructResponse(GFXResponseType.NotFound, "Session expired.");
 
-                loginTable.Update(string.Format("sessionid = '{0}'", usersessionid), result);
+                var user = result[0];
+
+                user.LastHeartbeat = DateTime.Now;
+
+                loginTable.Update(string.Format("sessionid = '{0}'", usersessionid), user);
 
                 return constructResponse(GFXResponseType.Normal, "Success");
             }

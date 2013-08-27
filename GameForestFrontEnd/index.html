@@ -6,54 +6,6 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
-    <script type="text/javascript">
-
-        function signInClick() {
-
-            var error = false;
-
-            var varEmail = $("#inputEmail1").val();
-            var varPword = $("#inputPassword1").val();
-
-            if (varEmail.length == 0 || varEmail == null)
-                error = true;
-
-            if (varPword.length == 0 || varPword == null)
-                error = true;
-
-            if (error) {
-                alert("Invalid username or password!");
-            }
-            else {
-                var request = $.ajax({
-                    url: "http://localhost:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
-                    async: true,
-                    type: "POST"
-                });
-
-                request.done(function (msg) {
-
-                    if (msg.ResponseType != 0) {
-
-                        // show error (maybe in an error div?)
-                        $("#alertDialog").css("visibility", "visible");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                    }
-                    else {
-
-                        // store session ID to local storage
-                    }
-                });
-
-                request.fail(function (nothing, textStatus, something) {
-
-
-
-                });
-            }
-        }
-
-    </script>
 </head>
 <body>
     <div class="container">
@@ -86,19 +38,18 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="index.html">Login</a></li>
+                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
 
         <!-- END OF NAVBAR -->
-
         <!-- FIRST ROW -->
 
         <div class="row">
 
-            <div id="alertDialog" class="alert alert-danger" style="visibility: hidden; position: relative"></div>
+            <div id="alertDialog" class="alert alert-danger"></div>
             <div class="col-sm-8">
                 <div class="jumbotron">
                     <h1>Game Forest</h1>
@@ -106,6 +57,13 @@
                 </div>
             </div>
             <div class="col-sm-4">
+                <div class="well" id="userinfo-well" style="display: none">
+                    <h3 id="profileHeader">Welcome back, &lt;username&gt;</h3>
+                    <h5>Some info</h5>
+                    <h5>More info</h5>
+                    <h5>Hala info</h5>
+                    <h5>Haha info</h5>
+                </div>
                 <div class="well" id="login-well">
                     <div class="form-group">
                         <div class="col-lg-12">
@@ -129,7 +87,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-lg-12">
-                            <button class="btn btn-default" onclick="signInClick();">Sign in</button>
+                            <button id="buttonSignIn" data-loading-text="Singing in..." class="btn btn-default" onclick="signInClick();">Sign in</button>
                             <a class="btn btn-default" href="register.html">Register</a>
                         </div>
                     </div>
@@ -138,7 +96,6 @@
         </div>
 
         <!-- END OF FIRST ROW -->
-
         <!-- SECOND ROW -->
 
         <div class="row">
@@ -181,5 +138,156 @@
     </div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            $("#alertDialog").hide();
+
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  false,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    $("#login-well").hide();
+                    $("#userinfo-well").show();
+
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url:    "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type:   "GET",
+                        async:  false,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#profileHeader").html("Welcome back, " + adata.FirstName);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+                    });
+                }
+                else
+                {
+                    $("#login-well").show();
+                    $("#userinfo-well").hide();
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                $("#login-well").show();
+                $("#userinfo-well").hide();
+            });
+        });
+
+        function signInClick()
+        {
+            $("#alertDialog").hide();
+
+            var error = false;
+
+            var varEmail = $("#inputEmail1").val();
+            var varPword = $("#inputPassword1").val();
+
+            if (varEmail.length == 0 || varEmail == null)
+                error = true;
+
+            if (varPword.length == 0 || varPword == null)
+                error = true;
+
+            if (error)
+            {
+                $("#alertDialog").show();
+                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+            }
+            else
+            {
+                var request = $.ajax({
+                    url: "http://localhost:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                    async: true,
+                    type: "POST"
+                });
+
+                $("buttonSignIn").button('loading');
+
+                request.done(function (msg)
+                {
+                    if (msg.ResponseType != 0)
+                    {
+                        // show error (maybe in an error div?)
+                        $("#alertDialog").show();
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                    }
+                    else
+                    {
+                        // store session ID to local storage
+                        localStorage.setItem("user-session", msg.AdditionalData);
+                        window.location.href = "games.html";
+                    }
+
+                    $("buttonSignIn").button('reset');
+                });
+
+                request.fail(function (nothing, textStatus, something)
+                {
+                    $("#alertDialog").show();
+
+                    $("#alertDialog").css("class", "alert alert-danger");
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+
+                    $("buttonSignIn").button('reset');
+                });
+            }
+        }
+
+        function onLogout()
+        {
+            var request = $.ajax({
+                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async:  true,
+                type:   "DELETE"
+            });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    // hehe, this is imposible...
+                }
+                else
+                {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

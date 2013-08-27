@@ -81,5 +81,10 @@ namespace GameForestConsole
                 serverCore.Stop();
             }
         }
+
+        private void buttonClearLog_Click(object sender, RoutedEventArgs e)
+        {
+            textConsole.Document.Blocks.Clear();
+        }
     }
 }
