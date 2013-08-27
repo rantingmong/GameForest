@@ -1,191 +1,185 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GameForest</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameForest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
-  <link href="css/style.css" rel="stylesheet">
-  <script type="text/javascript">
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
+    <link href="css/style.css" rel="stylesheet">
+    <script type="text/javascript">
 
-      function signInClick() {
+        function signInClick() {
 
-        var error = false;
+            var error = false;
 
-        var varEmail = $("#inputEmail1").val();
-        var varPword = $("#inputPassword1").val();
+            var varEmail = $("#inputEmail1").val();
+            var varPword = $("#inputPassword1").val();
 
-        if (varEmail.length == 0 || varEmail == null)
-          error = true;
+            if (varEmail.length == 0 || varEmail == null)
+                error = true;
 
-        if (varPword.length == 0 || varPword == null)
-          error = true;
+            if (varPword.length == 0 || varPword == null)
+                error = true;
 
-        if (error)
-        {
-          alert("Invalid username or password!");
+            if (error) {
+                alert("Invalid username or password!");
+            }
+            else {
+                var request = $.ajax({
+                    url: "http://localhost:17049/Services/GFXUserService.svc/user/login?username=" + varEmail + "&password=" + varPword,
+                    async: true,
+                    type: "POST"
+                });
+
+                request.done(function (msg) {
+
+                    if (msg.ResponseType != 0) {
+
+                        // show error (maybe in an error div?)
+                        $("#alertDialog").css("visibility", "visible");
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                    }
+                    else {
+
+                        // store session ID to local storage
+                    }
+                });
+
+                request.fail(function (nothing, textStatus, something) {
+
+
+
+                });
+            }
         }
-        else
-        {
-            var request =  $.ajax({
-                url:        "http://localhost:17049/Services/GFXUserService.svc/user/login?username=" + varEmail + "&password=" + varPword,
-                async:      true,
-                type:       "POST"
-            });
-            
-            request.done(function (msg) {
 
-                if (msg.ResponseType != 0) {
-
-                    // show error (maybe in an error div?)
-                    $("#alertDialog").css("visibility", "visible");
-                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                }
-                else {
-
-                    // store session ID to local storage
-                }
-            });
-
-            request.fail(function (nothing, textStatus, something) {
-
-
-
-            });
-        }
-      }
-
-      function onFail(x, s, w) {
-
-        alert(x + " " + s + " " + w);
-      }
-
-  </script>
+    </script>
 </head>
 <body>
-  <div class="container">
-    <br>
+    <div class="container">
+        <br>
 
-    <!-- NAVBAR -->
+        <!-- NAVBAR -->
 
-    <nav class="navbar navbar-default" role="navigation">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">GameForest</a>
-      </div>
-
-      <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="index.html">Home</a></li>
-          <li class="dropdown">
-            <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="news.html">News</a></li>
-              <li><a href="games.html">Games</a></li>
-              <li><a href="dev.html">Developer</a></li>
-            </ul>
-          </li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="profile.html">Profile</a></li>
-          <li><a href="index.html">Login</a></li>
-        </ul>
-      </div>
-    </nav>
-
-    <!-- END OF NAVBAR -->
-
-    <!-- FIRST ROW -->
-    
-    <div class="row">
-
-      <div id="alertDialog" class="alert alert-danger" style="visibility:hidden;position:relative"></div>
-      <div class="col-sm-8">
-        <div class="jumbotron">
-          <h1>Game Forest</h1>
-          <p>An online HTML5 multiplayer game lobby.</p>
-        </div>
-      </div>
-      <div class="col-sm-4">
-        <div class="well" id="login-well">
-            <div class="form-group">
-              <div class="col-lg-12">
-                <input type="email" class="form-control" id="inputEmail1" placeholder="Email">
-              </div>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-            <div class="form-group">
-              <div class="col-lg-12">
-                <input type="password" class="form-control" id="inputPassword1" placeholder="Password">
-              </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="news.html">News</a></li>
+                            <li><a href="games.html">Games</a></li>
+                            <li><a href="dev.html">Developer</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="index.html">Login</a></li>
+                </ul>
             </div>
-            <div class="form-group">
-              <div class="col-lg-12">
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox"> Remember me
-                  </label>
+        </nav>
+
+        <!-- END OF NAVBAR -->
+
+        <!-- FIRST ROW -->
+
+        <div class="row">
+
+            <div id="alertDialog" class="alert alert-danger" style="visibility: hidden; position: relative"></div>
+            <div class="col-sm-8">
+                <div class="jumbotron">
+                    <h1>Game Forest</h1>
+                    <p>An online HTML5 multiplayer game lobby.</p>
                 </div>
-              </div>
             </div>
-            <div class="form-group">
-              <div class="col-lg-12">
-                <button class="btn btn-default" onclick="signInClick();">Sign in</button>
-                <button class="btn btn-default">Register</button>
-              </div>
+            <div class="col-sm-4">
+                <div class="well" id="login-well">
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <input type="email" class="form-control" id="inputEmail1" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <input type="password" class="form-control" id="inputPassword1" placeholder="Password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox">
+                                    Remember me
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <button class="btn btn-default" onclick="signInClick();">Sign in</button>
+                            <a class="btn btn-default" href="register.html">Register</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-      </div>
+
+        <!-- END OF FIRST ROW -->
+
+        <!-- SECOND ROW -->
+
+        <div class="row">
+            <div class="col-xs-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Game 1</h3>
+                    </div>
+                    <div class="panel-body text-center">
+                        <img class="img-responsive" src="http://placehold.it/500x250&text=G1" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Game 1</h3>
+                    </div>
+                    <div class="panel-body text-center">
+                        <img class="img-responsive" src="http://placehold.it/500x250&text=G2" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-4">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Game 1</h3>
+                    </div>
+                    <div class="panel-body text-center">
+                        <img class="img-responsive" src="http://placehold.it/500x250&text=G3" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- END OF SECOND ROW -->
+
     </div>
-
-    <!-- END OF FIRST ROW -->
-
-    <!-- SECOND ROW -->
-
-    <div class="row">
-      <div class="col-xs-4">
-        <div class="panel panel-info">
-          <div class="panel-heading">
-            <h3 class="panel-title">Game 1</h3>
-          </div>
-          <div class="panel-body text-center">
-            <img class="img-responsive" src="http://placehold.it/500x250&text=G1" />
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xs-4">
-        <div class="panel panel-info">
-          <div class="panel-heading">
-            <h3 class="panel-title">Game 1</h3>
-          </div>
-          <div class="panel-body text-center">
-            <img class="img-responsive" src="http://placehold.it/500x250&text=G2" />
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xs-4">
-        <div class="panel panel-info">
-          <div class="panel-heading">
-            <h3 class="panel-title">Game 1</h3>
-          </div>
-          <div class="panel-body text-center">
-            <img class="img-responsive" src="http://placehold.it/500x250&text=G3" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- END OF SECOND ROW -->
-
-  </div>
-  <script src="js/jquery.js"></script>
-  <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
