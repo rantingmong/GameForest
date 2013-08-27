@@ -1,5 +1,6 @@
 ﻿using GameForestCore.Common;
 using GameForestCore.Database;
+using GameForestDatabaseConnector.Logger;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,10 @@ using System.ServiceModel.Activation;
 
 namespace GameForestCore.Services
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single), AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXLobbyService : IGFXLobbyService
     {
+        private GFXLogger                                       logger;
         private readonly GFXDatabaseTable<GFXUserRow>           userTable;
         private readonly GFXDatabaseTable<GFXGameRow>           gameTable;
         private readonly GFXDatabaseTable<GFXLoginRow>          loginTable;
@@ -19,22 +21,39 @@ namespace GameForestCore.Services
 
         public GFXLobbyService()
         {
-            userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
-            gameTable = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
+            userTable           = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+            gameTable           = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
 
-            loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-            lobbyTable = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
+            loginTable          = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+            lobbyTable          = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
 
-            lobbySessionTable = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
+            lobbySessionTable   = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
+
+            logger              = new GFXLogger("lobby service");
+        }
+
+        public GFXLobbyService(GFXLogger gameLogger)
+        {
+            userTable           = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+            gameTable           = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
+
+            loginTable          = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+            lobbyTable          = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
+
+            lobbySessionTable   = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
+
+            logger              = gameLogger;
         }
 
         // ----------------------------------------------------------------------------------------------------------------
 
         public GFXRestResponse GetLobbies(int maxcount)
         {
+            logger.Log(GFXLoggerLevel.INFO, "GetLobbies", "Fetching lobby list...");
+
             try
             {
-                return constructResponse(GFXResponseType.Normal, lobbyTable.Select(string.Empty, maxcount));
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(lobbyTable.Select(string.Empty, maxcount)));
             }
             catch (Exception exp)
             {
@@ -46,6 +65,8 @@ namespace GameForestCore.Services
 
         public GFXRestResponse GetLobby(string lobbyid)
         {
+            logger.Log(GFXLoggerLevel.INFO, "GetLobby", "Fetching lobby info...");
+
             try
             {
                 var lobby = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
@@ -230,7 +251,7 @@ namespace GameForestCore.Services
                 if (users.Count <= 0)
                     throw new InvalidProgramException("So close but no cigar!");
 
-                return constructResponse(GFXResponseType.Normal, users[0]);
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(users[0]));
             }
             catch (Exception exp)
             {
@@ -271,13 +292,15 @@ namespace GameForestCore.Services
             if (userInfo.Count <= 0)
                 throw new InvalidOperationException("Bug bug!");
 
-            return constructResponse(GFXResponseType.Normal, userInfo[0]);
+            return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfo[0]));
         }
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        private static GFXRestResponse constructResponse(GFXResponseType responseType, object payload)
+        private GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
+            logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
+
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }
 

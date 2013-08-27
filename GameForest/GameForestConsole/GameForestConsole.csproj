@@ -33,9 +33,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -61,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GFXServerCore.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -84,11 +90,27 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="INCONSOLATA.OTF" />
+    <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameForestCore\GameForestCore.csproj">
+      <Project>{95b76b85-36c6-424a-a6e9-7f7ebb0230b6}</Project>
+      <Name>GameForestCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameForestDatabaseConnector\GameForestDatabaseConnector.csproj">
+      <Project>{4d8182b9-0284-4c28-829e-652d2d4297d7}</Project>
+      <Name>GameForestDatabaseConnector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameForestGameCore\GameForestCoreWebSocket.csproj">
+      <Project>{1e0d7a59-462b-46bd-9102-a327132d39e7}</Project>
+      <Name>GameForestCoreWebSocket</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

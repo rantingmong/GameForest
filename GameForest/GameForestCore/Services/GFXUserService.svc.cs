@@ -1,5 +1,6 @@
 ﻿using GameForestCore.Common;
 using GameForestCore.Database;
+using GameForestDatabaseConnector.Logger;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,10 @@ using System.ServiceModel.Activation;
 
 namespace GameForestCore.Services
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single), AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXUserService : IGFXUserService
     {
+        private GFXLogger logger;
         private readonly GFXDatabaseTable<GFXUserRow> userTable;
         private readonly GFXDatabaseTable<GFXLoginRow> loginTable;
 
@@ -18,6 +20,16 @@ namespace GameForestCore.Services
         {
             userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+
+            this.logger = new GFXLogger("user service");
+        }
+
+        public GFXUserService(GFXLogger logger)
+        {
+            userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+            loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+
+            this.logger = logger;
         }
 
         // ----------------------------------------------------------------------------------------------------------------
@@ -313,8 +325,10 @@ namespace GameForestCore.Services
             }
         }
 
-        private static GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
+        private GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
+            logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
+
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }
     }

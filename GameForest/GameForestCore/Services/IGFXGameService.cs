@@ -5,7 +5,7 @@ using System.ServiceModel.Web;
 namespace GameForestCore.Services
 {
     [ServiceContract]
-    interface IGFXGameService
+    public interface IGFXGameService
     {
         [OperationContract, WebInvoke(UriTemplate = "?maxcount={maxCount}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetGameList(int maxCount);
