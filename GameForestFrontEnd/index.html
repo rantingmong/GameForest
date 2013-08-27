@@ -27,24 +27,31 @@
         }
         else
         {
-          $.ajax({
-              url:        "http://localhost:17049/Services/GFXUserService.svc/user/login?username=" + varEmail + "&password=" + varPword,
-              async:      true,
-              error:      onFail,
-              type:       "POST"
-          }).done(function(msg){
+            var request =  $.ajax({
+                url:        "http://localhost:17049/Services/GFXUserService.svc/user/login?username=" + varEmail + "&password=" + varPword,
+                async:      true,
+                type:       "POST"
+            });
+            
+            request.done(function (msg) {
 
-              if (msg.ResponseType != 0) {
+                if (msg.ResponseType != 0) {
 
-                  // show error (maybe in an error div?)
-                  $("#alertDialog").css("visibility", "visible");
-                  $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-              }
-              else {
+                    // show error (maybe in an error div?)
+                    $("#alertDialog").css("visibility", "visible");
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                }
+                else {
 
-                  // store session ID to local storage
-              }
-          });
+                    // store session ID to local storage
+                }
+            });
+
+            request.fail(function (nothing, textStatus, something) {
+
+
+
+            });
         }
       }
 
@@ -129,6 +136,7 @@
             <div class="form-group">
               <div class="col-lg-12">
                 <button class="btn btn-default" onclick="signInClick();">Sign in</button>
+                <button class="btn btn-default">Register</button>
               </div>
             </div>
         </div>
