@@ -1,7 +1,4 @@
-﻿/// <reference path="promise.js" />
-/// <reference path="guid.js" />
-/// <reference path="jquery.js" />
-"use strict";
+﻿"use strict";
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
 var GameForestVerboseMessaging  = false;
@@ -117,35 +114,35 @@ var GameForest = function (gameId, lobbyId, sessionId)
                 case GFX_START_GAME:
 
                     GameForest.prototype.onGameStart();
-                    break
+                    break;
                 case GFX_START_CHOICE:
 
                     GameForest.prototype.onGameChoose();
-                    break
+                    break;
                 case GFX_GAME_TALLIED:
 
                     GameForest.prototype.onGameTally(parse.Payload);
-                    break
+                    break;
                 case GFX_GAME_FINISHED:
 
                     GameForest.prototype.onGameFinish();
-                    break
+                    break;
                 case GFX_TURN_START:
 
                     GameForest.prototype.onTurnStart();
-                    break
+                    break;
                 case GFX_TURN_CHANGED:
 
                     GameForest.prototype.onTurnChange();
-                    break
+                    break;
                 case GFX_TURN_RESOLVE:
 
                     GameForest.prototype.onTurnSelect();
-                    break
+                    break;
                 case GFX_DATA_CHANGED:
 
                     GameForest.prototype.onUpdateData(JSON.parse(parse.Message));
-                    break
+                    break;
                 case GFX_ASK_DATA:
                 case GFX_ASK_USER_DATA:
                 case GFX_SEND_DATA:
@@ -172,7 +169,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
     // function to stop the game forest client
     this.stop                   = function ()
     {
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, STOP_CONNECTION, "");
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_STOP_CONNECTION, "");
     };
 
     // ------------------------------------------------------------------------------------------------
@@ -368,11 +365,15 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     function sendRequest        (url, onSuccess, onError)
     {
-        $.ajax({
+        var response = $.ajax({
             url:        "http://" + cloudURL + ":" + cloudPRT + url,
-            async:      false,
-            success:    onSuccess,
-            error:      function (a, b, c) { onError(b, c);}
+            async:      true
+        });
+
+        response.success(onSuccess);
+        response.fail(function(a, b, c) {
+
+            onError(b, c);
         });
     }
 

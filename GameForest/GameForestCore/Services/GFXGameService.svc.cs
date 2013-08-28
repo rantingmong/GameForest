@@ -13,17 +13,23 @@ namespace GameForestCore.Services
     {
         private GFXLogger                       logger;
         private GFXDatabaseTable<GFXGameRow>    gameTable;
+        private GFXDatabaseTable<GFXUserRow>    userTable;
+        private GFXDatabaseTable<GFXLoginRow>   loginTable;
 
         public GFXGameService                   ()
         {
             logger      = new GFXLogger("game service");
+            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
+            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
         }
 
         public GFXGameService                   (GFXLogger gameLogger)
         {
             logger      = gameLogger;
+            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
+            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
         }
 
         public GFXRestResponse                  GetGameList         (int maxCount)
@@ -67,11 +73,76 @@ namespace GameForestCore.Services
             }
         }
 
+        public GFXRestResponse                  CreateGame          (string name, string description, int minPlayers, int maxPlayers, string usersessionid)
+        {
+            logger.Log(GFXLoggerLevel.INFO, "CreateGame", "Creating game...");
+
+            if (!sessionExists(usersessionid))
+            {
+                return constructResponse(GFXResponseType.NotFound, "User session not found!");
+            }
+
+            try
+            {
+                GFXGameRow newGame = new GFXGameRow
+                {
+                    Creator         = getUserId(usersessionid),
+                    Description     = description,
+                    GameID          = Guid.NewGuid(),
+                    MaxPlayers      = maxPlayers,
+                    MinPlayers      = minPlayers,
+                    Name            = name,
+                    RelativeLink    = new Uri("/game/" + name, UriKind.Relative)
+                };
+
+                return constructResponse(GFXResponseType.Normal, "");
+            }
+            catch (Exception exp)
+            {
+                logger.Log(GFXLoggerLevel.INFO, "CreateGame", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
         private GFXRestResponse                 constructResponse   (GFXResponseType responseType, string payload)
         {
             logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
+        }
+
+        private bool                            userExists          (string user)
+        {
+            Guid userId;
+
+            if (Guid.TryParse(user, out userId))
+                return userTable.Count(string.Format("userid = '{0}'", userId)) == 1;
+
+            return this.userTable.Count(string.Format("username = '{0}'", user)) == 1;
+        }
+
+        private bool                            sessionExists       (string sessionid)
+        {
+            return loginTable.Count(string.Format("sessionid = '{0}'", sessionid)) == 1;
+        }
+
+        private Guid                            getUserId           (string input)
+        {
+            Guid sessionId;
+
+            if (Guid.TryParse(input, out sessionId))
+            {
+                var result = new List<GFXLoginRow>(loginTable.Select(string.Format("sessionid = '{0}'", sessionId)));
+
+                return result.Count > 0 ? result[0].UserId : Guid.Empty;
+            }
+            else
+            {
+                var result = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", input)));
+
+                return result.Count > 0 ? result[0].UserId : Guid.Empty;
+            }
         }
     }
 }
