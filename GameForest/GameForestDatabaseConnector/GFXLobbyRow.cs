@@ -38,7 +38,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "GameId", "Name", "Password", "Private", "Status", "CurrentPlayer" }; }
+            get { return new[] { "LobbyId", "GameId", "Name", "Password", "Private", "LobbyStatus", "CurrentPlayer" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbyRow data)

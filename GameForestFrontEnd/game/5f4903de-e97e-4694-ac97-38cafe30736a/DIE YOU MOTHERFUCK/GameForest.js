@@ -1,29 +1,24 @@
 ﻿"use strict";
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
-var GameForestVerboseMessaging  = false;
+var GameForestVerboseMessaging = false;
 
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-var GameForestCloudUrl          = "game-forest.cloudapp.net";
+var GameForestCloudUrl = "game-forest.cloudapp.net";
 
 // Game Forest client API
-var GameForest = function (gameId, lobbyId, sessionId)
-{
+var GameForest = function (gameId, lobbyId, sessionId) {
     if (!Guid.isGuid(gameId) ||
         !Guid.isGuid(lobbyId) ||
-        !Guid.isGuid(sessionId))
-    {
+        !Guid.isGuid(sessionId)) {
         console.error("Parameters required to start GameForest is either missing or in an invalid state.");
 
-        if(GameForestVerboseMessaging)
-        {
+        if (GameForestVerboseMessaging) {
             alert("Parameters required to start GameForest is either missing or in an invalid state.");
         }
 
         return;
     }
-
-    // important shizzocrap, DO NOT FUCKING CHANGE!! D:<
 
     // internal game forest messages
 
@@ -34,10 +29,10 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     var GFX_ASK_DATA            = "GFX_ASK_DATA";           // message to ask for the game's data
     var GFX_ASK_USER_DATA       = "GFX_ASK_USER_DATA";      // message to ask for the user's game data
-    
+
     var GFX_SEND_DATA           = "GFX_SEND_DATA";          // message to send game data
     var GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA";     // message to send user game data
-    
+
     var GFX_FINISH              = "GFX_GAME_FINISH";        // message to inform the server the game is finished
     var GFX_TALLY               = "GFX_GAME_TALLY";         // message to inform the server the game's scores are tallied and ready to be shown to players
 
@@ -67,50 +62,66 @@ var GameForest = function (gameId, lobbyId, sessionId)
     // we don't have to make a promise for each websocket message.
     var wsPromise               = new promise.Promise();
 
-    // end of important shizzocrap
+    this.gameId                 = gameId;                   // the unique identifier of the game
+    this.lobbyId                = lobbyId;                  // the unique identifier of the lobby the player is in
+    this.sessionId              = sessionId;                // the unique identifier of the current session of the player
 
-    this.gameId                 = gameId;                                       // the unique identifier of the game
-    this.lobbyId                = lobbyId;                                      // the unique identifier of the lobby the player is in
-    this.sessionId              = sessionId;                                    // the unique identifier of the current session of the player
+    this.connectionId           = "";                       // the unique identifier for the websocket connection
 
-    this.connectionId           = "";                                           // the unique identifier for the websocket connection
-
-    this.wsConnection           = new WebSocket("ws://localhost:1193");         // websocket object
+    this.wsConnection           = new WebSocket("ws://localhost:8084");     // websocket object
 
     // ------------------------------------------------------------------------------------------------
 
     // function to start the game forest client
-    this.start                  = function ()
-    {
+    this.start = function () {
         var pGfxObject = this;
 
-        this.wsConnection.onopen    = function ()
-        {
-            if (GameForestVerboseMessaging)
-            {
+        this.wsConnection.onopen = function () {
+            if (GameForestVerboseMessaging) {
                 alert("Connection is opened with the server! Expecting the server to give connection ID...");
             }
         };
-        this.wsConnection.onclose   = function ()
-        {
-            if (GameForestVerboseMessaging)
-            {
+        this.wsConnection.onclose = function () {
+            if (GameForestVerboseMessaging) {
                 alert("Connection is closed with the server.");
             }
         };
-        this.wsConnection.onmessage = function (message)
-        {
-            if (Guid.isGuid(message.data))
-            {
-                pGfxObject.connectionId = message.data;
-            }
+        this.wsConnection.onmessage = function (message) {
+
+            console.log(message.data);
 
             var parse = JSON.parse(message.data);
 
             console.log(parse);
 
-            switch (parse.Subject)
-            {
+            // receiving end
+            switch (parse.Subject) {
+
+                case GFX_INIT_CONNECTION:
+
+                    pGfxObject.connectionId = parse.Message;
+                    constructWSRequest(pGfxObject.wsConnection, pGfxObject.connectionId, pGfxObject.sessionId, GFX_INIT_CONNECTION, "");
+                    break;
+                case GFX_ASK_DATA:
+                case GFX_ASK_USER_DATA:
+                case GFX_SEND_DATA:
+                case GFX_SEND_USER_DATA:
+                case GFX_FINISH:
+                case GFX_TALLY:
+                case GFX_NEXT_TURN:
+                case GFX_CONFIRM_TURN:
+                case GFX_GAME_START_CONFIRM:
+                    
+                    if (parse.ResponseCode == 0) {
+                        wsPromise.done(null, parse.Message);
+                    } else {
+                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
+                    }
+                    break;
+                case GFX_GAME_START:
+
+                    GameForest.prototype.onGameStartSignal();
+                    break;
                 case GFX_START_GAME:
 
                     GameForest.prototype.onGameStart();
@@ -121,7 +132,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
                     break;
                 case GFX_GAME_TALLIED:
 
-                    GameForest.prototype.onGameTally(parse.Payload);
+                    GameForest.prototype.onGameTally(parse.Message);
                     break;
                 case GFX_GAME_FINISHED:
 
@@ -143,40 +154,18 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
                     GameForest.prototype.onUpdateData(JSON.parse(parse.Message));
                     break;
-                case GFX_ASK_DATA:
-                case GFX_ASK_USER_DATA:
-                case GFX_SEND_DATA:
-                case GFX_SEND_USER_DATA:
-                case GFX_FINISH:
-                case GFX_TALLY:
-                case GFX_GAME_START:
-                case GFX_GAME_START_CONFIRM:
-                case GFX_NEXT_TURN:
-                case GFX_CONFIRM_TURN:
-
-                    if (parse.ResponseCode == 0)
-                    {
-                        wsPromise.done(null, parse);
-                    }
-                    else
-                    {
-                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
-                    }
-                    break;
             }
         };
     };
     // function to stop the game forest client
-    this.stop                   = function ()
-    {
+    this.stop = function () {
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_STOP_CONNECTION, "");
     };
 
     // ------------------------------------------------------------------------------------------------
 
     // function to inform the server its the next player's turn
-    this.nextTurn               = function ()
-    {
+    this.nextTurn = function () {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_NEXT_TURN, "");
@@ -184,8 +173,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to inform the server the next player's turn has come
-    this.confirmTurn            = function (changedTurn)
-    {
+    this.confirmTurn = function (changedTurn) {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_CONFIRM_TURN, changedTurn);
@@ -193,8 +181,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to inform the server the game's scores are tallied
-    this.sendTallyResult        = function (tallyResult)
-    {
+    this.sendTallyResult = function (tallyResult) {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_TALLY, tallyResult);
@@ -203,21 +190,17 @@ var GameForest = function (gameId, lobbyId, sessionId)
     };
 
     // function to get the current active player
-    this.getCurrentPlayer       = function ()
-    {
+    this.getCurrentPlayer = function () {
         var p = new promise.Promise();
 
         sendRequest("/user/currentplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
-            function (result)
-            {
+            function (result) {
                 p.done(null, result);
             },
-            function (status, why)
-            {
+            function (status, why) {
                 p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
+                if (GameForestVerboseMessaging) {
                     alert("Error in getCurrentPlayer function: [status=" + status + "] [reason=" + why + "]");
                 }
             });
@@ -225,21 +208,17 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return p;
     };
     // function to get the next player "steps" from the player calling this function
-    this.getNextPlayer          = function (steps)
-    {
+    this.getNextPlayer = function (steps) {
         var p = new promise.Promise();
 
         sendRequest("/user/nextplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId + "&steps=" + this.steps,
-            function (result)
-            {
+            function (result) {
                 p.done(null, result);
             },
-            function (status, why)
-            {
+            function (status, why) {
                 p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
+                if (GameForestVerboseMessaging) {
                     alert("Error in getCurrentPlayer function: [status=" + status + "] [reason=" + why + "]");
                 }
             });
@@ -248,21 +227,17 @@ var GameForest = function (gameId, lobbyId, sessionId)
     };
 
     // function to get the user's information
-    this.getUserInfo            = function (username)
-    {
+    this.getUserInfo = function (username) {
         var p = new promise.Promise();
 
         sendRequest("/user/" + username,
-            function (result)
-            {
+            function (result) {
                 p.done(null, result);
             },
-            function (status, why)
-            {
+            function (status, why) {
                 p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
+                if (GameForestVerboseMessaging) {
                     alert("Error in getUserInfo function: [status=" + status + "] [reason=" + why + "]");
                 }
             });
@@ -270,21 +245,17 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return p;
     };
     // function to get the lobby's user list
-    this.getUserList            = function ()
-    {
+    this.getUserList = function () {
         var p = new promise.Promise();
 
         sendRequest("/lobby/users?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
-            function (result)
-            {
+            function (result) {
                 p.done(null, result);
             },
-            function (status, why)
-            {
+            function (status, why) {
                 p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
+                if (GameForestVerboseMessaging) {
                     alert("Error in getUserList function: [status=" + status + "] [reason=" + why + "]");
                 }
             });
@@ -292,21 +263,17 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return p;
     };
     // function to get the game's information
-    this.getGameInfo            = function ()
-    {
+    this.getGameInfo = function () {
         var p = new promise.Promise();
 
         sendRequest("/game/" + this.gameId,
-            function (result)
-            {
+            function (result) {
                 p.done(null, result);
             },
-            function (status, why)
-            {
+            function (status, why) {
                 p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
+                if (GameForestVerboseMessaging) {
                     alert("Error in getGameInfo function: [status=" + status + "] [reason=" + why + "]");
                 }
             });
@@ -315,8 +282,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
     };
 
     // function to retrieve the game data
-    this.askGameData            = function ()
-    {
+    this.askGameData = function () {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_ASK_DATA, "");
@@ -324,8 +290,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to retrieve the user data
-    this.askUserGameData        = function ()
-    {
+    this.askUserGameData = function () {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_ASK_USER_DATA, "");
@@ -334,8 +299,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
     };
 
     // function to finish the game
-    this.finishGame             = function ()
-    {
+    this.finishGame = function () {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_FINISH, "");
@@ -343,8 +307,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to send game data
-    this.sendGameData           = function (payload)
-    {
+    this.sendGameData = function (payload) {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_DATA, payload);
@@ -352,8 +315,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to send user data
-    this.sendUserGameData       = function (payload)
-    {
+    this.sendUserGameData = function (payload) {
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_USER_DATA, payload);
@@ -361,82 +323,91 @@ var GameForest = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
 
+    this.startGame = function () {
+
+        wsPromise = new promise.Promise();
+
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_GAME_START, "");
+
+        return wsPromise;
+    };
+    this.readyGame = function () {
+
+        wsPromise = new promise.Promise();
+
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_GAME_START_CONFIRM, "");
+
+        return wsPromise;
+    };
+
     // ------------------------------------------------------------------------------------------------
 
-    function sendRequest        (url, onSuccess, onError)
-    {
+    function sendRequest(url, onSuccess, onError) {
         var response = $.ajax({
-            url:        "http://" + cloudURL + ":" + cloudPRT + url,
-            async:      true
+            url: "http://" + cloudURL + ":" + cloudPRT + url,
+            async: true
         });
 
         response.success(onSuccess);
-        response.fail(function(a, b, c) {
+        response.fail(function (a, b, c) {
 
             onError(b, c);
         });
     }
 
-    function constructWSRequest (ws, cid, sid, subject, payload)
-    {
+    function constructWSRequest(ws, cid, sid, subject, payload) {
         ws.send(JSON.stringify(
             {
                 "ConnectionId": cid,
-                "SessionId":    sid,
-                "Subject":      subject,
-                "Message":      payload
+                "SessionId": sid,
+                "Subject": subject,
+                "Message": payload
             }));
     }
+};
+
+GameForest.prototype.onGameStartSignal  = function () {
+
 };
 
 // override these methods in your game
 
 // method to override when the game has started
-GameForest.prototype.onGameStart    = function ()
-{
+GameForest.prototype.onGameStart        = function () {
 
 };
 
 // method to override when the game should display the choose screen
-GameForest.prototype.onGameChoose   = function ()
-{
+GameForest.prototype.onGameChoose       = function () {
 
 };
 
 // method to override when its the player's turn
-GameForest.prototype.onTurnStart    = function ()
-{
+GameForest.prototype.onTurnStart        = function () {
 
 };
 
 // method to override when its the other player's turn
-GameForest.prototype.onTurnChange   = function () {
-    this.askGameData().then(function(result) {
+GameForest.prototype.onTurnChange       = function () {
 
-        //
-    });
 };
 
 // method to override when its the player's time to change his/her order
-GameForest.prototype.onTurnSelect   = function (originalTurn)
-{
+GameForest.prototype.onTurnSelect       = function (originalTurn) {
 
 };
 
 // method to override when the game's data has changed
-GameForest.prototype.onUpdateData   = function (data)
-{
+GameForest.prototype.onUpdateData       = function (data) {
 
 };
 
 // method to override when the game is finished
-GameForest.prototype.onGameFinish   = function ()
-{
+GameForest.prototype.onGameFinish       = function () {
 
 };
 
 // method to override when the game's scores are tallied
-GameForest.prototype.onGameTally    = function (tallyList)
-{
+GameForest.prototype.onGameTally        = function (tallyList) {
 
 };

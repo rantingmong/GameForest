@@ -8,7 +8,7 @@ namespace GameForestCore.Services
     public interface IGFXLobbyService
     {
         [OperationContract, WebInvoke(UriTemplate = "?maxcount={maxcount}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
-        GFXRestResponse GetLobbies(int maxcount);
+        GFXRestResponse GetLobbies(string maxcount);
 
         [OperationContract, WebInvoke(UriTemplate = "/{lobbyid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetLobby(string lobbyid);
@@ -24,6 +24,9 @@ namespace GameForestCore.Services
 
         [OperationContract, WebInvoke(UriTemplate = "/users?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetUserList(string lobbyid, string usersessionid);
+
+        [OperationContract, WebInvoke(UriTemplate = "/usercount?lobbyid={lobbyid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        GFXRestResponse GetUserCount(string lobbyid);
 
         [OperationContract, WebInvoke(UriTemplate = "/currentplayer?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetCurrentPlayer(string lobbyid, string usersessionid);

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using Fleck;
 using Newtonsoft.Json;
 using GameForestCore.Database;
@@ -65,7 +65,7 @@ namespace GameForestCoreWebSocket
             listenerList.Add(new GFXGameStart());
             listenerList.Add(new GFXGameStartConfirm());
             
-            server = new WebSocketServer(1193, "ws://localhost");
+            server = new WebSocketServer("ws://localhost:8084");
 
             server.Start(socket =>
                 {
@@ -81,18 +81,22 @@ namespace GameForestCoreWebSocket
                                     ResponseCode    = GFXResponseType.Normal,
                                     Subject         = INIT_CONNECTION
                                 }));
+
+                            Debug.WriteLine("Connection opened with " + socket.ConnectionInfo);
                         };
                     socket.OnClose      = () =>
                         {
-
+                            Debug.WriteLine("Connection closed with " + socket.ConnectionInfo);
                         };
 
                     socket.OnMessage    = message =>
                         {
+                            Debug.WriteLine("Message received: " + message);
+
                             // parse message
                             GFXSocketInfo info = JsonConvert.DeserializeObject<GFXSocketInfo>(message);
 
-                            if (info.Message == INIT_CONNECTION)
+                            if (info.Subject == INIT_CONNECTION)
                             {
                                 if (verifyList.Contains(info.ConnectionId))
                                 {
@@ -113,22 +117,10 @@ namespace GameForestCoreWebSocket
                                         }));
                                 }
                             }
-                            else if (info.Message == STOP_CONNECTION)
+                            else if (info.Subject == STOP_CONNECTION)
                             {
-                                if (verifyList.Contains(info.ConnectionId))
-                                {
-                                    webSocketList.Remove(info.SessionId);
-                                    connectionList.Remove(info.SessionId);
-                                }
-                                else
-                                {
-                                    socket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
-                                        {
-                                            Message         = INIT_CONNECTION,
-                                            Subject         = "Connection ID is not in the verification list! Denying connection.",
-                                            ResponseCode    = GFXResponseType.DoesNotExist
-                                        }));
-                                }
+                                webSocketList.Remove(info.SessionId);
+                                connectionList.Remove(info.SessionId);
                             }
                             else
                             {
@@ -146,7 +138,7 @@ namespace GameForestCoreWebSocket
 
                                 foreach (var listener in listenerList)
                                 {
-                                    if (info.Message == listener.Subject)
+                                    if (info.Subject == listener.Subject)
                                     {
                                         socket.Send(JsonConvert.SerializeObject(listener.DoMessage(this, info, socket)));
                                         break;
@@ -155,6 +147,11 @@ namespace GameForestCoreWebSocket
                             }
                         };
                 });
+        }
+
+        public void Stop()
+        {
+            server.Dispose();
         }
     }
 }

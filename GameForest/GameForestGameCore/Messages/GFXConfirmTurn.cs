@@ -2,9 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameForestCoreWebSocket.Messages
 {
@@ -51,10 +48,11 @@ namespace GameForestCoreWebSocket.Messages
 
                 nextPlayer = nextPlayers[0];
 
-                server.WebSocketList[nextPlayer.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                server.WebSocketList[nextPlayer.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                     {
-                        Message = "GFX_TURN_RESOLVE",
-                        Payload = ""
+                        Subject = "GFX_TURN_RESOLVE",
+                        Message = "",
+                        ResponseCode = GFXResponseType.Normal
                     }));
 
                 var checkPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", nextPlayer.LobbyID)));
@@ -81,29 +79,32 @@ namespace GameForestCoreWebSocket.Messages
                     // send a GFX_START_GAME to all clients
                     foreach (var player in checkPlayers)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_START_GAME",
-                                Payload = ""
+                              Subject = "GFX_START_GAME",
+                              Message = "",
+                              ResponseCode = GFXResponseType.Normal
                             }));
                     }
 
                     // send a GFX_TURN_START to the first player and GFX_TURN_CHANGED to other players
                     var order = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", currentPlayer.LobbyID)));
 
-                    server.WebSocketList[order[0].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                    server.WebSocketList[order[0].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                         {
-                            Message = "GFX_TURN_START",
-                            Payload = ""
+                            Subject = "GFX_TURN_START",
+                            Message = "",
+                            ResponseCode = GFXResponseType.Normal
                         }));
 
                     for (int i = 1; i < order.Count; i++)
                     {
-                        server.WebSocketList[order[i].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
-                        {
-                            Message = "GFX_TURN_CHANGED",
-                            Payload = ""
-                        }));
+                        server.WebSocketList[order[i].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                            {
+                                Subject = "GFX_TURN_CHANGED",
+                                Message = "",
+                                ResponseCode = GFXResponseType.Normal
+                            }));
                     }
                 }
                 

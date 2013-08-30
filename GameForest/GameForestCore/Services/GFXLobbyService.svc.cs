@@ -47,13 +47,13 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        public GFXRestResponse GetLobbies(int maxcount)
+        public GFXRestResponse GetLobbies(string maxcount)
         {
             logger.Log(GFXLoggerLevel.INFO, "GetLobbies", "Fetching lobby list...");
 
             try
             {
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(lobbyTable.Select(string.Empty, maxcount)));
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(lobbyTable.Select(string.Empty, int.Parse(maxcount))));
             }
             catch (Exception exp)
             {
@@ -125,7 +125,7 @@ namespace GameForestCore.Services
 
                 loginRow.UserStatus = GFXLoginStatus.LOBBY;
 
-                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
+                loginTable.Update(string.Format("SessionId = '{0}'", usersessionid), loginRow);
 
                 return constructResponse(GFXResponseType.Normal, session.LobbyID.ToString());
             }
@@ -147,6 +147,16 @@ namespace GameForestCore.Services
                 if (!lobbyExists(lobbyid))
                     return constructResponse(GFXResponseType.NotFound, "Lobby ID is invalid.");
 
+                int lobbyCount = Convert.ToInt32(GetUserCount(lobbyid).AdditionalData);
+
+                var games = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId='{0}'", lobbyid)))[0];
+                var game = new List<GFXGameRow>(gameTable.Select(string.Format("GameId='{0}'", games.GameID)))[0];
+
+                if (lobbyCount + 1 > game.MaxPlayers)
+                {
+                    return constructResponse(GFXResponseType.InvalidInput, "This lobby is full!");
+                }
+
                 GFXLobbySessionRow session = new GFXLobbySessionRow
                 {
                     LobbyID     = Guid.Parse(lobbyid),
@@ -154,7 +164,7 @@ namespace GameForestCore.Services
                     Order       = lobbySessionTable.Count(string.Format("LobbyID = '{0}'", lobbyid)) + 1,
                     Owner       = false,
                     Status      = 0,
-                    RowId       = lobbySessionTable.Count()
+                    RowId       = lobbySessionTable.Count()+1
                 };
 
                 lobbySessionTable.Insert(session);
@@ -163,9 +173,9 @@ namespace GameForestCore.Services
 
                 loginRow.UserStatus = GFXLoginStatus.LOBBY;
 
-                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
+                loginTable.Update(string.Format("SessionId = '{0}'", usersessionid), loginRow);
 
-                return constructResponse(GFXResponseType.Normal, "");
+                return constructResponse(GFXResponseType.Normal, lobbyid);
             }
             catch (Exception exp)
             {
@@ -191,7 +201,7 @@ namespace GameForestCore.Services
 
                 loginRow.UserStatus = GFXLoginStatus.MENU;
 
-                loginTable.Update(string.Format("UserSessionId = {0}", usersessionid), loginRow);
+                loginTable.Update(string.Format("SessionId = '{0}'", usersessionid), loginRow);
 
                 return constructResponse(GFXResponseType.Normal, "");
             }
@@ -207,18 +217,40 @@ namespace GameForestCore.Services
         {
             try
             {
-                if (new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionID = '{0}' AND LobbyID = '{1}'", usersessionid, lobbyid))).Count <= 0)
+                var lobbySessions =
+                    new List<GFXLobbySessionRow>(
+                        lobbySessionTable.Select(string.Format("SessionID = '{0}' AND LobbyID = '{1}'", usersessionid,
+                                                               lobbyid)));
+
+                if (lobbySessions.Count <= 0)
                 {
                     return constructResponse(GFXResponseType.NotFound, "User session specified is not in the lobby.");
                 }
 
-                List<GFXLobbySessionRow> userList = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
+                var userList =
+                    new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
 
                 return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userList));
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|LeaveLobby] " + exp.Message);
+                Console.Error.WriteLine("[Lobby|GetUserList] " + exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse GetUserCount(string lobbyid)
+        {
+            try
+            {
+                var userList = lobbySessionTable.Count(string.Format("LobbyId = '{0}'", lobbyid));
+
+                return constructResponse(GFXResponseType.Normal, userList.ToString());
+            }
+            catch (Exception exp)
+            {
+                Console.Error.WriteLine("[Lobby|UserCount] " + exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }

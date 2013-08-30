@@ -105,7 +105,9 @@ namespace GameForestCore.Database
             {
                 while (reader.Read())
                 {
-                    rtlist.Add(translator.ToNativeData(reader));
+                    var ta = translator.ToNativeData(reader);
+
+                    rtlist.Add(ta);
                 }
             }
             catch (Exception exp)
@@ -126,18 +128,25 @@ namespace GameForestCore.Database
 
         public int              Count               (string condition = "")
         {
-            if (string.IsNullOrEmpty(condition))
+            try
             {
-                commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName;
+                if (string.IsNullOrEmpty(condition))
+                {
+                    commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName;
+                }
+                else
+                {
+                    commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName + " WHERE " + condition;
+                }
+
+                var result = commandNum.ExecuteScalar();
+
+                return int.Parse(result.ToString());
             }
-            else
+            finally
             {
-                commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName + " WHERE " + condition;
+                
             }
-
-            var result = commandNum.ExecuteScalar();
-
-            return int.Parse(result.ToString());
         }
 
         private string          ColumnsString       (IEnumerable<string> columns)

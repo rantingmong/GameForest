@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>GameForest game app</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+</head>
+<body onunload="unload();">
+    <div id="gameForestGameWindow" class="container" style="display: none">
+        <!--This is where you will place your game-->
+    </div>
+    <div id="gameForestLobbyWindow" class="container">
+        <div class="page-header">
+            <h1>Lobby <small>Game 1</small></h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="pager">
+                    <li class="previous"><button class="btn btn-warning pull-left" id="gfxButtonLeave">Leave</button></li>
+                    <li class="next"><button class="btn btn-primary pull-right" id="gfxButtonStart">Start game</button></li>
+                </ul>
+            </div>
+            <br>
+            <div class="col-sm-8">
+                <div class="panel panel-default" id="gfxUserList">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="well">
+                    <textarea class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="focusedInput" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="buttonSendChat">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="gameForestTallyWindow" class="container" style="display: none">
+        <div class="page-header">
+            <h1>Tally <small>Game 1</small></h1>
+        </div>
+        <div class="row">
+
+        </div>
+    </div>
+
+    <script src="guid.js"></script>
+    <script src="jquery.js"></script>
+    <script src="promise.js"></script>
+
+    <script src="Bootstrap/js/bootstrap.min.js"></script>
+    <script src="GameForest.js"></script>
+
+    <script type="text/javascript">
+
+        GameForestCloudUrl          = "localhost";
+        GameForestVerboseMessaging  = true;
+
+        var gf = new GameForest(localStorage.getItem("lobby-game"),
+                                localStorage.getItem("lobby-session"),
+                                localStorage.getItem("user-session"));
+
+        $(document).ready(function ()
+        {
+
+            gf.start();
+
+            // setup timer for user list
+            setInterval(updateUserList, 5000);
+
+            // check if user is owner or not
+            var isowner = localStorage.getItem("lobby-owner");
+
+            if (isowner == "true")
+            {
+                $("#gfxButtonStart").html("Start game");
+                $("#gfxButtonStart").click(function ()
+                {
+                    gf.startGame();
+                });
+            }
+            else
+            {
+                $("#gfxButtonLeave").click(function ()
+                {
+                    unload();
+
+                    // navigate to main page
+                    window.location.href = "../../../index.html";
+                });
+
+                $("#gfxButtonStart").html("Ready");
+                $("#gfxButtonStart").click(function ()
+                {
+                    gf.readyGame();
+                });
+            }
+        });
+
+        function unload()
+        {
+            $.ajax({
+                url:    "http://localhost:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "DELETE",
+                async:  false
+            });
+
+            gf.stop();
+        }
+
+        function updateUserList()
+        {
+            var response = $.ajax({
+                url:    "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                type:   "GET",
+                async:  false
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    $("#gfxUserList").html("");
+
+                    var userList = JSON.parse(data.AdditionalData);
+
+                    for (var i = 0; i < userList.length; i++)
+                    {
+                        var item = userList[i];
+
+                        var userinforesponse = $.ajax({
+                            url:    "http://localhost:1193/service/user/session/" + item.SessionID,
+                            type:   "GET",
+                            async:  false
+                        });
+
+                        userinforesponse.success(function (itemData)
+                        {
+                            var processeddata = JSON.parse(itemData.AdditionalData);
+                            var text = "<div class='panel-body'><span class='glyphicon glyphicon-user' style='margin-right: 10px'></span>" + processeddata.Username + "</div>";
+                            $("#gfxUserList").append(text);
+                        });
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

@@ -38,10 +38,10 @@
                         </ul>
                     </li>
                 </ul>
-
+                
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="index.html">Login</a></li>
+                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
@@ -64,7 +64,14 @@
                     <h2>Upload game</h2>
                 </div>
                 <form runat="server">
-                    <a id="loginSession" runat="server" style="display: none"></a>
+                    <div class="form-group">
+                        <label for="inputUserId">User ID (don't change this):</label>
+                        <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputSessionId">Session ID (don't change this):</label>
+                        <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
                     <div class="form-group">
                         <label for="inputGameName">Game name:</label>
                         <asp:TextBox ID="inputGameName" runat="server" CssClass="form-control"></asp:TextBox>
@@ -94,7 +101,63 @@
 
         $(document).ready(function () {
 
-            $("#loginSession").html(localStorage.getItem("user-session"));
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: false,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+
+                        $("#inputUserId").val(adata.UserId);
+                        $("#inputSessionId").val(localStorage.getItem("user-session"));
+                    });
+                }
+                else
+                {
+                    window.location.href = "index.html";
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                window.location.href = "index.html";
+            });
         });
 
     </script>

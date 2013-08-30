@@ -21,13 +21,15 @@ namespace GameForestConsole
     public partial class MainWindow : Window
     {
         private GFXLogger logger = new GFXLogger("GameForest");
-        private GFXServerCore serverCore;
+        private GFXRestServerCore serverCore;
+        private GFXWebsocketCore websocketCore;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            serverCore = new GFXServerCore(logger);
+            websocketCore = new GFXWebsocketCore(logger);
+            serverCore = new GFXRestServerCore(logger);
 
             serverCore.OnServerRestStart += (o, e) =>
                 {
@@ -59,8 +61,12 @@ namespace GameForestConsole
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
             ellipseREST.Fill = Brushes.Orange;
+            ellipseWSSV.Fill = Brushes.Orange;
 
             serverCore.Start();
+            websocketCore.Start();
+
+            ellipseWSSV.Fill = Brushes.Green;
 
             buttonStart.IsEnabled = false;
             buttonStop.IsEnabled = true;
@@ -68,7 +74,8 @@ namespace GameForestConsole
 
         private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
-            serverCore.Start();
+            serverCore.Stop();
+            websocketCore.Stop();
 
             buttonStart.IsEnabled = true;
             buttonStop.IsEnabled = false;

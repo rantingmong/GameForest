@@ -92,8 +92,10 @@ namespace GameForestCore.Services
                     MaxPlayers      = maxPlayers,
                     MinPlayers      = minPlayers,
                     Name            = name,
-                    RelativeLink    = new Uri("/game/" + name, UriKind.Relative)
+                    RelativeLink    = "game/" + getUserId(usersessionid) + "/" + name
                 };
+
+                gameTable.Insert(newGame);
 
                 return constructResponse(GFXResponseType.Normal, "");
             }

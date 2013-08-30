@@ -25,7 +25,6 @@ namespace GameForestCore.Database
 
     public class GFXLobbySessionRowTranslator : GFXDatabaseTranslator<GFXLobbySessionRow>
     {
-
         public string               TableName
         {
             get { return "LobbySession"; }
@@ -33,7 +32,7 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "SessionId", "Owner", "Order", "Status", "RowId" }; }
+            get { return new[] { "LobbyId", "SessionId", "IsOwner", "PlayerOrder", "Status", "RowId" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbySessionRow data)
@@ -54,12 +53,12 @@ namespace GameForestCore.Database
         {
             return new GFXLobbySessionRow
             {
-                LobbyID     = Guid.Parse(reader.GetString(0)),
-                SessionID   = Guid.Parse(reader.GetString(1)),
-                Owner       = reader.GetBoolean(2),
-                Order       = reader.GetInt32(3),
-                Status      = reader.GetInt32(4),
-                RowId       = reader.GetInt32(5)
+                LobbyID     = reader.GetGuid("LobbyId"),
+                SessionID   = reader.GetGuid("SessionId"),
+                Owner       = reader.GetBoolean("IsOwner"),
+                Order       = reader.GetInt32("PlayerOrder"),
+                Status      = reader.GetInt32("Status"),
+                RowId       = reader.GetInt32("RowId")
             };
         }
     }

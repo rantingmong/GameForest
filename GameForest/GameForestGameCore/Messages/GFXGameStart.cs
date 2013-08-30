@@ -28,7 +28,7 @@ namespace GameForestCoreWebSocket.Messages
                     return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
 
                 // send message to other connected players
-                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbySessions[0].SessionID)));
+                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbySessions[0].LobbyID)));
 
                 foreach (var player in players)
                 {

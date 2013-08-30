@@ -1,27 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
+
+using ICSharpCode.SharpZipLib.Zip;
+using Newtonsoft.Json;
 
 public partial class upload : System.Web.UI.Page
 {
+    public enum GFXResponseType
+    {
+        Normal = 0,
+        InvalidInput = 1,
+
+        NotFound = 10,
+        DuplicateEntry = 11,
+
+        FatalError = 30,
+        RuntimeError = 31,
+
+        NotSupported = 50,
+    }
+
+    public struct GFXRestResponse
+    {
+        public GFXResponseType ResponseType { get; set; }
+        public object AdditionalData { get; set; }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        inputUserId.Attributes.Add("readonly", "readonly");
+        inputSessionId.Attributes.Add("readonly", "readonly");
     }
     protected void ButtonSubmit_Click(object sender, EventArgs e)
     {
-        bool error = false;
-
+        var error       = false;
+        var basePath    = AppDomain.CurrentDomain.BaseDirectory;
+        
         if (FileUpload.HasFile)
         {
-            if (Path.GetExtension(FileUpload.FileName) == "zip")
+            string ext = Path.GetExtension(FileUpload.FileName);
+
+            if (ext.Contains("zip"))
             {
-                FileUpload.SaveAs(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp", FileUpload.FileName));
+                if (!Directory.Exists(Path.Combine(basePath, "temp")))
+                {
+                    Directory.CreateDirectory(Path.Combine(basePath, "temp"));
+                }
+
+                if (!Directory.Exists(Path.Combine(basePath, "temp", inputUserId.Text)))
+                {
+                    Directory.CreateDirectory(Path.Combine(basePath, "temp", inputUserId.Text));
+                }
+
+                FileUpload.SaveAs(Path.Combine(basePath, "temp", inputUserId.Text, FileUpload.FileName));
             }
             else
             {
@@ -41,25 +74,81 @@ public partial class upload : System.Web.UI.Page
 
         if (error == false)
         {
-            // send REST request to server
-            HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
-                                                                                            inputGameName,
-                                                                                            inputDescription,
-                                                                                            inputMinPlayers,
-                                                                                            inputMaxPlayers,
-                                                                                            Guid.Parse(loginSession.InnerHtml));
+            // process zip file and place to games folder
+            try
+            {
+                FastZip zipFile = new FastZip();
+                zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, FileUpload.FileName),
+                                   Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text),
+                                   null);
 
-            newGameRequest.ContentType  = "application/json";
-            newGameRequest.Method       = "POST";
+                bool gfjsok = false;
+                bool gfmain = false;
 
-            newGameRequest.BeginGetResponse(new AsyncCallback((iar) =>
+                // inspect the newly decompressed game
+                foreach (string file in Directory.GetFiles(Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text)))
                 {
-                    var response    = (HttpWebResponse)newGameRequest.GetResponse();
-                    var reader      = new StreamReader(response.GetResponseStream());
+                    if (file.ToLower().Contains("gameforest.js"))
+                        gfjsok = true;
 
-                    string stringResponse = reader.ReadToEnd();
+                    if (file.ToLower().Contains("index.html"))
+                        gfmain = true;
+                }
 
-                }), null);
+                // if something is missing or broken, delete the directory and inform the user
+                if (!gfjsok || !gfmain)
+                {
+                    alertDialog.Attributes["class"] = "alert alert-danger";
+                    alertDialog.Style["display"] = "normal";
+                    alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Your zip file does not contain the required gameforest files.";
+
+                    Directory.Delete(Path.Combine("games", inputUserId.Text, inputGameName.Text));
+                    File.Delete(Path.Combine(basePath, "temp", FileUpload.FileName));
+
+                    return;
+                }
+            }
+            catch (ZipException zipException)
+            {
+                alertDialog.Style["display"] = "normal";
+                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Zip file decompression failed. Please check if your the file is a valid zip file.";
+
+                if (File.Exists(Path.Combine(basePath, "temp", FileUpload.FileName)))
+                    File.Delete(Path.Combine(basePath, "temp", FileUpload.FileName));
+
+                return;
+            }
+
+            // send REST request to server
+            HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
+                                                                                            inputGameName.Text,
+                                                                                            inputDescription.Text,
+                                                                                            inputMinPlayers.Text,
+                                                                                            inputMaxPlayers.Text,
+                                                                                            Guid.Parse(inputSessionId.Text)));
+
+            newGameRequest.Method           = "POST";
+            newGameRequest.ContentLength    = 0;
+
+            var response    = (HttpWebResponse)newGameRequest.GetResponse();
+            var reader      = new StreamReader(response.GetResponseStream());
+
+            var respose = JsonConvert.DeserializeObject<GFXRestResponse>(reader.ReadToEnd());
+
+            if (respose.ResponseType == GFXResponseType.Normal)
+            {
+                // inform user we are done processing
+                alertDialog.Attributes["class"] = "alert alert-success";
+                alertDialog.Style["display"] = "normal";
+                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation succesful! The page will now go back to the games page.";
+            }
+            else
+            {
+                // read response, if it fails, inform the user and don't continue and delete the uploaded file.
+                alertDialog.Attributes["class"] = "alert alert-danger";
+                alertDialog.Style["display"] = "normal";
+                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation was not successful.";
+            }
         }
     }
 }

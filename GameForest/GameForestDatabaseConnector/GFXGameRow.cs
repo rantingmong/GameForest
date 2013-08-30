@@ -13,7 +13,7 @@ namespace GameForestCore.Database
 
         public string   Description     { get; set; }
 
-        public Uri      RelativeLink    { get; set; }
+        public string   RelativeLink    { get; set; }
 
         public Guid     Creator         { get; set; }
 
@@ -57,7 +57,7 @@ namespace GameForestCore.Database
                 Creator         = Guid.Parse(reader.GetString(1)),
                 Name            = reader.GetString(2),
                 Description     = reader.GetString(3),
-                RelativeLink    = new Uri(reader.GetString(4)),
+                RelativeLink    = reader.GetString(4),
                 MinPlayers      = reader.GetInt32(5),
                 MaxPlayers      = reader.GetInt32(6)
             };

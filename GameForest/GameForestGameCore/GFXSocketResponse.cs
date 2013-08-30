@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GameForestCoreWebSocket
+﻿namespace GameForestCoreWebSocket
 {
     public enum GFXResponseType
     {
