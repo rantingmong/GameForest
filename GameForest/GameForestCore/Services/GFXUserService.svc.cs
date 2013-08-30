@@ -12,7 +12,6 @@ namespace GameForestCore.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXUserService : IGFXUserService
     {
-        private GFXLogger logger;
         private readonly GFXDatabaseTable<GFXUserRow> userTable;
         private readonly GFXDatabaseTable<GFXLoginRow> loginTable;
 
@@ -20,16 +19,6 @@ namespace GameForestCore.Services
         {
             userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-
-            this.logger = new GFXLogger("user service");
-        }
-
-        public GFXUserService(GFXLogger logger)
-        {
-            userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
-            loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-
-            this.logger = logger;
         }
 
         // ----------------------------------------------------------------------------------------------------------------
@@ -356,7 +345,7 @@ namespace GameForestCore.Services
 
         private GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
-            logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }

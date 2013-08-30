@@ -67,19 +67,21 @@ namespace GameForestCoreWebSocket.Messages
                     foreach (var player in players)
                     {
                         gameData.UserData.Add(player.SessionID, "");
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_START_CHOOSE",
-                                Payload = ""
+                                Subject = "GFX_START_CHOOSE",
+                                Message = "",
+                                ResponseCode = GFXResponseType.Normal
                             }));
 
                         if (player.Owner)
                         {
                             // send a GFX_TURN_RESOLVE to the owner of the lobby
-                            server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                            server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                                 {
-                                    Message = "GFX_TURN_RESOLVE",
-                                    Payload = ""
+                                    Subject = "GFX_TURN_RESOLVE",
+                                    Message = "",
+                                    ResponseCode = GFXResponseType.Normal
                                 }));
                         }
                     }

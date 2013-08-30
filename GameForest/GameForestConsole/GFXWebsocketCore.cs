@@ -15,7 +15,7 @@ namespace GameForestConsole
         private bool isRunning = true;
         private Thread wsThread;
 
-        public GFXWebsocketCore(GFXLogger logger)
+        public GFXWebsocketCore()
         {
             wsThread = new Thread(new ThreadStart(() =>
                 {

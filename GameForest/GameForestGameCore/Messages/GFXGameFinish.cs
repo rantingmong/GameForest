@@ -31,10 +31,11 @@ namespace GameForestCoreWebSocket.Messages
             foreach (var player in players)
             {
                 // send GFX_GAME_FINISHED
-                server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                     {
-                        Message = "GFX_GAME_FINISHED",
-                        Payload = ""
+                        ResponseCode    = GFXResponseType.Normal,
+                        Subject         = "GFX_GAME_FINISHED",
+                        Message         = ""
                     }));
             }
 

@@ -47,10 +47,11 @@ namespace GameForestCoreWebSocket.Messages
 
                     foreach (var player in players)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_DATA_CHANGED",
-                                Payload = JsonConvert.SerializeObject(dataStore)
+                                Subject = "GFX_DATA_CHANGED",
+                                Message = JsonConvert.SerializeObject(dataStore),
+                                ResponseCode = GFXResponseType.Normal
                             }));
                     }
                 }

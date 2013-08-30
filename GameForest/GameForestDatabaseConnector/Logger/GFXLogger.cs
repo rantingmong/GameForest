@@ -25,7 +25,13 @@ namespace GameForestDatabaseConnector.Logger
 
     public class GFXLogger
     {
-        private string                              applicationGroup    = "";
+        private static GFXLogger                    instance            = new GFXLogger();
+
+        public static GFXLogger                     GetInstance         ()
+        {
+            return instance;
+        }
+
         private List<GFXLoggerEntry>                entries             = new List<GFXLoggerEntry>();
 
         public ReadOnlyCollection<GFXLoggerEntry>   Entries
@@ -35,9 +41,9 @@ namespace GameForestDatabaseConnector.Logger
 
         public event Action<GFXLoggerEntry>         OnLogged;
 
-        public GFXLogger                            (string group)
+        private                                     GFXLogger           ()
         {
-            applicationGroup = group;
+            Debug.WriteLine("Logger initialized!");
         }
 
         public void                                 Log                 (GFXLoggerLevel level, string category, string message)
@@ -49,14 +55,12 @@ namespace GameForestDatabaseConnector.Logger
                 Message     = message
             };
 
-            var msg     = string.Format("[{0} | {1}] ({2}) {3}", applicationGroup, category, level, message);
-            
             entries.Add(entry);
 
             if (OnLogged != null)
                 OnLogged(entry);
 
-            Debug.WriteLine(msg);
+            Debug.WriteLine(string.Format("[{0}] ({1}) {2}", category, level, message));
         }
 
         public void                                 Clear               ()

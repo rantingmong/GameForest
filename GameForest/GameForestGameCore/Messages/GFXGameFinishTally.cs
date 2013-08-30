@@ -1,10 +1,6 @@
 ﻿using GameForestCore.Database;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameForestCoreWebSocket.Messages
 {
@@ -31,10 +27,11 @@ namespace GameForestCoreWebSocket.Messages
             foreach (var player in players)
             {
                 // send GFX_GAME_TALLIED with the tally data to all players 
-                server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                 {
-                    Message = "GFX_GAME_TALLIED",
-                    Payload = info.Message
+                    ResponseCode    = GFXResponseType.Normal,
+                    Subject         = "GFX_GAME_TALLIED",
+                    Message         = info.Message
                 }));
             }
 

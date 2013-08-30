@@ -33,7 +33,7 @@ namespace GameForestConsole
             get { return isStarted; }
         }
 
-        public GFXRestServerCore(GFXLogger logger)
+        public GFXRestServerCore()
         {
             GFXDatabaseCore.Initialize("Server=localhost;Database=GameForest;Uid=root;Pwd=1234;");
 
@@ -43,9 +43,9 @@ namespace GameForestConsole
                 HttpsGetEnabled     = true
             };
 
-            serviceHostUser = new WebServiceHost(new GFXUserService(logger), new Uri("http://localhost:1193/service/user"));
-            serviceHostGame = new WebServiceHost(new GFXGameService(logger), new Uri("http://localhost:1193/service/game"));
-            serviceHostLobi = new WebServiceHost(new GFXLobbyService(logger), new Uri("http://localhost:1193/service/lobby"));
+            serviceHostUser = new WebServiceHost(new GFXUserService(), new Uri("http://localhost:1193/service/user"));
+            serviceHostGame = new WebServiceHost(new GFXGameService(), new Uri("http://localhost:1193/service/game"));
+            serviceHostLobi = new WebServiceHost(new GFXLobbyService(), new Uri("http://localhost:1193/service/lobby"));
 
             var uEndpoint = serviceHostUser.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXUserService), new WebHttpBinding(), "");
             var gEndpoint = serviceHostGame.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXGameService), new WebHttpBinding(), "");

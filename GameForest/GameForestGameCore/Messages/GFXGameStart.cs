@@ -34,10 +34,11 @@ namespace GameForestCoreWebSocket.Messages
                 {
                     if (player.SessionID != info.SessionId)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_GAME_START",
-                                Payload = ""
+                                Subject = "GFX_GAME_START",
+                                Message = "",
+                                ResponseCode = GFXResponseType.Normal
                             }));
                     }
                 }

@@ -61,18 +61,20 @@ namespace GameForestCoreWebSocket.Messages
                 {
                     if (player.SessionID == nextPlayer.SessionID)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_TURN_START",
-                                Payload = ""
+                                Subject = "GFX_TURN_START",
+                                Message = "",
+                                ResponseCode = GFXResponseType.Normal
                             }));
                     }
                     else
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketSend
+                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Message = "GFX_TURN_CHANGED",
-                                Payload = ""
+                                Subject = "GFX_TURN_CHANGED",
+                                Message = "",
+                                ResponseCode = GFXResponseType.Normal
                             }));
                     }
                 }

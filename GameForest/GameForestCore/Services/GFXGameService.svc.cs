@@ -11,22 +11,12 @@ namespace GameForestCore.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXGameService : IGFXGameService
     {
-        private GFXLogger                       logger;
         private GFXDatabaseTable<GFXGameRow>    gameTable;
         private GFXDatabaseTable<GFXUserRow>    userTable;
         private GFXDatabaseTable<GFXLoginRow>   loginTable;
 
         public GFXGameService                   ()
         {
-            logger      = new GFXLogger("game service");
-            userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
-            gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
-            loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-        }
-
-        public GFXGameService                   (GFXLogger gameLogger)
-        {
-            logger      = gameLogger;
             userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
             loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
@@ -34,7 +24,7 @@ namespace GameForestCore.Services
 
         public GFXRestResponse                  GetGameList         (int maxCount)
         {
-            logger.Log(GFXLoggerLevel.INFO, "GetGameList", "Fetching game list...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetGameList", "Fetching game list...");
 
             try
             {
@@ -44,7 +34,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                logger.Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -52,7 +42,7 @@ namespace GameForestCore.Services
 
         public GFXRestResponse                  GetGameInfo         (string gameId)
         {
-            logger.Log(GFXLoggerLevel.INFO, "GetGameInfo", "Fetching game info...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetGameInfo", "Fetching game info...");
 
             try
             {
@@ -67,7 +57,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                logger.Log(GFXLoggerLevel.INFO, "GetGameInfo", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetGameInfo", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -75,7 +65,7 @@ namespace GameForestCore.Services
 
         public GFXRestResponse                  CreateGame          (string name, string description, int minPlayers, int maxPlayers, string usersessionid)
         {
-            logger.Log(GFXLoggerLevel.INFO, "CreateGame", "Creating game...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "CreateGame", "Creating game...");
 
             if (!sessionExists(usersessionid))
             {
@@ -101,7 +91,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                logger.Log(GFXLoggerLevel.INFO, "CreateGame", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "CreateGame", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -109,7 +99,7 @@ namespace GameForestCore.Services
 
         private GFXRestResponse                 constructResponse   (GFXResponseType responseType, string payload)
         {
-            logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }

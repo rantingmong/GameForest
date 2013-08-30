@@ -20,7 +20,6 @@ namespace GameForestConsole
     /// </summary>
     public partial class MainWindow : Window
     {
-        private GFXLogger logger = new GFXLogger("GameForest");
         private GFXRestServerCore serverCore;
         private GFXWebsocketCore websocketCore;
 
@@ -28,8 +27,8 @@ namespace GameForestConsole
         {
             InitializeComponent();
 
-            websocketCore = new GFXWebsocketCore(logger);
-            serverCore = new GFXRestServerCore(logger);
+            serverCore      = new GFXRestServerCore();
+            websocketCore   = new GFXWebsocketCore();
 
             serverCore.OnServerRestStart += (o, e) =>
                 {
@@ -46,7 +45,7 @@ namespace GameForestConsole
                         }));
                 };
 
-            logger.OnLogged += (entry) =>
+            GFXLogger.GetInstance().OnLogged += (entry) =>
                 {
                     Dispatcher.Invoke(new Action(() =>
                         {

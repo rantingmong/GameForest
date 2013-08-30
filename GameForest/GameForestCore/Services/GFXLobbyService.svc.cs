@@ -12,7 +12,6 @@ namespace GameForestCore.Services
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXLobbyService : IGFXLobbyService
     {
-        private GFXLogger                                       logger;
         private readonly GFXDatabaseTable<GFXUserRow>           userTable;
         private readonly GFXDatabaseTable<GFXGameRow>           gameTable;
         private readonly GFXDatabaseTable<GFXLoginRow>          loginTable;
@@ -28,28 +27,13 @@ namespace GameForestCore.Services
             lobbyTable          = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
 
             lobbySessionTable   = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
-
-            logger              = new GFXLogger("lobby service");
-        }
-
-        public GFXLobbyService(GFXLogger gameLogger)
-        {
-            userTable           = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
-            gameTable           = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
-
-            loginTable          = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-            lobbyTable          = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
-
-            lobbySessionTable   = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
-
-            logger              = gameLogger;
         }
 
         // ----------------------------------------------------------------------------------------------------------------
 
         public GFXRestResponse GetLobbies(string maxcount)
         {
-            logger.Log(GFXLoggerLevel.INFO, "GetLobbies", "Fetching lobby list...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetLobbies", "Fetching lobby list...");
 
             try
             {
@@ -65,7 +49,7 @@ namespace GameForestCore.Services
 
         public GFXRestResponse GetLobby(string lobbyid)
         {
-            logger.Log(GFXLoggerLevel.INFO, "GetLobby", "Fetching lobby info...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetLobby", "Fetching lobby info...");
 
             try
             {
@@ -331,7 +315,7 @@ namespace GameForestCore.Services
 
         private GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
         {
-            logger.Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }
