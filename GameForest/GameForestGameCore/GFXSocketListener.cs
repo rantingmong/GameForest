@@ -1,4 +1,5 @@
 ﻿using Fleck;
+using GameForestDatabaseConnector.Logger;
 using System;
 
 namespace GameForestCoreWebSocket
@@ -11,6 +12,8 @@ namespace GameForestCoreWebSocket
 
         protected       GFXSocketResponse   constructResponse   (GFXResponseType response, string payload)
         {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, Subject, string.Format("Response: {0}, Payload: {1}", response, payload));
+
             return new GFXSocketResponse
             {
                 Message         = payload,

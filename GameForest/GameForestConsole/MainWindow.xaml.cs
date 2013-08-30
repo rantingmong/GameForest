@@ -27,6 +27,8 @@ namespace GameForestConsole
         {
             InitializeComponent();
 
+            textConsole.Document.Blocks.Clear();
+
             serverCore      = new GFXRestServerCore();
             websocketCore   = new GFXWebsocketCore();
 
@@ -50,9 +52,26 @@ namespace GameForestConsole
                     Dispatcher.Invoke(new Action(() =>
                         {
                             var par = new Paragraph();
-                            par.Inlines.Add(new Run(string.Format("[{0}] ({1}) {2}", entry.Category, entry.LoggerLevel, entry.Message)));
+                            var run = new Run(string.Format("[{0}] ({1}) {2}", entry.Category, entry.LoggerLevel, entry.Message));
+
+                            switch(entry.LoggerLevel)
+                            {
+                                case GFXLoggerLevel.ERROR:
+                                case GFXLoggerLevel.FATAL:
+                                    run.Foreground = Brushes.DarkRed;
+                                    break;
+                                case GFXLoggerLevel.INFO:
+                                    run.Foreground = Brushes.DarkBlue;
+                                    break;
+                                case GFXLoggerLevel.WARN:
+                                    run.Foreground = Brushes.Orange;
+                                    break;
+                            }
+
+                            par.Inlines.Add(run);
 
                             textConsole.Document.Blocks.Add(par);
+                            textConsole.ScrollToEnd();
                         }));
                 };
         }
@@ -78,6 +97,8 @@ namespace GameForestConsole
 
             buttonStart.IsEnabled = true;
             buttonStop.IsEnabled = false;
+
+            ellipseWSSV.Fill = Brushes.Gray;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -85,6 +106,11 @@ namespace GameForestConsole
             if (serverCore.IsStarted)
             {
                 serverCore.Stop();
+            }
+
+            if (websocketCore.IsRunning)
+            {
+                websocketCore.Stop();
             }
         }
 

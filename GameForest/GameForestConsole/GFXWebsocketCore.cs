@@ -12,8 +12,13 @@ namespace GameForestConsole
     {
         private GFXServerCore serverCore;
 
-        private bool isRunning = true;
+        private bool isRunning = false;
         private Thread wsThread;
+
+        public bool IsRunning
+        {
+            get { return isRunning; }
+        }
 
         public GFXWebsocketCore()
         {
@@ -30,6 +35,7 @@ namespace GameForestConsole
 
         public void Start()
         {
+            isRunning = true;
             wsThread.Start();
         }
 

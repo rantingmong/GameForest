@@ -9,25 +9,18 @@ namespace GameForestCore.Database
     {
         private readonly string                     columnValue = "";
 
-        private readonly MySqlCommand               commandIns;
-        private readonly MySqlCommand               commandRem;
-        private readonly MySqlCommand               commandUpt;
-        private readonly MySqlCommand               commandSel;
+        private MySqlCommand                        commandIns;
+        private MySqlCommand                        commandRem;
+        private MySqlCommand                        commandUpt;
+        private MySqlCommand                        commandSel;
 
-        private readonly MySqlCommand               commandNum;
+        private MySqlCommand                        commandNum;
 
         private readonly GFXDatabaseTranslator<T>   translator; 
 
         public GFXDatabaseTable                     (GFXDatabaseTranslator<T> translator)
         {
             this.translator = translator;
-
-            commandIns = new MySqlCommand { Connection = GFXDatabaseCore.Instance };
-            commandRem = new MySqlCommand { Connection = GFXDatabaseCore.Instance };
-            commandUpt = new MySqlCommand { Connection = GFXDatabaseCore.Instance };
-            commandSel = new MySqlCommand { Connection = GFXDatabaseCore.Instance };
-
-            commandNum = new MySqlCommand { Connection = GFXDatabaseCore.Instance };
 
             var columns = new List<string>(this.translator.TableColumns);
 
@@ -39,113 +32,138 @@ namespace GameForestCore.Database
             columnValue += columns[columns.Count - 1];
         }
 
-        ~GFXDatabaseTable                           ()
-        {
-            commandIns.Dispose();
-            commandRem.Dispose();
-            commandUpt.Dispose();
-            commandSel.Dispose();
-        }
-
         public void             Insert              (T data)
         {
-            var builder = new StringBuilder();
-            var svalues = new List<string>(translator.ToStringValues(data));
-
-            for (int i = 0; i < svalues.Count - 1; i++)
+            using (var msc = GFXDatabaseCore.GetConnection())
             {
-                builder.AppendFormat("{0}, ", svalues[i]);
+                commandIns = new MySqlCommand { Connection = msc };
+
+                var builder = new StringBuilder();
+                var svalues = new List<string>(translator.ToStringValues(data));
+
+                for (int i = 0; i < svalues.Count - 1; i++)
+                {
+                    builder.AppendFormat("{0}, ", svalues[i]);
+                }
+
+                builder.AppendFormat("{0}", svalues[svalues.Count - 1]);
+
+                commandIns.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})", translator.TableName, columnValue, builder);
+                commandIns.ExecuteNonQuery();
+
+                commandIns.Dispose();
             }
-
-            builder.AppendFormat("{0}", svalues[svalues.Count - 1]);
-
-            commandIns.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})", translator.TableName, columnValue, builder);
-            commandIns.ExecuteNonQuery();
         }
 
         public void             Remove              (string condition)
         {
-            commandRem.CommandText = string.Format("DELETE FROM {0} WHERE {1}", translator.TableName, condition);
-            commandRem.ExecuteNonQuery();
+            using (var msc = GFXDatabaseCore.GetConnection())
+            {
+                commandRem = new MySqlCommand { Connection = msc };
+
+                commandRem.CommandText = string.Format("DELETE FROM {0} WHERE {1}", translator.TableName, condition);
+                commandRem.ExecuteNonQuery();
+
+                commandRem.Dispose();
+            }
         }
 
         public void             Update              (string condition, T data)
         {
-            var values = new List<string>(translator.ToStringValues(data));
-            var column = new List<string>(translator.TableColumns);
-            
-            if (column.Count != values.Count)
+            using (var msc = GFXDatabaseCore.GetConnection())
             {
-                throw new InvalidOperationException("Values should match column count.");
+                commandUpt = new MySqlCommand { Connection = msc };
+
+                var values = new List<string>(translator.ToStringValues(data));
+                var column = new List<string>(translator.TableColumns);
+
+                if (column.Count != values.Count)
+                {
+                    throw new InvalidOperationException("Values should match column count.");
+                }
+
+                var combinedValues = new StringBuilder();
+
+                for (var i = 0; i < values.Count - 1; i++)
+                {
+                    combinedValues.AppendFormat("{0} = {1}, ", column[i], values[i]);
+                }
+
+                combinedValues.AppendFormat(" {0} = {1}", column[values.Count - 1], values[values.Count - 1]);
+
+                commandUpt.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2}", translator.TableName, combinedValues, condition);
+                commandUpt.ExecuteNonQuery();
+
+                commandUpt.Dispose();
             }
-
-            var combinedValues = new StringBuilder();
-            
-            for (var i = 0; i < values.Count - 1; i++)
-            {
-                combinedValues.AppendFormat("{0} = {1}, ", column[i], values[i]);
-            }
-
-            combinedValues.AppendFormat(" {0} = {1}", column[values.Count - 1], values[values.Count - 1]);
-
-            commandUpt.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2}", translator.TableName, combinedValues, condition);
-            commandUpt.ExecuteNonQuery();
         }
 
         public IEnumerable<T>   Select              (string condition, int maxRows = int.MaxValue)
         {
-            commandSel.CommandText = string.IsNullOrEmpty(condition) ?
-                string.Format("SELECT * FROM {0} LIMIT {1}", translator.TableName, maxRows) :
-                string.Format("SELECT * FROM {0} WHERE {1} LIMIT {2}", translator.TableName, condition, maxRows);
-
-            var reader = commandSel.ExecuteReader();
-            var rtlist = new List<T>();
-
-            try
+            using (var msc = GFXDatabaseCore.GetConnection())
             {
-                while (reader.Read())
+                commandSel = new MySqlCommand { Connection = GFXDatabaseCore.GetConnection() };
+
+                commandSel.CommandText = string.IsNullOrEmpty(condition) ?
+                    string.Format("SELECT * FROM {0} LIMIT {1}", translator.TableName, maxRows) :
+                    string.Format("SELECT * FROM {0} WHERE {1} LIMIT {2}", translator.TableName, condition, maxRows);
+
+                var reader = commandSel.ExecuteReader();
+                var rtlist = new List<T>();
+
+                try
                 {
-                    var ta = translator.ToNativeData(reader);
+                    while (reader.Read())
+                    {
+                        var ta = translator.ToNativeData(reader);
 
-                    rtlist.Add(ta);
+                        rtlist.Add(ta);
+                    }
                 }
+                catch (Exception exp)
+                {
+                    // TODO: log the exception
+                    Console.WriteLine(exp.Message);
+
+                    return null;
+                }
+                finally
+                {
+                    reader.Close();
+                    reader.Dispose();
+
+                    commandSel.Dispose();
+                }
+
+                return rtlist.ToArray();
             }
-            catch (Exception exp)
-            {
-                // TODO: log the exception
-                Console.WriteLine(exp.Message);
-                
-                return null;
-            }
-            finally
-            {
-                reader.Close();
-                reader.Dispose();
-            }
-            
-            return rtlist.ToArray();
         }
 
         public int              Count               (string condition = "")
         {
-            try
+            using (var msc = GFXDatabaseCore.GetConnection())
             {
-                if (string.IsNullOrEmpty(condition))
+                try
                 {
-                    commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName;
+                    commandNum = new MySqlCommand { Connection = GFXDatabaseCore.GetConnection() };
+
+                    if (string.IsNullOrEmpty(condition))
+                    {
+                        commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName;
+                    }
+                    else
+                    {
+                        commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName + " WHERE " + condition;
+                    }
+
+                    var result = commandNum.ExecuteScalar();
+
+                    return int.Parse(result.ToString());
                 }
-                else
+                finally
                 {
-                    commandNum.CommandText = "SELECT COUNT(*) FROM " + translator.TableName + " WHERE " + condition;
+                    commandNum.Dispose();
                 }
-
-                var result = commandNum.ExecuteScalar();
-
-                return int.Parse(result.ToString());
-            }
-            finally
-            {
-                
             }
         }
 

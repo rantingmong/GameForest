@@ -8,8 +8,24 @@
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
 </head>
 <body onunload="unload();">
-    <div id="gameForestGameWindow" class="container" style="display: none">
+    <div id="gameForestGameWindow" class="container" style="display: normal">
         <!--This is where you will place your game-->
+        <div id="sampleGameChooseScreen" style="display: normal" class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h2 style="text-align: center">Choose between O or X:</h2>
+                <div class="col-md-6" style="text-align: center">
+                    <button id="sampleGameButtonChooseO" class="btn btn-success btn-lg" style="margin: auto">I choose O</button>
+                </div>
+                <div class="col-md-6" style="text-align: center">
+                    <button id="sampleGameButtonChooseX" class="btn btn-info btn-lg" style="margin: auto">I choose X</button>
+                </div>
+            </div>
+        </div>
+        <div id="sampleGameActualGame" style="display: none">
+            <canvas width="800" height="480">
+
+            </canvas>
+        </div>
     </div>
     <div id="gameForestLobbyWindow" class="container">
         <div class="page-header">
@@ -19,7 +35,7 @@
             <div class="col-sm-12">
                 <ul class="pager">
                     <li class="previous"><button class="btn btn-warning pull-left" id="gfxButtonLeave">Leave</button></li>
-                    <li class="next"><button class="btn btn-primary pull-right" id="gfxButtonStart">Start game</button></li>
+                    <li class="next"><button class="btn btn-primary pull-right" id="gfxButtonStart" disabled>Start game</button></li>
                 </ul>
             </div>
             <br>
@@ -58,54 +74,54 @@
 
     <script src="Bootstrap/js/bootstrap.min.js"></script>
     <script src="GameForest.js"></script>
+    <script src="GameLogic.js"></script>
 
     <script type="text/javascript">
 
-        GameForestCloudUrl          = "localhost";
-        GameForestVerboseMessaging  = true;
+        var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
+                                new Guid(localStorage.getItem("lobby-session")),
+                                new Guid(localStorage.getItem("user-session")));
 
-        var gf = new GameForest(localStorage.getItem("lobby-game"),
-                                localStorage.getItem("lobby-session"),
-                                localStorage.getItem("user-session"));
-
-        $(document).ready(function ()
+        $("#gfxButtonLeave").click(function ()
         {
+            // navigate to main page
+            window.location.href = "../../../index.html";
+        });
 
-            gf.start();
+        $(document).ready(documentReady);
 
+        function documentReady  ()
+        {
             // setup timer for user list
             setInterval(updateUserList, 5000);
+
+            gf.start();
 
             // check if user is owner or not
             var isowner = localStorage.getItem("lobby-owner");
 
             if (isowner == "true")
             {
+                $("#gfxButtonStart").removeAttr("disabled");
                 $("#gfxButtonStart").html("Start game");
                 $("#gfxButtonStart").click(function ()
                 {
                     gf.startGame();
+                    $("#gfxButtonStart").prop("disabled", true);
+                    $("#gfxButtonStart").html("Waiting for other players...");
                 });
             }
             else
             {
-                $("#gfxButtonLeave").click(function ()
-                {
-                    unload();
-
-                    // navigate to main page
-                    window.location.href = "../../../index.html";
-                });
-
                 $("#gfxButtonStart").html("Ready");
                 $("#gfxButtonStart").click(function ()
                 {
                     gf.readyGame();
                 });
             }
-        });
+        }
 
-        function unload()
+        function unload         ()
         {
             $.ajax({
                 url:    "http://localhost:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
@@ -116,7 +132,7 @@
             gf.stop();
         }
 
-        function updateUserList()
+        function updateUserList ()
         {
             var response = $.ajax({
                 url:    "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),

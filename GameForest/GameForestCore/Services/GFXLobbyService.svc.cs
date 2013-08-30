@@ -41,7 +41,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|GetLobbies] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -64,7 +64,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|GetLobby] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetLobby", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -75,10 +75,16 @@ namespace GameForestCore.Services
             try
             {
                 if (!sessionExists(usersessionid))
+                {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "CreateLobby", "Invalid user session id.");
                     return constructResponse(GFXResponseType.NotFound, "Invalid user session id.");
+                }
 
                 if (!gameExists(gameid))
+                {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "CreateLobby", "Invalid game id.");
                     return constructResponse(GFXResponseType.NotFound, "Invalid game id.");
+                }
 
                 GFXLobbyRow session = new GFXLobbyRow
                 {
@@ -95,12 +101,13 @@ namespace GameForestCore.Services
                 // create the owner's session
                 GFXLobbySessionRow playerSession = new GFXLobbySessionRow
                 {
-                    LobbyID     = session.LobbyID,
-                    SessionID   = Guid.Parse(usersessionid),
-                    Order       = 1,
-                    Owner       = true,
-                    Status      = 0,
-                    RowId       = lobbySessionTable.Count()
+                    LobbyID         = session.LobbyID,
+                    SessionID       = Guid.Parse(usersessionid),
+                    Order           = 1,
+                    OrderOriginal   = 1,
+                    Owner           = true,
+                    Status          = 0,
+                    RowId           = lobbySessionTable.Count()
                 };
 
                 lobbySessionTable.Insert(playerSession);
@@ -115,7 +122,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|CreateLobby] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "CreateLobby", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -126,29 +133,42 @@ namespace GameForestCore.Services
             try
             {
                 if (!sessionExists(usersessionid))
+                {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "JoinLobby", "User session ID is invalid.");
+
                     return constructResponse(GFXResponseType.NotFound, "User session ID is invalid.");
+                }
 
                 if (!lobbyExists(lobbyid))
+                {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "JoinLobby", "Lobby id is invalid.");
+
                     return constructResponse(GFXResponseType.NotFound, "Lobby ID is invalid.");
+                }
 
                 int lobbyCount = Convert.ToInt32(GetUserCount(lobbyid).AdditionalData);
 
-                var games = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId='{0}'", lobbyid)))[0];
-                var game = new List<GFXGameRow>(gameTable.Select(string.Format("GameId='{0}'", games.GameID)))[0];
+                var games   = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId='{0}'", lobbyid)))[0];
+                var game    = new List<GFXGameRow>(gameTable.Select(string.Format("GameId='{0}'", games.GameID)))[0];
 
                 if (lobbyCount + 1 > game.MaxPlayers)
                 {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "JoinLobby", "This lobby is full!");
+
                     return constructResponse(GFXResponseType.InvalidInput, "This lobby is full!");
                 }
 
+                var order = lobbySessionTable.Count(string.Format("LobbyID = '{0}'", lobbyid)) + 1;
+
                 GFXLobbySessionRow session = new GFXLobbySessionRow
                 {
-                    LobbyID     = Guid.Parse(lobbyid),
-                    SessionID   = Guid.Parse(usersessionid),
-                    Order       = lobbySessionTable.Count(string.Format("LobbyID = '{0}'", lobbyid)) + 1,
-                    Owner       = false,
-                    Status      = 0,
-                    RowId       = lobbySessionTable.Count()+1
+                    LobbyID         = Guid.Parse(lobbyid),
+                    SessionID       = Guid.Parse(usersessionid),
+                    Order           = order,
+                    OrderOriginal   = order,
+                    Owner           = false,
+                    Status          = 0,
+                    RowId           = lobbySessionTable.Count()
                 };
 
                 lobbySessionTable.Insert(session);
@@ -163,7 +183,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|JoinLobby] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "JoinLobby", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -191,8 +211,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|LeaveLobby] " + exp.Message);
-
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "LeaveLobby", exp.Message);
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
         }
@@ -201,13 +220,11 @@ namespace GameForestCore.Services
         {
             try
             {
-                var lobbySessions =
-                    new List<GFXLobbySessionRow>(
-                        lobbySessionTable.Select(string.Format("SessionID = '{0}' AND LobbyID = '{1}'", usersessionid,
-                                                               lobbyid)));
+                var lobbySessions = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionID = '{0}' AND LobbyID = '{1}'", usersessionid,lobbyid)));
 
                 if (lobbySessions.Count <= 0)
                 {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "GetUserList", "User session specified is not in the lobby.");
                     return constructResponse(GFXResponseType.NotFound, "User session specified is not in the lobby.");
                 }
 
@@ -218,14 +235,15 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|GetUserList] " + exp.Message);
-
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "GetUserList", exp.Message);
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
         }
 
         public GFXRestResponse GetUserCount(string lobbyid)
         {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserCount", "Getting user count for lobby " + lobbyid);
+
             try
             {
                 var userList = lobbySessionTable.Count(string.Format("LobbyId = '{0}'", lobbyid));
@@ -234,21 +252,26 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|UserCount] " + exp.Message);
-
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetUserCount", exp.Message);
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
         }
 
         public GFXRestResponse GetCurrentPlayer(string lobbyid, string usersessionid)
         {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetCurrentPlayer", "Getting current player for session " + lobbyid);
+
             try
             {
                 // get lobbyid of user asking
                 List<GFXLobbySessionRow> sessions = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
 
                 if (sessions.Count <= 0)
+                {
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "GetCurrentPlayer", "User is not playing any games!");
+
                     return constructResponse(GFXResponseType.NotFound, "User is not playing any games!");
+                }
 
                 // get lobby information
                 List<GFXLobbyRow> lobbies = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId = '{0}'", sessions[0].LobbyID)));

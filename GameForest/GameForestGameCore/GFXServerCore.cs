@@ -5,6 +5,7 @@ using Fleck;
 using Newtonsoft.Json;
 using GameForestCore.Database;
 using GameForestCoreWebSocket.Messages;
+using GameForestDatabaseConnector.Logger;
 
 namespace GameForestCoreWebSocket
 {
@@ -140,6 +141,8 @@ namespace GameForestCoreWebSocket
                                 {
                                     if (info.Subject == listener.Subject)
                                     {
+                                        GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, info.Subject, "Message received: " + info.Message);
+
                                         socket.Send(JsonConvert.SerializeObject(listener.DoMessage(this, info, socket)));
                                         break;
                                     }
