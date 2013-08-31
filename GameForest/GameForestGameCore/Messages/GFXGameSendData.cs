@@ -40,14 +40,12 @@ namespace GameForestCoreWebSocket.Messages
                     // send message to other connected players
                     List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbySessions[0].LobbyID)));
 
-                    string gameData = JsonConvert.SerializeObject(dataStore);
-
                     foreach (var player in players)
                     {
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject = "GFX_DATA_CHANGED",
-                                Message = JsonConvert.SerializeObject(dataStore),
+                                Message = info.Message,
                                 ResponseCode = GFXResponseType.Normal
                             }));
                     }

@@ -31,11 +31,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     // ------------------------------------------------------------------------------------------------
     
-    // URL of the game forest server and its port. DO NOT EVER EVER EVER CHANGE THIS IF YOU DON'T WANT YOUR GAME TO EXPLODE. >:)
-
-    var cloudURL                = GameForestCloudUrl,
-        cloudPRT                = 1193,
-        wsPromise               = new promise.Promise();    // promise instance for websocket messages
+    // critical variables
 
     this.gameId                 = gameId;                   // the unique identifier of the game
     this.lobbyId                = lobbyId;                  // the unique identifier of the lobby the player is in
@@ -49,17 +45,21 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     // helper methods
 
-    function sendRequest        (url, onSuccess, onError)
+    function sendRequest        (url, type, onSuccess, onError)
     {
+        var httpURL = "http://" + cloudURL + ":" + cloudPRT + "/service" + url;
+
+        console.log("Doing " + type + " request on URL " + httpURL);
+
         var response = $.ajax({
-            url:    "http://" + cloudURL + ":" + cloudPRT + "/service" + url,
-            async:  true
+            url:    httpURL,
+            async:  true,
+            type:   type,
         });
 
         response.success(onSuccess);
         response.fail(function (a, b, c)
         {
-
             onError(b, c);
         });
     }
@@ -82,6 +82,12 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     // ------------------------------------------------------------------------------------------------
 
+    // URL of the game forest server and its port. DO NOT EVER EVER EVER CHANGE THIS IF YOU DON'T WANT YOUR GAME TO EXPLODE. >:)
+
+    var cloudURL                = GameForestCloudUrl,
+        cloudPRT                = 1193,
+        wsPromise               = new promise.Promise();    // promise instance for websocket messages
+
     // internal game forest messages
 
     var GFX_INIT_CONNECTION     = "GFX_INIT_CONNECTION",    // message to initiate connection with a game forest server
@@ -96,7 +102,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA",     // message to send user game data
 
         GFX_FINISH              = "GFX_GAME_FINISH",        // message to inform the server the game is finished
-        GFX_TALLY               = "GFX_GAME_TALLY",         // message to inform the server the game's scores are tallied and ready to be shown to players
 
         GFX_GAME_START          = "GFX_GAME_START",         // message to inform the server the game should start
         GFX_GAME_START_CONFIRM  = "GFX_GAME_START_CONFIRM", // message to inform the server the client has acknowledged the GFX_GAME_START message
@@ -108,7 +113,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         GFX_START_GAME          = "GFX_START_GAME",         // message to inform the client the game has started
         GFX_START_CHOICE        = "GFX_START_CHOICE",       // message to inform the client the game should display the order choose screen
-        GFX_GAME_TALLIED        = "GFX_GAME_TALLIED",       // message to inform the client the game's scores are tallied
         GFX_GAME_FINISHED       = "GFX_GAME_FINISHED",      // message to inform the client the game has finished
         GFX_TURN_START          = "GFX_TURN_START",         // message to inform the client its the player's turn
         GFX_TURN_CHANGED        = "GFX_TURN_CHANGED",       // message to inform the client the player's turn has changed
@@ -147,7 +151,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
                 case GFX_SEND_DATA:
                 case GFX_SEND_USER_DATA:
                 case GFX_FINISH:
-                case GFX_TALLY:
                 case GFX_NEXT_TURN:
                 case GFX_CONFIRM_TURN:
                 case GFX_GAME_START_CONFIRM:
@@ -195,12 +198,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     GameForest.prototype.onGameChoose();
                     break;
-                case GFX_GAME_TALLIED:
-
-                    console.log("Server is asking the game to tally the player's scores. Show the tally screen.");
-
-                    GameForest.prototype.onGameTally(parse.Message);
-                    break;
                 case GFX_GAME_FINISHED:
 
                     console.log("Server is informing players that the game is finished!");
@@ -229,7 +226,9 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     console.log("Server is informing players the game's data has changed.");
 
-                    GameForest.prototype.onUpdateData(JSON.parse(parse.Message));
+                    var packagedData = JSON.parse(parse.Message);
+
+                    GameForest.prototype.onUpdateData(packagedData.Key, JSON.parse(packagedData.Data));
                     break;
             }
         };
@@ -238,6 +237,16 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     this.stop                   = function ()
     {
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_STOP_CONNECTION, "");
+    };
+
+    // lol method
+    this.thenStarter            = function ()
+    {
+        var p = new promise.Promise();
+
+        p.done(null, "");
+
+        return p;
     };
 
     // ------------------------------------------------------------------------------------------------
@@ -260,25 +269,21 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return wsPromise;
     };
-    // function to inform the server the game's scores are tallied
-    this.sendTallyResult        = function (tallyResult)
-    {
-        wsPromise = new promise.Promise();
-
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_TALLY, tallyResult);
-
-        return wsPromise;
-    };
-
+    
     // function to get the current active player
     this.getCurrentPlayer       = function ()
     {
         var p = new promise.Promise();
 
-        sendRequest("/user/currentplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
+        sendRequest("/lobby/currentplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId, "GET",
             function (result)
             {
-                p.done(null, result);
+                console.log("Result is: " + result.ResponseType + " with payload: " + result.AdditionalData);
+
+                if (result.ResponseType == 0)
+                    p.done(null, JSON.parse(result.AdditionalData));
+                else
+                    p.done(result.ResponseType + " " + result.AdditionalData);
             },
             function (status, why)
             {
@@ -297,10 +302,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         var p = new promise.Promise();
 
-        sendRequest("/user/nextplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId + "&steps=" + this.steps,
+        sendRequest("/lobby/nextplayer?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId + "&steps=" + steps, "GET",
             function (result)
             {
-                p.done(null, result);
+                if (result.ResponseType == 0)
+                    p.done(null, JSON.parse(result.AdditionalData));
+                else
+                    p.done(result.ResponseType + " " + result.AdditionalData);
             },
             function (status, why)
             {
@@ -320,10 +328,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         var p = new promise.Promise();
 
-        sendRequest("/lobby/turn?lobbyid" + this.lobbyId + "?usersessionid=" + this.sessionId,
+        sendRequest("/lobby/turn?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId, "GET",
                     function (result)
                     {
-                        p.done(null, result);
+                        if (result.ResponseType == 0)
+                            p.done(null, parseInt(result.AdditionalData));
+                        else
+                            p.done(result.ResponseType + " " + result.AdditionalData);
                     },
                     function (status, why)
                     {
@@ -344,10 +355,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         if (username == undefined || username.length == 0 || username == " ")
         {
-            sendRequest("/user/session/" + this.sessionId,
+            sendRequest("/user/session/" + this.sessionId, "GET",
                         function (result)
                         {
-                            p.done(null, result);
+                            if (result.ResponseType == 0)
+                                p.done(null, JSON.parse(result.AdditionalData));
+                            else
+                                p.done(result.ResponseType + " " + result.AdditionalData);
                         },
                         function (status, why)
                         {
@@ -361,10 +375,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         }
         else
         {
-            sendRequest("/user/" + username,
+            sendRequest("/user/" + username, "GET",
                         function (result)
                         {
-                            p.done(null, result);
+                            if (result.ResponseType == 0)
+                                p.done(null, JSON.parse(result.AdditionalData));
+                            else
+                                p.done(result.ResponseType + " " + result.AdditionalData);
                         },
                         function (status, why)
                         {
@@ -385,10 +402,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         var p = new promise.Promise();
 
-        sendRequest("/lobby/users?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId,
+        sendRequest("/lobby/users?lobbyid=" + this.lobbyId + "&usersessionid=" + this.sessionId, "GET",
             function (result)
             {
-                p.done(null, result);
+                if (result.ResponseType == 0)
+                    p.done(null, JSON.parse(result.AdditionalData));
+                else
+                    p.done(result.ResponseType + " " + result.AdditionalData);
             },
             function (status, why)
             {
@@ -407,10 +427,13 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         var p = new promise.Promise();
 
-        sendRequest("/game/" + this.gameId,
+        sendRequest("/game/" + this.gameId, "GET",
             function (result)
             {
-                p.done(null, result);
+                if (result.ResponseType == 0)
+                    p.done(null, JSON.parse(result.AdditionalData));
+                else
+                    p.done(result.ResponseType + " " + result.AdditionalData);
             },
             function (status, why)
             {
@@ -445,7 +468,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     };
 
     // function to finish the game
-    this.finishGame             = function ()
+    this.finishGame             = function (tallyResults)
     {
         wsPromise = new promise.Promise();
 
@@ -454,11 +477,17 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     // function to send game data
-    this.sendGameData           = function (payload)
+    this.sendGameData           = function (key, payload)
     {
         wsPromise = new promise.Promise();
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_DATA, payload);
+        var packagedData =
+            {
+                Key:    key,
+                Data:   JSON.stringify(payload)
+            };
+
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_DATA, JSON.stringify(packagedData));
 
         return wsPromise;
     };
@@ -467,7 +496,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         wsPromise = new promise.Promise();
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_USER_DATA, payload);
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_USER_DATA, JSON.string(payload));
 
         return wsPromise;
     };
@@ -528,19 +557,13 @@ GameForest.prototype.onTurnSelect       = function (originalTurn)
 };
 
 // method to override when the game's data has changed
-GameForest.prototype.onUpdateData       = function (data)
+GameForest.prototype.onUpdateData       = function (key, data)
 {
 
 };
 
 // method to override when the game is finished
-GameForest.prototype.onGameFinish       = function ()
-{
-
-};
-
-// method to override when the game's scores are tallied
-GameForest.prototype.onGameTally        = function (tallyList)
+GameForest.prototype.onGameFinish       = function (tallyList)
 {
 
 };

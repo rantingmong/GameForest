@@ -46,12 +46,6 @@ namespace GameForestCoreWebSocket.Messages
 
                 if (allOkay)
                 {
-                    // if all user's status are 2, change lobby state to playing
-                    var lobby           = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)))[0];
-                        lobby.Status    = GFXLobbyStatus.Playing;
-
-                    server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
-
                     // send a GFX_START_GAME to all clients
                     foreach (var player in checkPlayers)
                     {
@@ -65,6 +59,16 @@ namespace GameForestCoreWebSocket.Messages
 
                     // send a GFX_TURN_START to the first player and GFX_TURN_CHANGED to other players
                     var order = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY PlayerOrder ASC", currentPlayer.LobbyID)));
+
+                    // update game data
+                    server.GameDataList[order[0].LobbyID].CurrentUserSession = order[0].SessionID;
+
+                    // if all user's status are 2, change lobby state to playing and set current player
+                    var lobby = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)))[0];
+                        lobby.Status        = GFXLobbyStatus.Playing;
+                        lobby.CurrentPlayer = order[0].SessionID;
+
+                    server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
                     server.WebSocketList[order[0].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                         {

@@ -20,11 +20,17 @@ var gameData                = {
 };
 
 var myTurn                  = false;
+var myToken                 = ' ';
+
+var xPlayer; // we know that X player is always the second one
+var oPlayer; // we know that O player is always the first one
+
+var currentPlayer           = null;
+
+var xPlayerName             = "";
+var oPlayerName             = "";
 
 var showUpdateText          = false;
-
-var player1Name             = "";
-var player2Name             = "";
 
 var selectedTile            = { x: 0, y: 0 };
 
@@ -36,21 +42,17 @@ var highlightBox            = "lightGray";
 
 Math.clamp = function (value, min, max)
 {
-    if      (value <= min)
+    if (value <= min)
+    {
         return min;
+    }
     else if (value >= max)
+    {
         return max;
-    else
-        return value;
+    }
+
+    return value;
 };
-
-function drawTurns  ()
-{
-    canvasContex.fillStyle  = "black";
-    canvasContex.font       = "20px arial";
-
-    canvasContex.fillText("Players:", 20, 20);
-}
 
 function drawTile   ()
 {
@@ -63,7 +65,7 @@ function drawTile   ()
     canvasContex.moveTo(0, 140);
     canvasContex.lineTo(420, 140);
 
-    canvasContex.moveTo(  0, 280);
+    canvasContex.moveTo(0, 280);
     canvasContex.lineTo(420, 280);
 
     canvasContex.moveTo(140, 0);
@@ -75,7 +77,35 @@ function drawTile   ()
     canvasContex.stroke();
 
     canvasContex.restore();
-}
+};
+
+function drawTurns  ()
+{
+    canvasContex.fillStyle = "black";
+    canvasContex.font = "20px arial";
+
+    canvasContex.fillText("Players:", 20, 20);
+
+    if (currentPlayer != null)
+    {
+        if (currentPlayer == oPlayer)
+            canvasContex.fillStyle = "green";
+        else
+            canvasContex.fillStyle = "black";
+    }
+
+    canvasContex.fillText("O: " + oPlayerName, 20, 40);
+
+    if (currentPlayer != null)
+    {
+        if (currentPlayer == xPlayer)
+            canvasContex.fillStyle = "green";
+        else
+            canvasContex.fillStyle = "black";
+    }
+
+    canvasContex.fillText("X: " + xPlayerName, 20, 60);
+};
 
 function drawTokens ()
 {
@@ -87,7 +117,26 @@ function drawTokens ()
     canvasContex.fillRect(0, 0, 140, 140);
 
     canvasContex.restore();
-}
+
+    canvasContex.save();
+
+    canvasContex.textBaseline   = "middle";
+    canvasContex.fillStyle      = "black";
+    canvasContex.font           = "30px arial";
+
+    for (var y = 0; y < 3; y++)
+    {
+        for (var x = 0; x < 3; x++)
+        {
+            var tx = gameData.gameTile[y][x];
+            var tm = canvasContex.measureText(tx);
+
+            canvasContex.fillText(tx, x * 140 + 190 + ((140 - tm.width) / 2), y * 140 + 85);
+        }
+    }
+
+    canvasContex.restore();
+};
 
 function mouseMove  (evt)
 {
@@ -103,10 +152,10 @@ function mouseMove  (evt)
     selectedTile.y = Math.clamp(Math.floor(ty / 140), 0, 2);
 
     // do mouse handling stuff here
-    mousePositionMsg    = "Mouse position: {" + px + ", " + py + "}";
-    mousePosInTileMsg   = "Mouse position relative to tile: {" + tx + ", " + ty + "}";
-    selectedTileMsg     = "Selected tile position: {" + selectedTile.x + ", " + selectedTile.y + "}";
-}
+    mousePositionMsg = "Mouse position: {" + px + ", " + py + "}";
+    mousePosInTileMsg = "Mouse position relative to tile: {" + tx + ", " + ty + "}";
+    selectedTileMsg = "Selected tile position: {" + selectedTile.x + ", " + selectedTile.y + "}";
+};
 
 function mouseClick (evt)
 {
@@ -114,36 +163,40 @@ function mouseClick (evt)
         return;
 
     // get the mouse position and place token, in addition to checking if the tile is empty or not
-    if (gameData.gameTile[selectedTile.y][selectedTile.x] != ' ')
+    if (gameData.gameTile[selectedTile.y][selectedTile.x] == ' ')
     {
-        gameData.gameTile[selectedTile.y][selectedTile.x] = 'O'; // place the letter that i chose
+        gameData.gameTile[selectedTile.y][selectedTile.x] = myToken; // place the letter that i chose
 
         // remove the click event of the canvas object while we process gameforest things
         canvasObject.removeEventListener("click", mouseClick);
 
         // send the game data asynchonously
-        gf.sendGameData(gameData).then(function (a, b)
-        {
-            // if not empty, inform next player
-            gf.nextTurn().then(function (ca, cb)
+        gf.thenStarter()
+            .then(function (error, result)
+            {
+                return gf.sendGameData("GameData", gameData);
+            })
+            .then(function (error, result)
+            {
+                return gf.nextTurn();
+            })
+            .then(function (error, result)
             {
                 myTurn = false;
                 canvasObject.addEventListener("click", mouseClick);
             });
-        });
-        
     }
-}
+};
 
 function mouseDown  (evt)
 {
     highlightBox = "gray";
-}
+};
 
 function mouseUp    (evt)
 {
     highlightBox = "lightGray";
-}
+};
 
 var timer = setInterval(function()
 {
@@ -156,13 +209,6 @@ var timer = setInterval(function()
     drawTile    ();
     drawTurns   ();
 
-    canvasContex.fillStyle  = "black";
-    canvasContex.font       = "12px consolas";
-
-    canvasContex.fillText(mousePositionMsg, 10, 30);
-    canvasContex.fillText(mousePosInTileMsg, 10, 50);
-    canvasContex.fillText(selectedTileMsg, 10, 70);
-
 }, 1000 / 60);
 
 GameForest.prototype.onGameStart    = function ()
@@ -172,24 +218,78 @@ GameForest.prototype.onGameStart    = function ()
     $("#sampleGameChooseScreen").hide();
     $("#sampleGameActualGame").show();
 
-    // get this user's information
-    gf.getUserInfo().then(function (error, result)
-    {
-        var data = JSON.parse(result);
-        
-        /* returns: GFXUserRow
+    var userInfo = null;
 
+    // lol chain starter
+    gf.thenStarter()
+        .then(function (error, result)
+        {
+            // get this user's information
+            return gf.getUserInfo();
+        })
+        .then(function (error, result)
+        {
+            /* returns: GFXUserRow
+                {
+                    UserId,
+                    Password,
+                    Username,
+                    FirstName,
+                    LastName,
+                    Description
+                }
+             */
+
+            console.log("UserId: " + result.UserId + "\nPassword: " + result.Password + "\nUsername: " + result.Username);
+
+            userInfo = result;
+
+            // get player's order
+            return gf.getUserOrder();
+        })
+        .then(function (error, result)
+        {
+            // we have the user's order number!
+            console.log("Player order: " + result);
+
+            if     (result == 1)
             {
-                UserId,
-                Password,
-                Username,
-                FirstName,
-                LastName,
-                Description
+                myToken = 'O';
+
+                oPlayer = userInfo;
+            }
+            else if (result == 2)
+            {
+                myToken = 'X';
+
+                xPlayer = userInfo;
             }
 
-         */
-    });
+            return gf.getNextPlayer(1);
+        })
+        .then(function (error, result)
+        {
+            /* returns: GFXUserRow
+                {
+                    UserId,
+                    Password,
+                    Username,
+                    FirstName,
+                    LastName,
+                    Description
+                }
+             */
+
+            console.log("Get next player: " + JSON.stringify(result));
+
+            if      (myToken == 'O')
+                xPlayer = result;
+            else if (myToken == 'X')
+                oPlayer = result;
+
+            xPlayerName = xPlayer.Username;
+            oPlayerName = oPlayer.Username;
+        });
 };
 
 GameForest.prototype.onGameChoose   = function ()
@@ -217,6 +317,16 @@ GameForest.prototype.onTurnSelect   = function (originalTurn)
 GameForest.prototype.onTurnStart    = function ()
 {
     myTurn = true;
+
+    gf.thenStarter()
+        .then(function (error, result)
+        {
+            return gf.getCurrentPlayer();
+        })
+        .then(function (error, result)
+        {
+            currentPlayer = result;
+        });
 };
 
 GameForest.prototype.onTurnChange   = function ()
@@ -224,17 +334,14 @@ GameForest.prototype.onTurnChange   = function ()
 
 };
 
-GameForest.prototype.onUpdateData   = function (updatedData)
+GameForest.prototype.onUpdateData   = function (key, updatedData)
 {
+    gameData = updatedData;
 
+    // check if someone has won the game
 };
 
-GameForest.prototype.onGameFinish   = function ()
-{
-
-};
-
-GameForest.prototype.onGameTally    = function (tallyResults)
+GameForest.prototype.onGameFinish   = function (tallyList)
 {
 
 };
