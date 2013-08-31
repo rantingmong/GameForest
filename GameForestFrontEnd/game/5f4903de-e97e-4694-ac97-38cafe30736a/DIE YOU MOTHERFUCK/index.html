@@ -108,7 +108,7 @@
         function unload()
         {
             $.ajax({
-                url:    "http://localhost:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+                url:    "http://localhost:193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "DELETE",
                 async:  false
             });
@@ -119,7 +119,7 @@
         function updateUserList()
         {
             var response = $.ajax({
-                url:    "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                url:    "http://localhost:193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
                 type:   "GET",
                 async:  false
             });
@@ -137,7 +137,7 @@
                         var item = userList[i];
 
                         var userinforesponse = $.ajax({
-                            url:    "http://localhost:1193/service/user/session/" + item.SessionID,
+                            url:    "http://localhost:193/service/user/session/" + item.SessionID,
                             type:   "GET",
                             async:  false
                         });

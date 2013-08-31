@@ -105,7 +105,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://localhost:193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type: "PUT",
                 async: false,
             });
@@ -127,7 +127,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://localhost:193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
                         async: true,
                     });

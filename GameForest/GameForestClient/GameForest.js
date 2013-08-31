@@ -61,7 +61,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
     // URL of the game forest server and its port. DO NOT EVER EVER EVER CHANGE THIS IF YOU DON'T WANT YOUR GAME TO EXPLODE. >:)
 
     var cloudURL                = GameForestCloudUrl;
-    var cloudPRT                = 1193;
+    var cloudPRT                = 193;
 
     // we use this to make websocket messages synchonized. since only one websocket command can run at a time (via the promise's .then() function),
     // we don't have to make a promise for each websocket message.
@@ -75,7 +75,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     this.connectionId           = "";                                           // the unique identifier for the websocket connection
 
-    this.wsConnection           = new WebSocket("ws://localhost:1193");         // websocket object
+    this.wsConnection           = new WebSocket("ws://localhost:193");         // websocket object
 
     // ------------------------------------------------------------------------------------------------
 
