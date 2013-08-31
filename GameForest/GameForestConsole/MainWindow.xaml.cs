@@ -1,8 +1,10 @@
 ﻿using GameForestDatabaseConnector.Logger;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -76,6 +78,19 @@ namespace GameForestConsole
                 };
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (serverCore.IsStarted)
+            {
+                serverCore.Stop();
+            }
+
+            if (websocketCore.IsRunning)
+            {
+                websocketCore.Stop();
+            }
+        }
+
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
             ellipseREST.Fill = Brushes.Orange;
@@ -101,22 +116,29 @@ namespace GameForestConsole
             ellipseWSSV.Fill = Brushes.Gray;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (serverCore.IsStarted)
-            {
-                serverCore.Stop();
-            }
-
-            if (websocketCore.IsRunning)
-            {
-                websocketCore.Stop();
-            }
-        }
-
         private void buttonClearLog_Click(object sender, RoutedEventArgs e)
         {
             textConsole.Document.Blocks.Clear();
+        }
+
+        private void buttonSaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            Thread saveThread = new Thread(new ThreadStart(() =>
+                {
+                    var saveList = new List<GFXLoggerEntry>(GFXLogger.GetInstance().Entries);
+
+                    using (TextWriter tw = new StreamWriter(File.OpenWrite("log-" + DateTime.Now.ToFileTime() + ".txt")))
+                    {
+                        foreach (var item in saveList)
+                        {
+                            tw.WriteLine(item.ToString());
+                        }
+
+                        tw.Flush();
+                    }
+                }));
+
+            saveThread.Start();
         }
     }
 }

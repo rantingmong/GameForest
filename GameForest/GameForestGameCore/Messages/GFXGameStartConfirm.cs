@@ -59,7 +59,7 @@ namespace GameForestCoreWebSocket.Messages
 
                     server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
-                    GFXGameData gameData = new GFXGameData(Guid.Empty);
+                    GFXGameData gameData = new GFXGameData(currentPlayer.LobbyID);
 
                     // create the data store for the game
                     server.GameDataList.Add(currentPlayer.LobbyID, gameData);

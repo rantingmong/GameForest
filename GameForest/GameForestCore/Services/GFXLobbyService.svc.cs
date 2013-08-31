@@ -77,8 +77,8 @@ namespace GameForestCore.Services
             try
             {
                 // get user playing the lobby
-                var players = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = {0} AND SessionId = {1}", lobbyid, usersessionid)));
-
+                var players = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}' AND SessionId = '{1}'", lobbyid, usersessionid)));
+                
                 if (players.Count <= 0)
                 {
                     GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "GetPlayerOrder", "User is not playing any games!");
@@ -86,7 +86,7 @@ namespace GameForestCore.Services
                     return constructResponse(GFXResponseType.NotFound, "User is not playing any games!");
                 }
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(players[0]));
+                return constructResponse(GFXResponseType.Normal, players[0].Order.ToString());
             }
             catch (Exception exp)
             {
@@ -300,27 +300,17 @@ namespace GameForestCore.Services
                 }
 
                 // get lobby information
-                List<GFXLobbyRow> lobbies = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId = '{0}'", sessions[0].LobbyID)));
-
-                if (lobbies.Count <= 0)
-                    throw new InvalidProgramException("Bug here! D:");
+                var lobbies = new List<GFXLobbyRow>(lobbyTable.Select(string.Format("LobbyId = '{0}'", sessions[0].LobbyID)));
 
                 // get current player's information
-                List<GFXLoginRow> logins = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", lobbies[0].CurrentPlayer)));
-
-                if (logins.Count <= 0)
-                    throw new InvalidProgramException("Another bug here! D:");
-
-                List<GFXUserRow> users = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", logins[0].UserId)));
-
-                if (users.Count <= 0)
-                    throw new InvalidProgramException("So close but no cigar!");
+                var logins  = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", lobbies[0].CurrentPlayer)));
+                var users   = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", logins[0].UserId)));
 
                 return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(users[0]));
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[Lobby|LeaveLobby] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetCurrentPlayer", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -328,36 +318,49 @@ namespace GameForestCore.Services
 
         public GFXRestResponse GetNextPlayer        (string lobbyid, string usersessionid, string steps)
         {
-            // get other users
-            List<GFXLobbySessionRow> otherPlayers = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}' AND Order > {1} ORDER BY Order ASC", lobbyid)));
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetNextPlayer", "Getting current player for session " + lobbyid);
 
-            int lobbyCount = lobbySessionTable.Count(string.Format("LobbyId = '{0}'", lobbyid));
-
-            // change the CurrentUserSession of the game data to the next player
-            if (otherPlayers.Count <= 0)
+            try
             {
-                // get the first person
-                otherPlayers = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", lobbyid)));
+                // get other users
+                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
 
-                if (otherPlayers.Count <= 0)
+                int lobbyCount = lobbySessionTable.Count(string.Format("LobbyId = '{0}'", lobbyid));
+
+                // get the calling player's information
+                var callingPlayer = new GFXLobbySessionRow();
+
+                foreach (var item in players)
                 {
-                    throw new InvalidProgramException("Bug bug!");
+                    if (item.SessionID == Guid.Parse(usersessionid))
+                    {
+                        callingPlayer = item;
+                    }
                 }
+
+                // get the player who has callingplayer.playerorder + steps
+                int calledPlayer    = ((callingPlayer.Order + Convert.ToInt32(steps) - 1) % lobbyCount) + 1;
+                var selectedPlayer  = new GFXLobbySessionRow();
+
+                foreach (var item in players)
+                {
+                    if (item.Order == calledPlayer)
+                    {
+                        selectedPlayer = item;
+                    }
+                }
+
+                var loggedInUsers   = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", selectedPlayer.SessionID)));
+                var users           = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", loggedInUsers[0].UserId)));
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(users[0]));   
             }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetNextPlayer", exp.Message);
 
-            GFXLobbySessionRow nextPlayer = otherPlayers[int.Parse(steps) % lobbyCount];
-
-            List<GFXLoginRow> playerSession = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionID = '{0}'", nextPlayer.SessionID)));
-
-            if (playerSession.Count <= 0)
-                throw new InvalidOperationException("Bug bug!");
-
-            List<GFXUserRow> userInfo = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", playerSession[0].UserId)));
-
-            if (userInfo.Count <= 0)
-                throw new InvalidOperationException("Bug bug!");
-
-            return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfo[0]));
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
         }
 
         // ----------------------------------------------------------------------------------------------------------------

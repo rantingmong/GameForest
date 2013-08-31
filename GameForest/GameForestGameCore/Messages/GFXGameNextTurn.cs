@@ -31,8 +31,6 @@ namespace GameForestCoreWebSocket.Messages
                 var lobbies         = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
                 var nextPlayers     = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND PlayerOrder > {1} ORDER BY PlayerOrder ASC", currentPlayer.LobbyID, currentPlayer.Order)));
 
-                var lobby           = lobbies[0];
-
                 // change the CurrentUserSession of the game data to the next player
                 if (nextPlayers.Count <= 0)
                 {
@@ -46,9 +44,14 @@ namespace GameForestCoreWebSocket.Messages
                 }
 
                 var nextPlayer      = nextPlayers[0];
-                lobby.CurrentPlayer = nextPlayer.SessionID;
+
+                // change current player of the lobby in the database to the current player
+                var lobby               = lobbies[0];
+                    lobby.CurrentPlayer = nextPlayer.SessionID;
 
                 server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
+
+                server.GameDataList[nextPlayer.LobbyID].CurrentUserSession = nextPlayer.SessionID;
 
                 // send GFX_TURN_START to the next client and send GFX_TURN_CHANGED to other clients
                 var players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
