@@ -33,6 +33,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     
     // critical variables
 
+    this.lobbyStatus            = 0;
+
     this.gameId                 = gameId;                   // the unique identifier of the game
     this.lobbyId                = lobbyId;                  // the unique identifier of the lobby the player is in
     this.sessionId              = sessionId;                // the unique identifier of the current session of the player
@@ -90,6 +92,10 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         wsPromise               = new promise.Promise();    // promise instance for websocket messages
 
     // internal game forest messages
+
+    var GFX_STATUS_LOBBY        = 0,
+        GFX_STATUS_CHOOSE       = 1,
+        GFX_STATUS_PLAYING      = 2;
 
     var GFX_INIT_CONNECTION     = "GFX_INIT_CONNECTION",    // message to initiate connection with a game forest server
         GFX_STOP_CONNECTION     = "GFX_STOP_CONNECTION",    // message to terminate connection with a game forest server
@@ -188,6 +194,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
                     $("#gameForestLobbyWindow").hide();
                     $("#gameForestGameWindow").show();
 
+                    pGfxObject.lobbyStatus = GFX_STATUS_PLAYING;
+
                     GameForest.prototype.onGameStart();
                     break;
                 case GFX_START_CHOICE:
@@ -196,6 +204,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     $("#gameForestLobbyWindow").hide();
                     $("#gameForestGameWindow").show();
+
+                    pGfxObject.lobbyStatus = GFX_STATUS_CHOOSE;
 
                     GameForest.prototype.onGameChoose();
                     break;
@@ -271,6 +281,12 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
     
+    // function to get the lobby's current state (lobby, choose, playing)
+    this.getLobbyState          = function ()
+    {
+        return this.lobbyStatus;
+    };
+
     // function to get the current active player
     this.getCurrentPlayer       = function ()
     {

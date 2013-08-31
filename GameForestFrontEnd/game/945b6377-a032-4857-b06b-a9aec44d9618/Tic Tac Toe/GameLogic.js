@@ -226,12 +226,15 @@ function mouseUp                    (evt)
     highlightBox = "lightGray";
 };
 
-// we register events for the game
+function onDocumentReady            ()
+{
+    // we register events for the game
 
-canvasObject.addEventListener("mousemove",  mouseMove,  false);
-canvasObject.addEventListener("mouseup",    mouseUp,    false);
-canvasObject.addEventListener("click",      mouseClick, false);
-canvasObject.addEventListener("mousedown",  mouseDown,  false);
+    canvasObject.addEventListener("mousemove", mouseMove, false);
+    canvasObject.addEventListener("mouseup", mouseUp, false);
+    canvasObject.addEventListener("click", mouseClick, false);
+    canvasObject.addEventListener("mousedown", mouseDown, false);
+};
 
 // gameforest callback methods
 

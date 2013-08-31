@@ -3,13 +3,14 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>GameForest game app</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
 </head>
 <body onunload="unload();">
+
+    <!--This is where you will place your game-->
     <div id="gameForestGameWindow" class="container" style="display: none">
-        <!--This is where you will place your game-->
         <div id="sampleGameChooseScreen" style="display: none" class="row">
             <div class="col-md-6 col-md-offset-3">
                 <h2 style="text-align: center">Choose between O or X:</h2>
@@ -27,6 +28,8 @@
             </canvas>
         </div>
     </div>
+
+    <!--GameForest stuff. Do not customize unless you know what you're doing.-->
     <div id="gameForestLobbyWindow" class="container">
         <div class="page-header">
             <h1>Lobby <small>Game 1</small></h1>
@@ -59,14 +62,6 @@
             </div>
         </div>
     </div>
-    <div id="gameForestTallyWindow" class="container" style="display: none">
-        <div class="page-header">
-            <h1>Tally <small>Game 1</small></h1>
-        </div>
-        <div class="row">
-
-        </div>
-    </div>
 
     <script src="guid.js"></script>
     <script src="jquery.js"></script>
@@ -89,8 +84,6 @@
             // navigate to main page
             window.location.href = "../../../index.html";
         });
-
-        $(document).ready(documentReady);
 
         function documentReady  ()
         {
@@ -121,6 +114,8 @@
                     gf.readyGame();
                 });
             }
+
+            onDocumentReady();
         }
 
         function unload         ()
@@ -170,6 +165,8 @@
                 }
             });
         }
+
+        $(document).ready(documentReady);
 
     </script>
 </body>
