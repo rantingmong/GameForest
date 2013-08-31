@@ -213,7 +213,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     console.log("Server is informing players that the game is finished!");
 
-                    GameForest.prototype.onGameFinish();
+                    GameForest.prototype.onGameFinish(parse.Message);
                     break;
                 case GFX_TURN_START:
 

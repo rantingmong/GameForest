@@ -31,7 +31,7 @@ namespace GameForestCoreWebSocket.Messages
                     {
                         ResponseCode    = GFXResponseType.Normal,
                         Subject         = "GFX_GAME_FINISHED",
-                        Message         = ""
+                        Message         = info.Message
                     }));
             }
 

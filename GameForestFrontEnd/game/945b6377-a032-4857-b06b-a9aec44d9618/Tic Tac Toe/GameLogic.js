@@ -27,6 +27,8 @@ var gameData                        = {
 
 // user-specific data
 
+var finished                        = false;
+
 var myTurn                          = false;
 var myToken                         = ' ';
 
@@ -343,19 +345,87 @@ GameForest.prototype.onTurnSelect   = function (originalTurn)
 
 GameForest.prototype.onTurnStart    = function ()
 {
-    myTurn = true;
+    myTurn      = true;
+    finished    = false;
 
-    gf.thenStarter()
-        .then(function (error, result)
-        {
-            return gf.getCurrentPlayer();
-        })
-        .then(function (error, result)
-        {
-            console.log(JSON.stringify(result));
+    // check if game is finished
 
-            currentPlayer = result;
-        });
+    // x = 1 points
+    // o = 2 points
+
+    var scoreTile = [
+
+        [ 0, 0, 0 ],
+        [ 0, 0, 0 ],
+        [ 0, 0, 0 ]
+    ];
+
+    // convert gameTile to scoreTile
+    for (var y = 0; y < 3; y++)
+    {
+        for (var x = 0; x < 3; x++)
+        {
+            var score = 0;
+
+            switch (gameData.gameTile[y][x])
+            {
+                case 'O': score = 2;
+                    break;
+                case 'X': score = 1;
+                    break;
+            }
+
+            scoreTile[y][x] = score;
+        }
+    }
+
+    console.log("Score tile data: ");
+
+    console.log("[" + scoreTile[0][0] + ", " + scoreTile[0][1] + ", " + scoreTile[0][2] + "]");
+    console.log("[" + scoreTile[1][0] + ", " + scoreTile[1][1] + ", " + scoreTile[1][2] + "]");
+    console.log("[" + scoreTile[2][0] + ", " + scoreTile[2][1] + ", " + scoreTile[2][2] + "]");
+
+    var c1 = scoreTile[0][0] + scoreTile[1][0] + scoreTile[2][0],
+        c2 = scoreTile[0][1] + scoreTile[1][1] + scoreTile[2][1],
+        c3 = scoreTile[0][2] + scoreTile[1][2] + scoreTile[2][2],
+
+        c4 = scoreTile[0][2] + scoreTile[0][1] + scoreTile[0][0],
+        c5 = scoreTile[1][2] + scoreTile[1][1] + scoreTile[1][0],
+        c6 = scoreTile[2][2] + scoreTile[2][1] + scoreTile[2][0],
+
+        c7 = scoreTile[0][2] + scoreTile[1][1] + scoreTile[2][0],
+        c8 = scoreTile[0][0] + scoreTile[1][1] + scoreTile[2][2];
+
+    if (c1 == 6 || c2 == 6 || c3 == 6 || c4 == 6 || c5 == 6 || c6 == 6 || c7 == 6 || c8 == 6)
+    {
+        finished = true;
+
+        // O wins
+        gf.finishGame("X");
+    }
+
+    if (c1 == 3 || c2 == 3 || c3 == 3 || c4 == 3 || c5 == 3 || c6 == 3 || c7 == 3 || c8 == 3)
+    {
+        finished = true;
+
+        // X wins
+        gf.finishGame("O");
+    }
+
+    if (finished == false)
+    {
+        gf.thenStarter()
+            .then(function (error, result)
+            {
+                return gf.getCurrentPlayer();
+            })
+            .then(function (error, result)
+            {
+                console.log(JSON.stringify(result));
+
+                currentPlayer = result;
+            });
+    }
 };
 
 GameForest.prototype.onTurnChange   = function ()
