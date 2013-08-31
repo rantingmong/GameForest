@@ -75,7 +75,7 @@ var GameForest = function (gameId, lobbyId, sessionId)
 
     this.connectionId           = "";                                           // the unique identifier for the websocket connection
 
-    this.wsConnection           = new WebSocket("ws://localhost:193");         // websocket object
+    this.wsConnection           = new WebSocket("ws://localhost:1193");         // websocket object
 
     // ------------------------------------------------------------------------------------------------
 

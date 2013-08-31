@@ -100,6 +100,8 @@ namespace GameForestCoreWebSocket.Messages
 
                     GFXLobbySessionRow nextPlayer = nextPlayers[0];
 
+                    server.GameDataList[nextPlayer.LobbyID].CurrentUserSession = nextPlayer.SessionID;
+
                     server.WebSocketList[nextPlayer.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                     {
                         Subject         = "GFX_TURN_RESOLVE",

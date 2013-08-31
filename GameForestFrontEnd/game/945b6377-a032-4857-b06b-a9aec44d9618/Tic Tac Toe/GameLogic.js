@@ -25,6 +25,12 @@ var gameData                        = {
                   [ ' ', ' ', ' ' ] ]
 };
 
+var chooseData                      = {
+
+    oTaken: false,
+    xTaken: false
+};
+
 // user-specific data
 
 var finished                        = false;
@@ -334,12 +340,28 @@ GameForest.prototype.onTurnSelect   = function (originalTurn)
 
     $("#sampleGameButtonChooseO").click(function ()
     {
-        gf.confirmTurn(1);
+        console.log("o token taken!");
+
+        chooseData.oTaken = true;
+
+        gf.sendGameData("chooseData", chooseData)
+            .then(function (error, result)
+            {
+                gf.confirmTurn(1);
+            });
     });
 
     $("#sampleGameButtonChooseX").click(function ()
     {
-        gf.confirmTurn(2);
+        console.log("x token taken!");
+
+        chooseData.xTaken = true;
+
+        gf.sendGameData("chooseData", chooseData)
+            .then(function (error, result)
+            {
+                gf.confirmTurn(2);
+            });
     });
 };
 
@@ -350,8 +372,8 @@ GameForest.prototype.onTurnStart    = function ()
 
     // check if game is finished
 
-    // x = 1 points
-    // o = 2 points
+    // x = 4 points
+    // o = 5 points
 
     var scoreTile = [
 
@@ -369,9 +391,9 @@ GameForest.prototype.onTurnStart    = function ()
 
             switch (gameData.gameTile[y][x])
             {
-                case 'O': score = 2;
+                case 'O': score = 5;
                     break;
-                case 'X': score = 1;
+                case 'X': score = 4;
                     break;
             }
 
@@ -396,7 +418,7 @@ GameForest.prototype.onTurnStart    = function ()
         c7 = scoreTile[0][2] + scoreTile[1][1] + scoreTile[2][0],
         c8 = scoreTile[0][0] + scoreTile[1][1] + scoreTile[2][2];
 
-    if (c1 == 6 || c2 == 6 || c3 == 6 || c4 == 6 || c5 == 6 || c6 == 6 || c7 == 6 || c8 == 6)
+    if (c1 == 15 || c2 == 15 || c3 == 15 || c4 == 15 || c5 == 15 || c6 == 15 || c7 == 15 || c8 == 15)
     {
         finished = true;
 
@@ -404,7 +426,7 @@ GameForest.prototype.onTurnStart    = function ()
         gf.finishGame("X");
     }
 
-    if (c1 == 3 || c2 == 3 || c3 == 3 || c4 == 3 || c5 == 3 || c6 == 3 || c7 == 3 || c8 == 3)
+    if (c1 == 12 || c2 == 12 || c3 == 12 || c4 == 12 || c5 == 12 || c6 == 12 || c7 == 12 || c8 == 12)
     {
         finished = true;
 
@@ -445,10 +467,34 @@ GameForest.prototype.onTurnChange   = function ()
 
 GameForest.prototype.onUpdateData   = function (key, updatedData)
 {
-    gameData = updatedData;
+    console.log(gf.getLobbyState());
+
+    if      (gf.getLobbyState() == GFX_STATUS_CHOOSE)
+    {
+        console.log(updatedData.oTaken);
+        console.log(updatedData.xTaken);
+
+        if (updatedData.oTaken)
+        {
+            $("#sampleGameButtonChooseO").prop("disabled", true);
+        }
+        
+        if (updatedData.xTaken)
+        {
+            $("#sampleGameButtonChooseX").prop("disabled", true);
+        }
+
+        chooseData = updatedData;
+    }
+    else if (gf.getLobbyState() == GFX_STATUS_PLAYING)
+    {
+        gameData = updatedData;
+    }
 };
 
 GameForest.prototype.onGameFinish   = function (tallyList)
 {
+    alert(tallyList);
 
+    gf.navigateToGame();
 };

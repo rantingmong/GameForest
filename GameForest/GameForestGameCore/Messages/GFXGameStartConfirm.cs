@@ -77,6 +77,8 @@ namespace GameForestCoreWebSocket.Messages
 
                         if (player.Owner)
                         {
+                            server.GameDataList[currentPlayer.LobbyID].CurrentUserSession = player.SessionID;
+
                             // send a GFX_TURN_RESOLVE to the owner of the lobby
                             server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                                 {

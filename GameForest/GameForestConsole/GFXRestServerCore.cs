@@ -43,9 +43,9 @@ namespace GameForestConsole
                 HttpsGetEnabled     = true
             };
 
-            serviceHostUser = new WebServiceHost(new GFXUserService(), new Uri("http://localhost:193/service/user"));
-            serviceHostGame = new WebServiceHost(new GFXGameService(), new Uri("http://localhost:193/service/game"));
-            serviceHostLobi = new WebServiceHost(new GFXLobbyService(), new Uri("http://localhost:193/service/lobby"));
+            serviceHostUser = new WebServiceHost(new GFXUserService(), new Uri("http://localhost:1193/service/user"));
+            serviceHostGame = new WebServiceHost(new GFXGameService(), new Uri("http://localhost:1193/service/game"));
+            serviceHostLobi = new WebServiceHost(new GFXLobbyService(), new Uri("http://localhost:1193/service/lobby"));
 
             var uEndpoint = serviceHostUser.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXUserService), new WebHttpBinding(), "");
             var gEndpoint = serviceHostGame.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXGameService), new WebHttpBinding(), "");

@@ -11,6 +11,11 @@ var GameForestVerboseMessaging  = false;
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
 var GameForestCloudUrl          = "game-forest.cloudapp.net";
 
+var GFX_STATUS_LOBBY            = 0,
+    GFX_STATUS_CHOOSE           = 1,
+    GFX_STATUS_PLAYING          = 2,
+    GFX_STATUS_FINISHED         = 4;
+
 // Game Forest client API
 var GameForest                  = function (gameId, lobbyId, sessionId)
 {
@@ -93,10 +98,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     // internal game forest messages
 
-    var GFX_STATUS_LOBBY        = 0,
-        GFX_STATUS_CHOOSE       = 1,
-        GFX_STATUS_PLAYING      = 2;
-
     var GFX_INIT_CONNECTION     = "GFX_INIT_CONNECTION",    // message to initiate connection with a game forest server
         GFX_STOP_CONNECTION     = "GFX_STOP_CONNECTION",    // message to terminate connection with a game forest server
 
@@ -151,13 +152,14 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         {
             var parse = JSON.parse(message.data);
 
+            console.log(message.data);
+
             switch (parse.Subject)
             {
                 case GFX_ASK_DATA:
                 case GFX_ASK_USER_DATA:
                 case GFX_SEND_DATA:
                 case GFX_SEND_USER_DATA:
-                case GFX_FINISH:
                 case GFX_NEXT_TURN:
                 case GFX_CONFIRM_TURN:
                 case GFX_GAME_START_CONFIRM:
@@ -171,6 +173,21 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
                     {
                         wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
                     }
+                    break;
+                case GFX_FINISH:
+
+                    pGfxObject.lobbyStatus = GFX_STATUS_FINISHED;
+
+                    console.log("Game is finished!");
+
+                    if (parse.ResponseCode === 0)
+                    {
+                        wsPromise.done(null, parse.Message);
+                    } else
+                    {
+                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
+                    }
+
                     break;
                 case GFX_INIT_CONNECTION:
 
@@ -248,6 +265,12 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     this.stop                   = function ()
     {
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_STOP_CONNECTION, "");
+    };
+
+    // function to navigate back to the games page.
+    this.navigateToGame         = function ()
+    {
+        window.location.href = "../../../games.html";
     };
 
     // lol method
@@ -489,7 +512,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         wsPromise = new promise.Promise();
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_FINISH, "");
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_FINISH, tallyResults);
 
         return wsPromise;
     };
@@ -538,6 +561,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
 GameForest.prototype.onGameStartSignal  = function ()
 {
+    console.log("Game start signal invoked!");
+
     $("#gfxButtonStart").removeAttr("disabled");
 };
 
