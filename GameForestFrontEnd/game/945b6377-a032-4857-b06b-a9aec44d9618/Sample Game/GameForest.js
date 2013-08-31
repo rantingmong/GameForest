@@ -1,6 +1,7 @@
 ﻿/// <reference path="guid.js" />
 /// <reference path="jquery.js" />
 /// <reference path="promise.js" />
+/// <reference path="index.html" />
 
 'use strict';
 
@@ -51,7 +52,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     function sendRequest        (url, onSuccess, onError)
     {
         var response = $.ajax({
-            url:    "http://" + cloudURL + ":" + cloudPRT + url,
+            url:    "http://" + cloudURL + ":" + cloudPRT + "/service" + url,
             async:  true
         });
 
@@ -178,6 +179,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     console.log("Server sent a start game event! Time to really start the game.");
 
+                    clearInterval(updateUserList);
+
                     $("#gameForestLobbyWindow").hide();
                     $("#gameForestGameWindow").show();
 
@@ -186,6 +189,9 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
                 case GFX_START_CHOICE:
 
                     console.log("Server is asking the players to choose! Show the choose screen.");
+
+                    $("#gameForestLobbyWindow").hide();
+                    $("#gameForestGameWindow").show();
 
                     GameForest.prototype.onGameChoose();
                     break;
@@ -309,26 +315,69 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         return p;
     };
 
+    // function to get the user's current order
+    this.getUserOrder           = function ()
+    {
+        var p = new promise.Promise();
+
+        sendRequest("/lobby/turn?lobbyid" + this.lobbyId + "?usersessionid=" + this.sessionId,
+                    function (result)
+                    {
+                        p.done(null, result);
+                    },
+                    function (status, why)
+                    {
+                        p.done(status + ": " + why, null);
+
+                        if (GameForestVerboseMessaging)
+                        {
+                            alert("Error in getUserOrder function: [status=" + status + "] [reason=" + why + "]");
+                        }
+                    });
+
+        return p;
+    };
     // function to get the user's information
     this.getUserInfo            = function (username)
     {
         var p = new promise.Promise();
 
-        sendRequest("/user/" + username,
-            function (result)
-            {
-                p.done(null, result);
-            },
-            function (status, why)
-            {
-                p.done(status + ": " + why, null);
+        if (username == undefined || username.length == 0 || username == " ")
+        {
+            sendRequest("/user/session/" + this.sessionId,
+                        function (result)
+                        {
+                            p.done(null, result);
+                        },
+                        function (status, why)
+                        {
+                            p.done(status + ": " + why, null);
 
-                if (GameForestVerboseMessaging)
-                {
-                    alert("Error in getUserInfo function: [status=" + status + "] [reason=" + why + "]");
-                }
-            });
+                            if (GameForestVerboseMessaging)
+                            {
+                                alert("Error in getUserInfo function: [status=" + status + "] [reason=" + why + "]");
+                            }
+                        });
+        }
+        else
+        {
+            sendRequest("/user/" + username,
+                        function (result)
+                        {
+                            p.done(null, result);
+                        },
+                        function (status, why)
+                        {
+                            p.done(status + ": " + why, null);
 
+                            if (GameForestVerboseMessaging)
+                            {
+                                alert("Error in getUserInfo function: [status=" + status + "] [reason=" + why + "]");
+                            }
+                        });
+
+        }
+        
         return p;
     };
     // function to get the lobby's user list

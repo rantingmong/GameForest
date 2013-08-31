@@ -86,7 +86,7 @@ namespace GameForestCoreWebSocket.Messages
                 else
                 {
                     // send a GFX_TURN_RESOLVE to the next player
-                    var nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND PlayerOrderOriginal > {1} ORDER BY PlayerOrderOriginal ASC", currentPlayer.LobbyID, currentPlayer.Order)));
+                    var nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND PlayerOrderOriginal > {1} ORDER BY PlayerOrderOriginal ASC", currentPlayer.LobbyID, currentPlayer.OrderOriginal)));
 
                     if (nextPlayers.Count <= 0)
                     {
