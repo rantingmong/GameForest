@@ -120,7 +120,7 @@ public partial class upload : System.Web.UI.Page
             }
 
             // send REST request to server
-            HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
+            HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
                                                                                             inputGameName.Text,
                                                                                             inputDescription.Text,
                                                                                             inputMinPlayers.Text,
