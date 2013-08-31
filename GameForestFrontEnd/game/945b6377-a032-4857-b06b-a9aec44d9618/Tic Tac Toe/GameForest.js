@@ -55,6 +55,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
             url:    httpURL,
             async:  true,
             type:   type,
+            cache:  false
         });
 
         response.success(onSuccess);

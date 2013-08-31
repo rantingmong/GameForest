@@ -6,41 +6,52 @@
 
 'use strict';
 
-GameForestCloudUrl          = "localhost";
-GameForestVerboseMessaging  = true;
+// gameforest-specific data
 
-var canvasObject            = document.getElementById("sampleGameCanvas");
-var canvasContex            = canvasObject.getContext("2d");
+GameForestCloudUrl                  = "localhost";
+GameForestVerboseMessaging          = false;
 
-var gameData                = {
+// DOM elements
+
+var canvasObject                    = document.getElementById("sampleGameCanvas");
+var canvasContex                    = canvasObject.getContext("2d");
+
+// data that is shared between players
+
+var gameData                        = {
 
     gameTile:   [ [ ' ', ' ', ' ' ],
                   [ ' ', ' ', ' ' ],
                   [ ' ', ' ', ' ' ] ]
 };
 
-var myTurn                  = false;
-var myToken                 = ' ';
+// user-specific data
 
-var xPlayer; // we know that X player is always the second one
-var oPlayer; // we know that O player is always the first one
+var myTurn                          = false;
+var myToken                         = ' ';
 
-var currentPlayer           = null;
+var xPlayer                         = null; // we know that X player is always the second one
+var oPlayer                         = null; // we know that O player is always the first one
 
-var xPlayerName             = "";
-var oPlayerName             = "";
+var currentPlayer                   = null;
 
-var showUpdateText          = false;
+var xPlayerName                     = "";
+var oPlayerName                     = "";
 
-var selectedTile            = { x: 0, y: 0 };
+var showUpdateText                  = false;
 
-var mousePositionMsg        = "";
-var mousePosInTileMsg       = "";
-var selectedTileMsg         = "";
+var selectedTile                    = { x: 0, y: 0 };
 
-var highlightBox            = "lightGray";
+// debug data
 
-Math.clamp = function (value, min, max)
+var mousePositionMsg                = "";
+var mousePosInTileMsg               = "";
+var selectedTileMsg                 = "";
+
+var highlightBox                    = "lightGray";
+
+// clams "value" from "min" to "max"
+Math.clamp                          = function (value, min, max)
 {
     if (value <= min)
     {
@@ -54,7 +65,24 @@ Math.clamp = function (value, min, max)
     return value;
 };
 
-function drawTile   ()
+// game loop
+
+var timer                           = setInterval(function()
+{
+    canvasContex.clearRect  (0, 0, 800, 480);
+
+    canvasContex.fillStyle  = "white";
+    canvasContex.fillRect   (0, 0, 800, 480);
+
+    drawTokens  ();
+    drawTile    ();
+    drawTurns   ();
+
+}, 1000 / 60);
+
+// game specific functions
+
+function drawTile                   ()
 {
     canvasContex.save();
 
@@ -79,16 +107,16 @@ function drawTile   ()
     canvasContex.restore();
 };
 
-function drawTurns  ()
+function drawTurns                  ()
 {
     canvasContex.fillStyle = "black";
     canvasContex.font = "20px arial";
 
     canvasContex.fillText("Players:", 20, 20);
 
-    if (currentPlayer != null)
+    if (currentPlayer != null && oPlayer != null)
     {
-        if (currentPlayer == oPlayer)
+        if (currentPlayer.UserId == oPlayer.UserId)
             canvasContex.fillStyle = "green";
         else
             canvasContex.fillStyle = "black";
@@ -96,9 +124,9 @@ function drawTurns  ()
 
     canvasContex.fillText("O: " + oPlayerName, 20, 40);
 
-    if (currentPlayer != null)
+    if (currentPlayer != null && xPlayer != null)
     {
-        if (currentPlayer == xPlayer)
+        if (currentPlayer.UserId == xPlayer.UserId)
             canvasContex.fillStyle = "green";
         else
             canvasContex.fillStyle = "black";
@@ -107,7 +135,7 @@ function drawTurns  ()
     canvasContex.fillText("X: " + xPlayerName, 20, 60);
 };
 
-function drawTokens ()
+function drawTokens                 ()
 {
     canvasContex.save();
 
@@ -138,7 +166,7 @@ function drawTokens ()
     canvasContex.restore();
 };
 
-function mouseMove  (evt)
+function mouseMove                  (evt)
 {
     var rect = canvasObject.getBoundingClientRect();
 
@@ -157,7 +185,7 @@ function mouseMove  (evt)
     selectedTileMsg = "Selected tile position: {" + selectedTile.x + ", " + selectedTile.y + "}";
 };
 
-function mouseClick (evt)
+function mouseClick                 (evt)
 {
     if (myTurn == false)
         return;
@@ -188,28 +216,24 @@ function mouseClick (evt)
     }
 };
 
-function mouseDown  (evt)
+function mouseDown                  (evt)
 {
     highlightBox = "gray";
 };
 
-function mouseUp    (evt)
+function mouseUp                    (evt)
 {
     highlightBox = "lightGray";
 };
 
-var timer = setInterval(function()
-{
-    canvasContex.clearRect  (0, 0, 800, 480);
+// we register events for the game
 
-    canvasContex.fillStyle  = "white";
-    canvasContex.fillRect   (0, 0, 800, 480);
+canvasObject.addEventListener("mousemove",  mouseMove,  false);
+canvasObject.addEventListener("mouseup",    mouseUp,    false);
+canvasObject.addEventListener("click",      mouseClick, false);
+canvasObject.addEventListener("mousedown",  mouseDown,  false);
 
-    drawTokens  ();
-    drawTile    ();
-    drawTurns   ();
-
-}, 1000 / 60);
+// gameforest callback methods
 
 GameForest.prototype.onGameStart    = function ()
 {
@@ -325,20 +349,30 @@ GameForest.prototype.onTurnStart    = function ()
         })
         .then(function (error, result)
         {
+            console.log(JSON.stringify(result));
+
             currentPlayer = result;
         });
 };
 
 GameForest.prototype.onTurnChange   = function ()
 {
+    gf.thenStarter()
+        .then(function (error, result)
+        {
+            return gf.getCurrentPlayer();
+        })
+        .then(function (error, result)
+        {
+            console.log(JSON.stringify(result));
 
+            currentPlayer = result;
+        });
 };
 
 GameForest.prototype.onUpdateData   = function (key, updatedData)
 {
     gameData = updatedData;
-
-    // check if someone has won the game
 };
 
 GameForest.prototype.onGameFinish   = function (tallyList)
