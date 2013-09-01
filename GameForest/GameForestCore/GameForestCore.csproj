@@ -89,6 +89,8 @@
       <DependentUpon>GFXFileUpload.ashx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\CustomHeaderMessageInspector.cs" />
+    <Compile Include="Util\EnableCrossOriginResourceSharingBehavior.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

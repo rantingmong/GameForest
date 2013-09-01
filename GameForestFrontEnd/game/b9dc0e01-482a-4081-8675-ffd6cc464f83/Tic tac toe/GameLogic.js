@@ -423,7 +423,7 @@ GameForest.prototype.onTurnStart    = function ()
         finished = true;
 
         // O wins
-        gf.finishGame("X");
+        gf.finishGame(JSON.stringify(oPlayer));
     }
 
     if (c1 == 12 || c2 == 12 || c3 == 12 || c4 == 12 || c5 == 12 || c6 == 12 || c7 == 12 || c8 == 12)
@@ -431,7 +431,7 @@ GameForest.prototype.onTurnStart    = function ()
         finished = true;
 
         // X wins
-        gf.finishGame("O");
+        gf.finishGame(JSON.stringify(xPlayer));
     }
 
     if (finished == false)
@@ -494,7 +494,7 @@ GameForest.prototype.onUpdateData   = function (key, updatedData)
 
 GameForest.prototype.onGameFinish   = function (tallyList)
 {
-    alert(tallyList);
+    alert(JSON.stringify(tallyList));
 
     gf.navigateToGame();
 };
