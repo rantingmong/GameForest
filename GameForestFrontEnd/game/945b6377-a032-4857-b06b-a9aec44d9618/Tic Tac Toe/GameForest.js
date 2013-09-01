@@ -105,9 +105,11 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         GFX_ASK_DATA            = "GFX_ASK_DATA",           // message to ask for the game's data
         GFX_ASK_USER_DATA       = "GFX_ASK_USER_DATA",      // message to ask for the user's game data
+        GFX_ASK_SCORE_DATA      = "GFX_ASK_SCORE_DATA";     // message to ask for the highscore data
 
         GFX_SEND_DATA           = "GFX_SEND_DATA",          // message to send game data
         GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA",     // message to send user game data
+        GFX_SEND_SCORE_DATA     = "GFX_SEND_SCORE_DATA";    // message to send highscore data
 
         GFX_FINISH              = "GFX_GAME_FINISH",        // message to inform the server the game is finished
 
@@ -158,8 +160,10 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
             {
                 case GFX_ASK_DATA:
                 case GFX_ASK_USER_DATA:
+                case GFX_ASK_SCORE_DATA:
                 case GFX_SEND_DATA:
                 case GFX_SEND_USER_DATA:
+                case GFX_SEND_SCORE_DATA:
                 case GFX_NEXT_TURN:
                 case GFX_CONFIRM_TURN:
                 case GFX_GAME_START_CONFIRM:
@@ -506,6 +510,14 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return wsPromise;
     };
+    // function to retrieve the score data
+    this.askScoreData           = function () {
+        wsPromise = new promise.Promise();
+
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_ASK_SCORE_DATA, "");
+
+        return wsPromise;
+    };
 
     // function to finish the game
     this.finishGame             = function (tallyResults)
@@ -537,6 +549,14 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         wsPromise = new promise.Promise();
 
         constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_USER_DATA, JSON.string(payload));
+
+        return wsPromise;
+    };
+    // function to send score data
+    this.sendScoreData          = function (payload) {
+        wsPromise = new promise.Promise();
+
+        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_SEND_SCORE_DATA, JSON.string(payload));
 
         return wsPromise;
     };

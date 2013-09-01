@@ -57,18 +57,118 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Bin\GameForestFrontEnd.dll" />
+    <Content Include="Bin\GameForestFrontEnd.pdb" />
+    <Content Include="Bin\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="css\bootstrap-theme.css" />
+    <Content Include="css\bootstrap-theme.min.css" />
+    <Content Include="css\bootstrap.css" />
+    <Content Include="css\bootstrap.min-plum.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\style.css" />
+    <Content Include="dev.html" />
+    <Content Include="facebooktest.html" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="games.html" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\css\bootstrap-theme.css" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\css\bootstrap-theme.min.css" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\css\bootstrap.css" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\css\bootstrap.min.css" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\js\bootstrap.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\js\bootstrap.min.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\GameForest.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\GameLogic.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\guid.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\index.html" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\jquery.js" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\promise.js" />
+    <Content Include="index.html" />
+    <Content Include="js\bootstrap.js" />
+    <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\jquery.js" />
+    <Content Include="main.html" />
+    <Content Include="news.html" />
+    <Content Include="obj\Debug\GameForestFrontEnd.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\GameForestFrontEnd.dll" />
+    <Content Include="obj\Debug\GameForestFrontEnd.pdb" />
+    <Content Include="packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\lib\net20\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\NuGet.exe" />
+    <Content Include="profile.html" />
+    <Content Include="register.html" />
+    <Content Include="upload.aspx" />
     <Content Include="Web.config" />
+    <Content Include="zFoundation\css\foundation.css" />
+    <Content Include="zFoundation\css\foundation.min.css" />
+    <Content Include="zFoundation\css\normalize.css" />
+    <Content Include="zFoundation\dev.html" />
+    <Content Include="zFoundation\games.html" />
+    <Content Include="zFoundation\humans.txt" />
+    <Content Include="zFoundation\index.html" />
+    <Content Include="zFoundation\js\foundation.min.js" />
+    <Content Include="zFoundation\js\foundation\foundation.alerts.js" />
+    <Content Include="zFoundation\js\foundation\foundation.clearing.js" />
+    <Content Include="zFoundation\js\foundation\foundation.cookie.js" />
+    <Content Include="zFoundation\js\foundation\foundation.dropdown.js" />
+    <Content Include="zFoundation\js\foundation\foundation.forms.js" />
+    <Content Include="zFoundation\js\foundation\foundation.joyride.js" />
+    <Content Include="zFoundation\js\foundation\foundation.js" />
+    <Content Include="zFoundation\js\foundation\foundation.magellan.js" />
+    <Content Include="zFoundation\js\foundation\foundation.orbit.js" />
+    <Content Include="zFoundation\js\foundation\foundation.placeholder.js" />
+    <Content Include="zFoundation\js\foundation\foundation.reveal.js" />
+    <Content Include="zFoundation\js\foundation\foundation.section.js" />
+    <Content Include="zFoundation\js\foundation\foundation.tooltips.js" />
+    <Content Include="zFoundation\js\foundation\foundation.topbar.js" />
+    <Content Include="zFoundation\js\vendor\custom.modernizr.js" />
+    <Content Include="zFoundation\js\vendor\jquery.js" />
+    <Content Include="zFoundation\js\vendor\zepto.js" />
+    <Content Include="zFoundation\lobby.html" />
+    <Content Include="zFoundation\login.html" />
+    <Content Include="zFoundation\main.html" />
+    <Content Include="zFoundation\robots.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="upload.aspx.cs">
+      <DependentUpon>upload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="gameforest.sublime-project" />
+    <Content Include="gameforest.sublime-workspace" />
+    <Content Include="gamesample.zip" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="game\945b6377-a032-4857-b06b-a9aec44d9618\Tic Tac Toe\Bootstrap\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\GameForestFrontEnd.csprojResolveAssemblyReference.cache" />
+    <Content Include="packages.config" />
+    <Content Include="packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\ICSharpCode.SharpZipLib.dll.0.85.4.369.nupkg" />
+    <Content Include="packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\NuGet.Config" />
+    <Content Include="packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\NuGet.targets" />
+    <Content Include="packages\repositories.config" />
+    <Content Include="temp\945b6377-a032-4857-b06b-a9aec44d9618\gamesample.zip" />
+    <Content Include="Bin\ICSharpCode.SharpZipLib.dll.refresh" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <Content Include="zFoundation\img\.gitkeep" />
+    <Content Include="zFoundation\thesis.esproj\Project.espressostorage" />
+    <Content Include="zFoundation\thesis.esproj\user.dayvough.espressostorage" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
