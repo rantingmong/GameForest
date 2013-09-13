@@ -1,10 +1,6 @@
 ﻿using GameForestCore.Database;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameForestCoreWebSocket.Messages
 {
@@ -35,7 +31,7 @@ namespace GameForestCoreWebSocket.Messages
                     {
                         ResponseCode    = GFXResponseType.Normal,
                         Subject         = "GFX_GAME_FINISHED",
-                        Message         = ""
+                        Message         = info.Message
                     }));
             }
 

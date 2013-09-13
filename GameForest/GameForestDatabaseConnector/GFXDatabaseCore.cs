@@ -5,40 +5,22 @@ namespace GameForestCore.Database
 {
     public static class GFXDatabaseCore
     {
-        static GFXDatabaseCore()
+        private static string           connectionString    = "";
+
+        public static void              Initialize          (string connectionString)
         {
-            Instance = null;
+            GFXDatabaseCore.connectionString = connectionString;
         }
 
-        public static MySqlConnection   Instance    { get; private set; }
-
-        public static void              Initialize  (string connectionString)
+        public static MySqlConnection   GetConnection       ()
         {
-            if (Instance != null)
-                return;
+            var msc = new MySqlConnection(connectionString);
+            msc.Open();
 
-            Instance = new MySqlConnection(connectionString);
-
-            try
-            {
-                Console.WriteLine("Initializing MySql...");
-                Instance.Open();
-            }
-            catch (MySqlException exception)
-            {
-                Console.Error.WriteLine("MySql initialization failed: " + exception.Message);
-            }
-        }
-        public static void              Destroy     ()
-        {
-            if (Instance == null)
-                return;
-
-            Instance.Close();
-            Instance.Dispose();
+            return msc;
         }
 
-        public static string            ToSQLString (string value)
+        public static string            ToSQLString         (string value)
         {
             return string.Format("'{0}'", value);
         }

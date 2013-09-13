@@ -145,7 +145,8 @@ namespace GameForestCore.Services
                     LastName = "User",
                     Username = username,
                     Password = password,
-                    UserId = Guid.NewGuid()
+                    UserId = Guid.NewGuid(),
+                    fb_id = 0
                 });
 
                 return constructResponse(GFXResponseType.Normal, "Success!");

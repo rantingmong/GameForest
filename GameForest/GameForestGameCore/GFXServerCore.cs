@@ -5,6 +5,7 @@ using Fleck;
 using Newtonsoft.Json;
 using GameForestCore.Database;
 using GameForestCoreWebSocket.Messages;
+using GameForestDatabaseConnector.Logger;
 
 namespace GameForestCoreWebSocket
 {
@@ -58,7 +59,6 @@ namespace GameForestCoreWebSocket
             listenerList.Add(new GFXGameAskUserData());
             listenerList.Add(new GFXGameAskData());
             listenerList.Add(new GFXGameFinish());
-            listenerList.Add(new GFXGameFinishTally());
             listenerList.Add(new GFXGameNextTurn());
             listenerList.Add(new GFXGameSendData());
             listenerList.Add(new GFXGameSendUserData());
@@ -136,13 +136,29 @@ namespace GameForestCoreWebSocket
                                     return;
                                 }
 
+                                bool processed = false;
+
                                 foreach (var listener in listenerList)
                                 {
                                     if (info.Subject == listener.Subject)
                                     {
+                                        GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, info.Subject, "Message received: " + info.Message);
+
+                                        processed = true;
+
                                         socket.Send(JsonConvert.SerializeObject(listener.DoMessage(this, info, socket)));
                                         break;
                                     }
+                                }
+
+                                if (processed == false)
+                                {
+                                    socket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                                        {
+                                            Subject         = info.Subject,
+                                            Message         = "Message is not implemented on this server.",
+                                            ResponseCode    = GFXResponseType.DoesNotExist
+                                        }));
                                 }
                             }
                         };

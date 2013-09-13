@@ -1,8 +1,10 @@
 ﻿using GameForestDatabaseConnector.Logger;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,6 +29,8 @@ namespace GameForestConsole
         {
             InitializeComponent();
 
+            textConsole.Document.Blocks.Clear();
+
             serverCore      = new GFXRestServerCore();
             websocketCore   = new GFXWebsocketCore();
 
@@ -50,11 +54,41 @@ namespace GameForestConsole
                     Dispatcher.Invoke(new Action(() =>
                         {
                             var par = new Paragraph();
-                            par.Inlines.Add(new Run(string.Format("[{0}] ({1}) {2}", entry.Category, entry.LoggerLevel, entry.Message)));
+                            var run = new Run(string.Format("[{0}] ({1}) {2}", entry.Category, entry.LoggerLevel, entry.Message));
+
+                            switch(entry.LoggerLevel)
+                            {
+                                case GFXLoggerLevel.ERROR:
+                                case GFXLoggerLevel.FATAL:
+                                    run.Foreground = Brushes.DarkRed;
+                                    break;
+                                case GFXLoggerLevel.INFO:
+                                    run.Foreground = Brushes.DarkBlue;
+                                    break;
+                                case GFXLoggerLevel.WARN:
+                                    run.Foreground = Brushes.Orange;
+                                    break;
+                            }
+
+                            par.Inlines.Add(run);
 
                             textConsole.Document.Blocks.Add(par);
+                            textConsole.ScrollToEnd();
                         }));
                 };
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (serverCore.IsStarted)
+            {
+                serverCore.Stop();
+            }
+
+            if (websocketCore.IsRunning)
+            {
+                websocketCore.Stop();
+            }
         }
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
@@ -78,19 +112,33 @@ namespace GameForestConsole
 
             buttonStart.IsEnabled = true;
             buttonStop.IsEnabled = false;
-        }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (serverCore.IsStarted)
-            {
-                serverCore.Stop();
-            }
+            ellipseWSSV.Fill = Brushes.Gray;
         }
 
         private void buttonClearLog_Click(object sender, RoutedEventArgs e)
         {
             textConsole.Document.Blocks.Clear();
+        }
+
+        private void buttonSaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            Thread saveThread = new Thread(new ThreadStart(() =>
+                {
+                    var saveList = new List<GFXLoggerEntry>(GFXLogger.GetInstance().Entries);
+
+                    using (TextWriter tw = new StreamWriter(File.OpenWrite("log-" + DateTime.Now.ToFileTime() + ".txt")))
+                    {
+                        foreach (var item in saveList)
+                        {
+                            tw.WriteLine(item.ToString());
+                        }
+
+                        tw.Flush();
+                    }
+                }));
+
+            saveThread.Start();
         }
     }
 }

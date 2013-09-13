@@ -57,7 +57,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetGameInfo", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameInfo", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -91,7 +91,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "CreateGame", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "CreateGame", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }

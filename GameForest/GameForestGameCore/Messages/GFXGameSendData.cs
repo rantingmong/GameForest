@@ -3,9 +3,6 @@ using GameForestCore.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameForestCoreWebSocket.Messages
 {
@@ -41,16 +38,14 @@ namespace GameForestCoreWebSocket.Messages
                     dataStore.Data[entry.Key] = entry.Data;
 
                     // send message to other connected players
-                    List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbySessions[0].SessionID)));
-
-                    string gameData = JsonConvert.SerializeObject(dataStore);
+                    List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbySessions[0].LobbyID)));
 
                     foreach (var player in players)
                     {
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject = "GFX_DATA_CHANGED",
-                                Message = JsonConvert.SerializeObject(dataStore),
+                                Message = info.Message,
                                 ResponseCode = GFXResponseType.Normal
                             }));
                     }

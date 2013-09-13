@@ -2,9 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameForestCoreWebSocket.Messages
 {
@@ -28,20 +25,17 @@ namespace GameForestCoreWebSocket.Messages
                 if (lobbySessions.Count <= 0)
                     return constructResponse(GFXResponseType.InvalidInput, "User is not playing any games!");
 
-                var nextPlayer      = new GFXLobbySessionRow();
                 var currentPlayer   = lobbySessions[0];
 
                 // do a SQL query with order by of column 'order' in ascending order and greater than currentPlayer.Order
                 var lobbies         = new List<GFXLobbyRow>(server.LobbyList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
-                var nextPlayers     = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND Order > {1} ORDER BY Order ASC", currentPlayer.LobbyID, currentPlayer.Order)));
-
-                var lobby           = lobbies[0];
+                var nextPlayers     = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' AND PlayerOrder > {1} ORDER BY PlayerOrder ASC", currentPlayer.LobbyID, currentPlayer.Order)));
 
                 // change the CurrentUserSession of the game data to the next player
                 if (nextPlayers.Count <= 0)
                 {
                     // get the first person
-                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY Order ASC", currentPlayer.LobbyID)));
+                    nextPlayers = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}' ORDER BY PlayerOrder ASC", currentPlayer.LobbyID)));
 
                     if (nextPlayers.Count <= 0)
                     {
@@ -49,10 +43,15 @@ namespace GameForestCoreWebSocket.Messages
                     }
                 }
 
-                nextPlayer          = nextPlayers[0];
-                lobby.CurrentPlayer = nextPlayer.SessionID;
+                var nextPlayer      = nextPlayers[0];
+
+                // change current player of the lobby in the database to the current player
+                var lobby               = lobbies[0];
+                    lobby.CurrentPlayer = nextPlayer.SessionID;
 
                 server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
+
+                server.GameDataList[nextPlayer.LobbyID].CurrentUserSession = nextPlayer.SessionID;
 
                 // send GFX_TURN_START to the next client and send GFX_TURN_CHANGED to other clients
                 var players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));

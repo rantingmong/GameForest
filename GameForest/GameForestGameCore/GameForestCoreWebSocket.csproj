@@ -54,7 +54,6 @@
     <Compile Include="Messages\GFXGameAskData.cs" />
     <Compile Include="Messages\GFXGameAskUserData.cs" />
     <Compile Include="Messages\GFXGameFinish.cs" />
-    <Compile Include="Messages\GFXGameFinishTally.cs" />
     <Compile Include="Messages\GFXGameNextTurn.cs" />
     <Compile Include="Messages\GFXGameSendData.cs" />
     <Compile Include="Messages\GFXGameSendUserData.cs" />

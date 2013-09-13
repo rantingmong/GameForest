@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestClient", "GameForestClient\GameForestClient.csproj", "{FBE56C88-2C51-47EB-B7F3-6DE9E6E612C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestDatabaseConnector", "GameForestDatabaseConnector\GameForestDatabaseConnector.csproj", "{4D8182B9-0284-4C28-829E-652D2D4297D7}"

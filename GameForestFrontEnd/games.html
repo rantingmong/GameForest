@@ -156,7 +156,7 @@
             var response = $.ajax({
                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type: "PUT",
-                async: false,
+                async: true,
             });
 
             response.success(function (data)
@@ -177,7 +177,7 @@
                     var userResponse = $.ajax({
                         url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
-                        async: false,
+                        async: true,
                     });
 
                     userResponse.success(function (data)
@@ -196,76 +196,68 @@
                     localStorage.setItem('user-session', null);
                     window.location.href = "index.html";
                 }
+
+                var gameResponse = $.ajax({
+                    url: "http://localhost:1193/service/game?maxcount=100",
+                    type: "GET",
+                    async: true
+                });
+
+                gameResponse.success(function (gData) {
+                    if (gData.ResponseType == 0) {
+                        var gameList = JSON.parse(gData.AdditionalData);
+
+                        var x = 0,
+                            y = 0;
+
+                        if (gameList.length > 0) {
+                            for (var i = 0; i < gameList.length; i++) {
+                                var gameInfo = gameList[i];
+
+                                var mcolid = i % 4;
+                                var addElm = null;
+
+                                switch (mcolid) {
+                                    case 0:
+                                        addElm = $("#gameListColumn1");
+                                        break;
+                                    case 1:
+                                        addElm = $("#gameListColumn2");
+                                        break;
+                                    case 2:
+                                        addElm = $("#gameListColumn3");
+                                        break;
+                                    case 3:
+                                        addElm = $("#gameListColumn4");
+                                        break;
+                                }
+
+                                if (addElm == null)
+                                    continue;
+
+                                // add game to game list
+                                addElm.append('<div class="panel panel-default"><div class="panel-footer">' + gameInfo.Name + '</div><div class="panel-body"><img class="img-responsive" src="http://placehold.it/250x250&text=G1" /></div><div class="panel-footer text-right"><button class="btn btn-sm btn-primary" type="button" onclick="showCreateDialog(\'' + gameInfo.GameID + '\')">Create</button> <button class="btn btn-sm btn-info" type="button" onclick="showJoinDialog(\'' + gameInfo.GameID + '\')">Join</button></div></div>');
+                            }
+                        }
+                        else {
+                            $("#headerNoGames").show();
+                        }
+                    }
+                    else {
+
+                    }
+                });
+
+                gameResponse.fail(function (gData) {
+
+
+                });
             });
 
             response.fail(function (data)
             {
                 localStorage.setItem('user-session', null);
                 window.location.href = "index.html";
-            });
-
-            var gameResponse = $.ajax({
-                url: "http://localhost:1193/service/game?maxcount=100",
-                type: "GET",
-                async: false
-            });
-
-            gameResponse.success(function (data)
-            {
-                if (data.ResponseType == 0)
-                {
-                    var gameList = JSON.parse(data.AdditionalData);
-
-                    var x = 0,
-                        y = 0;
-
-                    if (gameList.length > 0)
-                    {
-                        for (var i = 0; i < gameList.length; i++)
-                        {
-                            var gameInfo = gameList[i];
-
-                            var mcolid = i % 4;
-                            var addElm = null;
-
-                            switch (mcolid)
-                            {
-                                case 0:
-                                    addElm = $("#gameListColumn1");
-                                    break;
-                                case 1:
-                                    addElm = $("#gameListColumn2");
-                                    break;
-                                case 2:
-                                    addElm = $("#gameListColumn3");
-                                    break;
-                                case 3:
-                                    addElm = $("#gameListColumn4");
-                                    break;
-                            }
-
-                            if (addElm == null)
-                                continue;
-
-                            // add game to game list
-                            addElm.append('<div class="panel panel-default"><div class="panel-footer">' + gameInfo.Name + '</div><div class="panel-body"><img class="img-responsive" src="http://placehold.it/250x250&text=G1" /></div><div class="panel-footer text-right"><button class="btn btn-sm btn-primary" type="button" onclick="showCreateDialog(\'' + gameInfo.GameID + '\')">Create</button> <button class="btn btn-sm btn-info" type="button" onclick="showJoinDialog(\'' + gameInfo.GameID + '\')">Join</button></div></div>');
-                        }
-                    }
-                    else
-                    {
-                        $("#headerNoGames").show();
-                    }
-                }
-                else
-                {
-
-                }
-            });
-
-            gameResponse.fail(function (data)
-            {
-
-
             });
         });
 
@@ -347,7 +339,7 @@
             var lobbyResponse = $.ajax({
                 url:    "http://localhost:1193/service/lobby?maxcount=1000",
                 type:   "GET",
-                async:  false,
+                async:  true,
             });
 
             lobbyResponse.success(function (data)
@@ -427,7 +419,7 @@
             var joinGameResponse = $.ajax({
 
                 url: "http://localhost:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
-                async: false,
+                async: true,
                 type: "POST"
             });
 
@@ -441,7 +433,7 @@
                     var gameResponse = $.ajax({
                         url: "http://localhost:1193/service/game/" + gameId,
                         type: "GET",
-                        async: false
+                        async: true
                     });
 
                     gameResponse.success(function (gameData) {

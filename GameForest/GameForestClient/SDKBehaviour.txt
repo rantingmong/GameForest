@@ -17,9 +17,11 @@ gfxGetGameInfo() : GFXGameInfo;             returns a descriptive information of
 
 gfxAskGameData() : String;                  returns the current data state of the game
 gfxAskUserGameData() : String;              returns the current user data state of a player
+gfxAskScoreData() : String;					returns the current score data of the game
 
 The SDK will also have functions to place information to the server:
 
 gfxFinishGame();                            function to inform the server the game has ended
 gfxSendGameData(payload: String);           function to send game data to the server
 gfxSendUserData(payload: String);           function to send user game data to the server
+gfxSendScoreData(payload: String);			function to send highscore data to the server

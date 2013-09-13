@@ -13,6 +13,9 @@ namespace GameForestCore.Services
         [OperationContract, WebInvoke(UriTemplate = "/{lobbyid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetLobby(string lobbyid);
 
+        [OperationContract, WebInvoke(UriTemplate = "/turn?lobbyid={lobbyid}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
+        GFXRestResponse GetPlayerOrder(string lobbyid, string usersessionid);
+
         [OperationContract, WebInvoke(UriTemplate = "?name={lobbyname}&gameid={gameid}&password={password}&usersessionid={usersessionid}&private={isprivate}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
         GFXRestResponse CreateLobby(string lobbyname, string gameid, string password, string usersessionid, bool isprivate);
 

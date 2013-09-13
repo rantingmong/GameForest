@@ -33,7 +33,7 @@ namespace GameForestCoreWebSocket.Messages
 
                 // send message to other connected players
                 bool gameReallyStart = true;
-                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.SessionID)));
+                List<GFXLobbySessionRow> players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
 
                 foreach (var player in players)
                 {
@@ -59,7 +59,7 @@ namespace GameForestCoreWebSocket.Messages
 
                     server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
-                    GFXGameData gameData = new GFXGameData(Guid.Empty);
+                    GFXGameData gameData = new GFXGameData(currentPlayer.LobbyID);
 
                     // create the data store for the game
                     server.GameDataList.Add(currentPlayer.LobbyID, gameData);
@@ -67,21 +67,24 @@ namespace GameForestCoreWebSocket.Messages
                     foreach (var player in players)
                     {
                         gameData.UserData.Add(player.SessionID, "");
+
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Subject = "GFX_START_CHOOSE",
-                                Message = "",
-                                ResponseCode = GFXResponseType.Normal
+                                Subject             = "GFX_START_CHOICE",
+                                Message             = "",
+                                ResponseCode        = GFXResponseType.Normal
                             }));
 
                         if (player.Owner)
                         {
+                            server.GameDataList[currentPlayer.LobbyID].CurrentUserSession = player.SessionID;
+
                             // send a GFX_TURN_RESOLVE to the owner of the lobby
                             server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                                 {
-                                    Subject = "GFX_TURN_RESOLVE",
-                                    Message = "",
-                                    ResponseCode = GFXResponseType.Normal
+                                    Subject         = "GFX_TURN_RESOLVE",
+                                    Message         = player.Order.ToString(),
+                                    ResponseCode    = GFXResponseType.Normal
                                 }));
                         }
                     }

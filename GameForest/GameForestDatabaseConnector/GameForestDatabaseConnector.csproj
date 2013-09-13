@@ -53,10 +53,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GFXChatRow.cs" />
+    <Compile Include="GFXChatroomRow.cs" />
     <Compile Include="GFXDatabaseCore.cs" />
     <Compile Include="GFXDatabaseTable.cs" />
     <Compile Include="GFXDatabaseTranslator.cs" />
     <Compile Include="GFXGameRow.cs" />
+    <Compile Include="GFXHighscoreListRow.cs" />
+    <Compile Include="GFXHighscoreUsersRow.cs" />
     <Compile Include="GFXLobbyRow.cs" />
     <Compile Include="GFXLobbySessionRow.cs" />
     <Compile Include="GFXLoginRow.cs" />
