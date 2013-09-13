@@ -15,7 +15,7 @@ namespace GameForestCore.Database
         public string   LastName    { get; set; }
 
         public string   Description { get; set; }
-        public int      fb_id       { get; set; }
+        public string   fb_id       { get; set; }
     }
 
     public sealed class GFXUserRowTranslator : GFXDatabaseTranslator<GFXUserRow>
@@ -40,7 +40,7 @@ namespace GameForestCore.Database
             returnData[3] = GFXDatabaseCore.ToSQLString(data.FirstName);
             returnData[4] = GFXDatabaseCore.ToSQLString(data.LastName);
             returnData[5] = GFXDatabaseCore.ToSQLString(data.Description);
-            returnData[6] = ((int)data.fb_id).ToString();
+            returnData[6] = GFXDatabaseCore.ToSQLString(data.fb_id);
 
             return returnData;
         }
@@ -55,7 +55,7 @@ namespace GameForestCore.Database
                 FirstName   = reader.GetString(3),
                 LastName    = reader.GetString(4),
                 Description = reader.GetString(5),
-                fb_id       = reader.GetInt32(6)
+                fb_id       = reader.GetString(6)
             };
         }
     }

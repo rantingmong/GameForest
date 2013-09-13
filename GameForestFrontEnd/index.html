@@ -20,9 +20,51 @@
                     cookie: true, // enable cookies to allow the server to access the session
                     xfbml: true  // parse XFBML
                 });
+
+                // Initialize when a user has authenticated with FB and this app
+                // Handle events accordingly
+                FB.Event.subscribe('auth.authResponseChange', function (response) {
+                    if (response.status === 'connected') {
+                        // user is logged in to FB
+                        // has authorized app
+                        var fbid = 0;
+
+                        console.log('Welcome, fetching information');
+                        FB.api('/me', function (response) {
+                            document.getElementById('fbuserid').innerHTML = response.id;
+                            fbid = response.id;
+                        });
+                        console.log('Userid: ' + fbid);
+
+                        document.getElementById('fb-log-well').style.display = 'none';
+                        document.getElementById('fb-auth-in').style.display = 'block';
+
+                        // handle login with the accessToken and response
+
+                    } else if (response.status === 'not_authorized') {
+                        // user is logged in to FB
+                        // has not authorized app
+
+                        document.getElementById('fb-log-well').style.display = 'block';
+                        document.getElementById('fb-auth-in').style.display = 'none';
+                    } else {
+                        // user is not logged in to FB
+                        // has not authorized app
+
+                        document.getElementById('fb-log-well').style.display = 'block';
+                        document.getElementById('fb-auth-in').style.display = 'none';
+                    }
+                });
+
+                document.getElementById('fb-logout').addEventListener('click', function () {
+                    window.location.reload(true);
+                    FB.logout();
+                });
+
+
             };
 
-            // Load SDK asynchronously...
+            // Load Facebook SDK asynchronously...
             (function (d) {
                 var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
                 if (d.getElementById(id)) { return; }
@@ -160,6 +202,7 @@
                 });
             }
 
+
         </script>
 
     <div class="container">
@@ -288,7 +331,28 @@
         </div>
         
         <!-- END OF SECOND ROW -->
-        <div class="fb-login-button" data-show-faces="true" data-width="400" data-max-rows="1"></div>
+        <!-- THIRD ROW -->
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="well" id="fb-log-well">
+                    <h4>Facebook Login</h4>
+                    <div class="fb-login-button" data-show-faces="true" data-width="400" data-max-rows="1"></div>
+                </div>
+                <div class="well" id="fb-auth-in" style="display:none">
+                    <h4>Facebook Debug</h4>
+                    <h5>Logged in as <span id="fbuserid"></span></h5>
+                    <h5><a href="#" id="fb-logout">Logout</a></h5>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="well" id="fb-info-well">
+                    <h4>Using FaceBook Login</h4>
+                    <h5>Info here</h5>
+                </div>
+            </div>
+        </div>
+            
     </div>
     
     
