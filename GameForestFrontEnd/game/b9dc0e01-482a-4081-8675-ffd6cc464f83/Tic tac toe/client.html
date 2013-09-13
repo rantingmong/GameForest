@@ -1,0 +1,54 @@
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Display Tracker</title>
+	<style type="text/css">
+		html , body {
+			font: normal 0.9em arial , helvetica;
+		}
+	</style>
+	<script src="http://localhost:8000/socket.io/socket.io.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var socket  = io.connect('http://localhost:8000');
+			
+			$('#save').click(function() {
+				if ($('#username').val() == '' || $('#user_wins').val() == '' || $('#user_losses').val() == '') {
+					return alert('Lacking username/wins/losses');
+				}
+				var data = {
+					UserId: $('#userid').val(),
+					UserName: $('#username').val(),
+					Wins: $('#user_wins').val(),
+					Losses: $('#user_losses').val()
+				};
+				socket.emit('add user', data);
+				$('#userid').val(1);
+				$('#username').val('');
+				$('#user_wins').val(0);
+				$('#user_losses').val(0);
+			});
+			
+			socket.on('populate', function(data) {
+			var out = "";
+				$.each(data, function(i, obj) {
+				out += "<li>id"+obj.UserId+":"+obj.UserName+" has "+obj.Wins+" wins and "+obj.Losses+" losses</li>";
+			});
+			$('#users').html(out);
+			});
+		});
+	</script>
+	<body>
+		<b>Manual Track</b>
+		<div>Userid: <input type='number' id='userid' value=0></div>
+		<div>Username: <input type='text' id='username' value=''></div>
+		<div>Wins: <input type='number' id='user_wins' value=0></div>
+		<div>Losses: <input type='number' id='user_losses' value=0></div>
+		<div><input type='button' value='Save' id='save'></div>
+		
+		<br>
+		<b>Tracked Users:</b>
+		<ul id='users'></ul>
+	</body>
+</html>

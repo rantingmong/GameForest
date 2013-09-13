@@ -46,14 +46,9 @@ var currentPlayer                   = null;
 var xPlayerName                     = "";
 var oPlayerName                     = "";
 
-var xPlayerWins                     = 0;
-var xPlayerLosses                   = 0;
-var oPlayerWins                     = 0;
-var oPlayerLosses                   = 0;
-
 var showUpdateText                  = false;
 
-var selectedTile = { x: 0, y: 0 };
+var selectedTile                    = { x: 0, y: 0 };
 
 // debug data
 
@@ -241,8 +236,6 @@ function mouseUp                    (evt)
 
 function onDocumentReady            ()
 {
-    var socket = io.connect('http://localhost:8000');
-
     // we register events for the game
 
     canvasObject.addEventListener("mousemove", mouseMove, false);
@@ -331,7 +324,6 @@ GameForest.prototype.onGameStart    = function ()
 
             xPlayerName = xPlayer.Username;
             oPlayerName = oPlayer.Username;
-           
         });
 };
 
@@ -428,32 +420,18 @@ GameForest.prototype.onTurnStart    = function ()
 
     if (c1 == 15 || c2 == 15 || c3 == 15 || c4 == 15 || c5 == 15 || c6 == 15 || c7 == 15 || c8 == 15)
     {
-        data.Wins = ++1;
-        data2.Losses = ++1;
-
-        socket.emit('add user', data);
-
-        socket.emit('add user', data2);
-
         finished = true;
 
         // O wins
-        gf.finishGame(JSON.stringify(oPlayer));
+        gf.finishGame("O");
     }
 
     if (c1 == 12 || c2 == 12 || c3 == 12 || c4 == 12 || c5 == 12 || c6 == 12 || c7 == 12 || c8 == 12)
     {
-        data2.Wins = ++1;
-        data.Losses = ++1;
-
-        socket.emit('add user', data);
-
-        socket.emit('add user', data2);
-
         finished = true;
 
         // X wins
-        gf.finishGame(JSON.stringify(xPlayer));
+        gf.finishGame("X");
     }
 
     if (finished == false)
@@ -499,13 +477,11 @@ GameForest.prototype.onUpdateData   = function (key, updatedData)
         if (updatedData.oTaken)
         {
             $("#sampleGameButtonChooseO").prop("disabled", true);
-            $("#sampleGameButtonChooseX").prop("disabled", false);
         }
         
         if (updatedData.xTaken)
         {
             $("#sampleGameButtonChooseX").prop("disabled", true);
-            $("#sampleGameButtonChooseO").prop("disabled", false);
         }
 
         chooseData = updatedData;
@@ -518,7 +494,7 @@ GameForest.prototype.onUpdateData   = function (key, updatedData)
 
 GameForest.prototype.onGameFinish   = function (tallyList)
 {
-    alert(JSON.stringify(tallyList));
+    alert(tallyList);
 
     gf.navigateToGame();
 };
