@@ -297,6 +297,84 @@ namespace GameForestCore.Services
             }
         }
 
+        public GFXRestResponse FBConnect(string fbid, string email, string fname, string lname)
+        {
+            if (!userExists(email))
+            {
+                try 
+                {
+                    userTable.Insert(new GFXUserRow
+                    {
+                        Description = "",
+                        FirstName = fname,
+                        LastName = lname,
+                        Username = email,
+                        Password = "debugger",
+                        UserId = Guid.NewGuid(),
+                        fb_id = fbid
+                    });
+
+                    return constructResponse(GFXResponseType.Normal, "REDIRECT");
+                }
+                catch (Exception exp)
+                {
+                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
+
+                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+                }
+            }
+
+            if (userExists(email))
+            {
+                try
+                {
+                    var sessionId = Guid.NewGuid();
+                    var userId = getUserId(email);
+
+                    if (userId == Guid.Empty)
+                        return constructResponse(GFXResponseType.RuntimeError, "Error in finding user id");
+
+                    if (loginTable.Count(string.Format("UserId = '{0}'", userId)) == 0)
+                    {
+                        loginTable.Insert(new GFXLoginRow
+                        {
+                            LastHeartbeat = DateTime.Now,
+                            UserId = userId,
+                            SessionId = sessionId,
+                            UserStatus = GFXLoginStatus.MENU
+                        });
+
+                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
+                    }
+                    else
+                    {
+                        var result = new List<GFXLoginRow>(loginTable.Select(string.Format("UserId = '{0}'", userId)));
+
+                        if (result.Count <= 0)
+                            return constructResponse(GFXResponseType.NotFound, "Session expired");
+
+                        var user = result[0];
+
+                        user.LastHeartbeat = DateTime.Now;
+
+                        loginTable.Update(string.Format("UserId = '{0}'", userId), user);
+
+                        sessionId = user.SessionId;
+
+                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
+                    }
+                }
+                catch (Exception exp)
+                {
+                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
+
+                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+                }
+            }
+
+            return constructResponse(GFXResponseType.Normal, "[User|FBConn] Something went wrong");
+        }
+
         // ----------------------------------------------------------------------------------------------------------------
 
         private bool userExists(string user)
@@ -311,7 +389,7 @@ namespace GameForestCore.Services
 
         private bool sessionExists(string sessionid)
         {
-            return loginTable.Count(string.Format("sessionid = '{0}'", sessionid)) == 1;
+            return loginTable.Count(string.Format("SessionId = '{0}'", sessionid)) == 1;
         }
 
         private bool passwordMatch(string username, string password)
