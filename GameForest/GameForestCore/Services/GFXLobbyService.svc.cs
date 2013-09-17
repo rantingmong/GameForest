@@ -254,8 +254,7 @@ namespace GameForestCore.Services
                     return constructResponse(GFXResponseType.NotFound, "User session specified is not in the lobby.");
                 }
 
-                var userList =
-                    new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
+                var userList = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
 
                 return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userList));
             }

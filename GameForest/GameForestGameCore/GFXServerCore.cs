@@ -14,6 +14,9 @@ namespace GameForestCoreWebSocket
         public static readonly string                   INIT_CONNECTION     = "GFX_INIT_CONNECTION";
         public static readonly string                   STOP_CONNECTION     = "GFX_STOP_CONNECTION";
 
+        private double                                  disconnectThreshold = 30D; // 30 seconds
+        private double                                  logoutThreshold     = 1.5D; // 1 hour and 30 minutes
+
         private WebSocketServer                         server;
 
         private List<Guid>                              verifyList          = new List<Guid>();
@@ -25,35 +28,38 @@ namespace GameForestCoreWebSocket
 
         private List<GFXSocketListener>                 listenerList        = new List<GFXSocketListener>();
 
+        private GFXDatabaseTable<GFXUserRow>            userList            = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
+        private GFXDatabaseTable<GFXLoginRow>           sessionList         = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+
         private GFXDatabaseTable<GFXLobbyRow>           lobbyList           = new GFXDatabaseTable<GFXLobbyRow>(new GFXLobbyRowTranslator());
         private GFXDatabaseTable<GFXLobbySessionRow>    lobbySessionList    = new GFXDatabaseTable<GFXLobbySessionRow>(new GFXLobbySessionRowTranslator());
 
-        public Dictionary<Guid, GFXGameData>            GameDataList
+        public  Dictionary<Guid, GFXGameData>           GameDataList
         {
             get { return gameDatalist; }
         }
 
-        public Dictionary<Guid, Guid>                   ConnectionList
+        public  Dictionary<Guid, Guid>                  ConnectionList
         {
             get { return connectionList; }
         }
 
-        public Dictionary<Guid, IWebSocketConnection>   WebSocketList
+        public  Dictionary<Guid, IWebSocketConnection>  WebSocketList
         {
             get { return webSocketList; }
         }
 
-        public GFXDatabaseTable<GFXLobbyRow>            LobbyList
+        public  GFXDatabaseTable<GFXLobbyRow>           LobbyList
         {
             get { return lobbyList; }
         }
 
-        public GFXDatabaseTable<GFXLobbySessionRow>     LobbySessionList
+        public  GFXDatabaseTable<GFXLobbySessionRow>    LobbySessionList
         {
             get { return lobbySessionList; }
         }
 
-        public GFXServerCore                            ()
+        public  GFXServerCore                           ()
         {
             listenerList.Add(new GFXConfirmTurn());
             listenerList.Add(new GFXGameAskUserData());
@@ -65,6 +71,9 @@ namespace GameForestCoreWebSocket
             listenerList.Add(new GFXGameStart());
             listenerList.Add(new GFXGameStartConfirm());
             
+            // TODO: create a timer that checks users if they are still online (interval: 30,000ms)
+            
+
             server = new WebSocketServer("ws://localhost:8084");
 
             server.Start(socket =>
@@ -165,9 +174,64 @@ namespace GameForestCoreWebSocket
                 });
         }
 
-        public void Stop()
+        public  void                                    Stop                    ()
         {
             server.Dispose();
+        }
+
+        // This method checks if the user is still logged in to the system
+        private void                                    CheckUsernameTick       ()
+        {
+            var userList    = new List<GFXUserRow>(this.userList.Select(""));
+            var sessionList = new List<GFXLoginRow>(this.sessionList.Select(""));
+
+            var dtNow       = DateTime.Now;
+
+            foreach (var item in sessionList)
+            {
+                if ((dtNow - item.LastHeartbeat).TotalHours > logoutThreshold)
+                {
+                    // remove this user from the login list
+                }
+            }
+        }
+
+        // This method checks if the user is online and connected to a game
+        private void                                    CheckUserConnectedTick  ()
+        {
+            var userList            = new List<GFXUserRow>(this.userList.Select(""));
+            var sessionList         = new List<GFXLoginRow>(this.sessionList.Select(""));
+            var lobbySessionList    = new List<GFXLobbySessionRow>(this.lobbySessionList.Select(""));
+
+            var dtNow               = DateTime.Now;
+
+            foreach (var item in lobbySessionList)
+            {
+                try
+                {
+                    var result = sessionList.Find(new Predicate<GFXLoginRow>((x) =>
+                    {
+                        foreach (var user in sessionList)
+                        {
+                            if (user.SessionId.Equals(item.SessionID))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }));
+
+                    if ((dtNow - result.LastHeartbeat).TotalSeconds > disconnectThreshold)
+                    {
+                        // this client has disconnected! send a message to other players that has this player
+                    }
+                }
+                catch (ArgumentNullException exp)
+                {
+                    // I swallow thee.
+                }
+            }
         }
     }
 }
