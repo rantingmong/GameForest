@@ -362,7 +362,7 @@ namespace GameForestCore.Services
                         sessionId = user.SessionId;
 
                         return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                    }
+                    } 
                 }
                 catch (Exception exp)
                 {

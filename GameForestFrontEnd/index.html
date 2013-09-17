@@ -34,11 +34,13 @@
             // Initialize when a user has authenticated with FB and this app
             // Handle events accordingly
             FB.Event.subscribe('auth.authResponseChange', function (response) {
+
                 if (response.status === 'connected') {
                     // user is logged in to FB
                     // has authorized app
 
                     console.log('Welcome, fetching information');
+
                     FB.api('/me', function (response) {
 
                         var fbid = response.id;
@@ -94,7 +96,8 @@
 
                             $("#profileHeader").html("Welcome back, " + adata.FirstName);
 
-                            $("#linkLogout").show();
+                            $("#fbLogout").show();
+                            $("#linkLogout").hide();
                             $("#linkProfile").show();
 
                             $("#linkProfile").html(adata.Username);
@@ -105,48 +108,43 @@
 
                         document.getElementById('fbuserid').innerHTML = fbid;
                     })
+                    
+                    document.getElementById('fbLogout').addEventListener('click', function () {
+                        var request = $.ajax({
+                            url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                            async: true,
+                            type: "DELETE"
+                        });
+
+                        request.success(function (data) {
+                            if (data.ResponseType != 0) {
+                                // hehe, this is imposible...
+                            }
+                            else {
+                                FB.logout(function () {
+                                    // wipe user
+                                    window.location.reload(true);
+                                });
+                            }
+                        });
+                    });
+                    
                 } else if (response.status === 'not_authorized') {
                     // user is logged in to FB
                     // has not authorized app
-                    $("#login-well").show();
-                    $("#userinfo-well").hide();
 
                     document.getElementById('fb-log-well').style.display = 'block';
                     document.getElementById('fb-auth-in').style.display = 'none';
                 } else {
                     // user is not logged in to FB
                     // has not authorized app
-                    $("#login-well").show();
-                    $("#userinfo-well").hide();
 
                     document.getElementById('fb-log-well').style.display = 'block';
                     document.getElementById('fb-auth-in').style.display = 'none';
                 }
             });
+            
 
-            /*
-            document.getElementById('linkLogout').addEventListener('click', function () {
-                function onLogout() {
-                    var request = $.ajax({
-                        url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                        async: true,
-                        type: "DELETE"
-                    });
-
-                    request.success(function (data) {
-                        if (data.ResponseType != 0) {
-                            // hehe, this is imposible...
-                        }
-                        else {
-                            FB.logout(function (response) {
-                                //wipe user
-                            });
-                            window.location.reload(true);
-                        }
-                    });
-                }
-            });
-            */
         }
 
         $(document).ready(function () {
@@ -264,6 +262,7 @@
             }
 
             function onLogout() {
+
                 var request = $.ajax({
                     url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                     async: true,
@@ -275,9 +274,6 @@
                         // hehe, this is imposible...
                     }
                     else {
-                        FB.logout(function (response) {
-                            //wipe user
-                        });
                         window.location.reload(true);
                     }
                 });
@@ -317,6 +313,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
+                    <li><a href="#" id="fbLogout" style="display: none">Logout (FB User)</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
