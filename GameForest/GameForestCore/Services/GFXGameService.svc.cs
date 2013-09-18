@@ -14,12 +14,14 @@ namespace GameForestCore.Services
         private GFXDatabaseTable<GFXGameRow>    gameTable;
         private GFXDatabaseTable<GFXUserRow>    userTable;
         private GFXDatabaseTable<GFXLoginRow>   loginTable;
+        private GFXDatabaseTable<GFXStatRow>    statTable;
 
         public GFXGameService                   ()
         {
             userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
             loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
+            statTable   = new GFXDatabaseTable<GFXStatRow>(new GFXStatRowTranslator());
         }
 
         public GFXRestResponse                  GetGameList         (int maxCount)
@@ -96,6 +98,113 @@ namespace GameForestCore.Services
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
         }
+
+        public GFXRestResponse                  AddStat             (string statname, string gameId)
+        {
+            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
+            var statGuid = Guid.NewGuid();
+
+            if (gameList.Count <= 0)
+                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
+
+            try
+            {
+                if ((statTable.Count(string.Format("stat_id = '{0}'", statGuid)) == 0) &&
+                    (statTable.Count(string.Format("stat_name = '{0}'", statname)) == 0))
+                {
+                    GFXStatRow statistic = new GFXStatRow
+                    {
+                        stat_id = statGuid,
+                        GameID = Guid.Parse(gameId),
+                        stat_name = statname,
+                        stat_value = 0
+                    };
+
+                    statTable.Insert(statistic);
+
+                    return constructResponse(GFXResponseType.Normal, statistic.stat_id.ToString());
+                }
+                else
+                {
+                    return constructResponse(GFXResponseType.Normal, statname +"already exists");
+                }
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "AddStat", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse                  GetStat             (string stat, string gameId)
+        {
+
+            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
+
+            if (gameList.Count <= 0)
+                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
+
+            try
+            {
+                string returnJSON;
+
+                if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
+                    (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 0))
+                {
+                    var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", stat)));
+
+                    for (int x = 0; x < result.Count; x++)
+                    {
+                        if (result[x].stat_name == stat)
+                        {
+                            returnJSON = JsonConvert.SerializeObject(result[x]);
+
+                            return constructResponse(GFXResponseType.Normal, returnJSON);
+                        }
+                    }
+
+                    return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                }
+                else
+                {
+                    return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                }
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetStat", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse                  UpdateStat          (string statId, string gameId, int stat_value)
+        {
+            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
+
+            if (gameList.Count <= 0)
+                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
+
+            try
+            {
+                var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_id = '{0}'", statId)))[0];
+
+                result.stat_value = stat_value;
+
+                statTable.Update(string.Format("stat_id = '{0}'", statId), result);
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "UpdateStat", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+
+            return constructResponse(GFXResponseType.Normal, "Success!");
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------
 
         private GFXRestResponse                 constructResponse   (GFXResponseType responseType, string payload)
         {
