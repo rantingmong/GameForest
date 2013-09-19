@@ -122,11 +122,15 @@ namespace GameForestCore.Services
 
                     statTable.Insert(statistic);
 
-                    return constructResponse(GFXResponseType.Normal, statistic.stat_id.ToString());
+                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statname)));
+
+                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statList[0]));
                 }
                 else
                 {
-                    return constructResponse(GFXResponseType.Normal, statname +"already exists");
+                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statname)));
+
+                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statList[0]));
                 }
             }
             catch (Exception exp)
@@ -137,7 +141,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse                  GetStat             (string stat, string gameId)
+        public GFXRestResponse                  GetStat             (string stat, string gameId, bool allcheck)
         {
 
             List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
@@ -149,26 +153,33 @@ namespace GameForestCore.Services
             {
                 string returnJSON;
 
-                if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
-                    (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 0))
+                if (allcheck == false)
                 {
-                    var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", stat)));
-
-                    for (int x = 0; x < result.Count; x++)
+                    if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
+                        (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 0))
                     {
-                        if (result[x].stat_name == stat)
+                        var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", stat)));
+
+                        for (int x = 0; x < result.Count; x++)
                         {
-                            returnJSON = JsonConvert.SerializeObject(result[x]);
+                            if (result[x].stat_name == stat)
+                            {
+                                returnJSON = JsonConvert.SerializeObject(result[x]);
 
-                            return constructResponse(GFXResponseType.Normal, returnJSON);
+                                return constructResponse(GFXResponseType.Normal, returnJSON);
+                            }
                         }
-                    }
 
-                    return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                        return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                    }
+                    else
+                    {
+                        return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                    }
                 }
                 else
                 {
-                    return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statTable.Select(string.Format("GameID = '{0}'", gameId))));
                 }
             }
             catch (Exception exp)
@@ -201,7 +212,7 @@ namespace GameForestCore.Services
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
 
-            return constructResponse(GFXResponseType.Normal, "Success!");
+            return constructResponse(GFXResponseType.Normal, "Update push success!");
         }
 
         // ----------------------------------------------------------------------------------------------------------------
