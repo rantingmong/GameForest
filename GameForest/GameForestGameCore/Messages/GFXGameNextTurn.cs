@@ -71,8 +71,9 @@ namespace GameForestCoreWebSocket.Messages
                 // prepare game data and user list
                 var entries = new Dictionary<string, object>();
 
-                entries["GameData"] = server.GameDataList[lobby.LobbyID];
-                entries["UserList"] = players;
+                entries["GameData"]     = server.GameDataList[lobby.LobbyID];
+                entries["UserList"]     = players;
+                entries["NextPlayer"]   = nextPlayer;
 
                 foreach (var player in players)
                 {

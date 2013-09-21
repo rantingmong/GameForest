@@ -5,20 +5,19 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
-using System.ServiceModel.Activation;
 
 namespace GameForestCore.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXLobbyService : IGFXLobbyService
     {
-        private readonly GFXDatabaseTable<GFXUserRow>           userTable;
-        private readonly GFXDatabaseTable<GFXGameRow>           gameTable;
-        private readonly GFXDatabaseTable<GFXLoginRow>          loginTable;
-        private readonly GFXDatabaseTable<GFXLobbyRow>          lobbyTable;
-        private readonly GFXDatabaseTable<GFXLobbySessionRow>   lobbySessionTable;
+        private readonly GFXDatabaseTable<GFXUserRow>                   userTable;
+        private readonly GFXDatabaseTable<GFXGameRow>                   gameTable;
+        private readonly GFXDatabaseTable<GFXLoginRow>                  loginTable;
+        private readonly GFXDatabaseTable<GFXLobbyRow>                  lobbyTable;
+        private readonly GFXDatabaseTable<GFXLobbySessionRow>           lobbySessionTable;
 
-        public GFXLobbyService                      ()
+        public                              GFXLobbyService             ()
         {
             userTable           = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable           = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
@@ -31,7 +30,7 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        public GFXRestResponse GetLobbies           (string maxcount)
+        public  GFXRestResponse             GetLobbies                  (string maxcount)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetLobbies", "Fetching lobby list...");
 
@@ -47,7 +46,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetLobby             (string lobbyid)
+        public  GFXRestResponse             GetLobby                    (string lobbyid)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetLobby", "Fetching lobby info...");
 
@@ -70,7 +69,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetPlayerOrder       (string lobbyid, string usersessionid)
+        public  GFXRestResponse             GetPlayerOrder              (string lobbyid, string usersessionid)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetPlayerOrder", "Fetching lobby info...");
 
@@ -96,7 +95,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse CreateLobby          (string lobbyname, string gameid, string password, string usersessionid, bool isprivate)
+        public  GFXRestResponse             CreateLobby                 (string lobbyname, string gameid, string password, string usersessionid, bool isprivate)
         {
             try
             {
@@ -154,7 +153,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse JoinLobby            (string lobbyid, string usersessionid)
+        public  GFXRestResponse             JoinLobby                   (string lobbyid, string usersessionid)
         {
             try
             {
@@ -215,7 +214,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse LeaveLobby           (string usersessionid)
+        public  GFXRestResponse             LeaveLobby                  (string usersessionid)
         {
             try
             {
@@ -242,7 +241,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetUserList          (string lobbyid, string usersessionid)
+        public  GFXRestResponse             GetUserList                 (string lobbyid, string usersessionid)
         {
             try
             {
@@ -254,18 +253,26 @@ namespace GameForestCore.Services
                     return constructResponse(GFXResponseType.NotFound, "User session specified is not in the lobby.");
                 }
 
-                var userList = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)));
+                var returnList = new List<Dictionary<string, object>>();
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userList));
+                foreach (var item in lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)))
+                {
+                    var sessionList = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", item.SessionID)));
+                    var userList    = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", sessionList[0].UserId)));
+
+                    returnList.Add(userInfoToJson(userList[0]));
+                }
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(returnList));
             }
             catch (Exception exp)
             {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "GetUserList", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "GetUserList", exp.Message);
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
         }
 
-        public GFXRestResponse GetUserCount         (string lobbyid)
+        public  GFXRestResponse             GetUserCount                (string lobbyid)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserCount", "Getting user count for lobby " + lobbyid);
 
@@ -282,7 +289,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetCurrentPlayer     (string lobbyid, string usersessionid)
+        public  GFXRestResponse             GetCurrentPlayer            (string lobbyid, string usersessionid)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetCurrentPlayer", "Getting current player for session " + lobbyid);
 
@@ -305,7 +312,7 @@ namespace GameForestCore.Services
                 var logins  = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", lobbies[0].CurrentPlayer)));
                 var users   = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", logins[0].UserId)));
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(users[0]));
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfoToJson(users[0])));
             }
             catch (Exception exp)
             {
@@ -315,7 +322,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetNextPlayer        (string lobbyid, string usersessionid, string steps)
+        public  GFXRestResponse             GetNextPlayer               (string lobbyid, string usersessionid, string steps)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetNextPlayer", "Getting current player for session " + lobbyid);
 
@@ -352,7 +359,7 @@ namespace GameForestCore.Services
                 var loggedInUsers   = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", selectedPlayer.SessionID)));
                 var users           = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", loggedInUsers[0].UserId)));
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(users[0]));   
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfoToJson(users[0])));
             }
             catch (Exception exp)
             {
@@ -364,54 +371,37 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        private GFXRestResponse constructResponse   (GFXResponseType responseType, string payload)
+        private Dictionary<string, object>  userInfoToJson              (GFXUserRow userRow)
+        {
+            var uResult = new Dictionary<string, object>();
+
+            uResult["Name"]         = userRow.FirstName + " " + userRow.LastName;
+            uResult["UserId"]       = userRow.UserId;
+            uResult["Description"]  = userRow.Description;
+
+            return uResult;
+        }
+
+        private GFXRestResponse             constructResponse           (GFXResponseType responseType, string payload)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
             return new GFXRestResponse { AdditionalData = payload, ResponseType = responseType };
         }
 
-        private bool userExists                     (string user)
-        {
-            Guid userId;
-
-            if (Guid.TryParse(user, out userId))
-                return userTable.Count(string.Format("userid = '{0}'", userId)) == 1;
-
-            return this.userTable.Count(string.Format("username = '{0}'", user)) == 1;
-        }
-
-        private bool sessionExists                  (string sessionid)
+        private bool                        sessionExists               (string sessionid)
         {
             return loginTable.Count(string.Format("sessionid = '{0}'", sessionid)) == 1;
         }
 
-        private bool gameExists                     (string gameid)
+        private bool                        gameExists                  (string gameid)
         {
             return gameTable.Count(string.Format("gameid = '{0}'", gameid)) == 1;
         }
 
-        private bool lobbyExists                    (string lobbyid)
+        private bool                        lobbyExists                 (string lobbyid)
         {
             return lobbyTable.Count(string.Format("lobbyid = '{0}'", lobbyid)) == 1;
-        }
-
-        private Guid getUserId                      (string input)
-        {
-            Guid sessionId;
-
-            if (Guid.TryParse(input, out sessionId))
-            {
-                var result = new List<GFXLoginRow>(loginTable.Select(string.Format("sessionid = '{0}'", sessionId)));
-
-                return result.Count > 0 ? result[0].UserId : Guid.Empty;
-            }
-            else
-            {
-                var result = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", input)));
-
-                return result.Count > 0 ? result[0].UserId : Guid.Empty;
-            }
         }
     }
 }

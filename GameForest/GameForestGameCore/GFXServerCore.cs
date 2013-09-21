@@ -14,7 +14,7 @@ namespace GameForestCoreWebSocket
         public static readonly string                   INIT_CONNECTION     = "GFX_INIT_CONNECTION";
         public static readonly string                   STOP_CONNECTION     = "GFX_STOP_CONNECTION";
 
-        private double                                  disconnectThreshold = 30D; // 30 seconds
+        private double                                  disconnectThreshold = 30D;  // 30 seconds
         private double                                  logoutThreshold     = 1.5D; // 1 hour and 30 minutes
 
         private WebSocketServer                         server;
@@ -73,7 +73,6 @@ namespace GameForestCoreWebSocket
             
             // TODO: create a timer that checks users if they are still online (interval: 30,000ms)
             
-
             server = new WebSocketServer("ws://localhost:8084");
 
             server.Start(socket =>
@@ -182,7 +181,6 @@ namespace GameForestCoreWebSocket
         // This method checks if the user is still logged in to the system
         private void                                    CheckUsernameTick       ()
         {
-            var userList    = new List<GFXUserRow>(this.userList.Select(""));
             var sessionList = new List<GFXLoginRow>(this.sessionList.Select(""));
 
             var dtNow       = DateTime.Now;
@@ -199,7 +197,6 @@ namespace GameForestCoreWebSocket
         // This method checks if the user is online and connected to a game
         private void                                    CheckUserConnectedTick  ()
         {
-            var userList            = new List<GFXUserRow>(this.userList.Select(""));
             var sessionList         = new List<GFXLoginRow>(this.sessionList.Select(""));
             var lobbySessionList    = new List<GFXLobbySessionRow>(this.lobbySessionList.Select(""));
 
@@ -230,6 +227,7 @@ namespace GameForestCoreWebSocket
                 catch (ArgumentNullException exp)
                 {
                     // I swallow thee.
+                    Console.Write(exp + "\r\n");
                 }
             }
         }
