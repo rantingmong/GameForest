@@ -62,8 +62,8 @@ var highlightBox                    = "lightGray";
 
 var xWins							= "X Wins";
 var oWins							= "O Wins";
-var xwinId							= null;
-var owinId							= null;
+var xwinId = null;
+var owinId = null;
 
 // clams "value" from "min" to "max"
 Math.clamp                          = function (value, min, max)
@@ -249,6 +249,7 @@ function onDocumentReady            ()
     canvasObject.addEventListener("mouseup", mouseUp, false);
     canvasObject.addEventListener("click", mouseClick, false);
     canvasObject.addEventListener("mousedown", mouseDown, false);
+	
 };
 
 // gameforest callback methods
@@ -266,31 +267,6 @@ GameForest.prototype.onGameStart    = function ()
     gf.thenStarter()
 		.then(function (error, result)
 		{
-		    return gf.trackStat(xWins);
-		})
-		.then(function (error, result)
-		{
-			/* returns: GFXStatRow
-				{
-					stat_id,
-					GameID,
-					stat_name,
-					stat_value
-				}
-			*/
-			
-			console.log("Stat ID: " + result.stat_id);
-			
-			xwinId = result.stat_id;
-			
-			return gf.trackStat(oWins);
-		})
-		.then(function (error, result)
-		{
-			console.log("Stat ID: " + result.stat_id);
-			
-			owinId = result.stat_id;
-			
 			// get this user's information
             return gf.getUserInfo();
 		})
@@ -364,10 +340,19 @@ GameForest.prototype.onGameChoose   = function ()
     console.log("OnGameChoose is invoked!");
 
     $("#sampleGameChooseScreen").show();
+	
+	gf.trackStat(xWins);
+	gf.trackStat(oWins);
+	
+	xwinId = gf.getStat(xWins, false);
+	console.log(xwinId);
+	
+	owinId = gf.getStat(oWins, false);
+	console.log(owinId);
 };
 
 GameForest.prototype.onTurnSelect   = function (originalTurn)
-{
+{	
     console.log("My turn is " + originalTurn);
 
     $("#sampleGameButtonChooseO").click(function ()

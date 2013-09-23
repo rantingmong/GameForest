@@ -22,7 +22,7 @@ namespace GameForestCore.Services
         [OperationContract, WebInvoke(UriTemplate = "/stat?addstat={statname}&gameid={gameId}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
         GFXRestResponse AddStat(string statname, string gameId);
 
-        [OperationContract, WebInvoke(UriTemplate = "/stats?updatestat={statId}&gameid={gameId}&statvalue={stat_value}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse UpdateStat(string statId, string gameId, int stat_value);
+        [OperationContract, WebInvoke(UriTemplate = "/stats?updatestat={statname}&gameid={gameId}&statvalue={stat_value}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
+        GFXRestResponse UpdateStat(string statname, string gameId, int stat_value);
     }
 }

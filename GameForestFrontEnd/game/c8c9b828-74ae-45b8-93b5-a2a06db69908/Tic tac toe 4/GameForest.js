@@ -492,20 +492,55 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 	// IMPORTANT: THIS ONLY WORKS WITH STATS TRACKING INT VALUES (not float nor time)
 	this.trackStat				= function (statName)
 	{
-		var p = new promise.Promise();
+		var p = null;
 		
 		sendRequest("/game/stat?addStat=" + statName + "&gameid=" + this.gameId, "POST",
 			function(result)
 			{
-				if(result.ResponseType == 0)
-					p.Done(JSON.parse(result.AdditionalData));
-				else
-					p.Done(result.ResponseType + " " + result.AdditionalData);
+				if(result.ResponseType == 0) {
+					p = JSON.parse(result.AdditionalData);
+					return p;
+					}
+				else {
+					var p = "Err: " + JSON.parse(result.AdditionalData);
+					console.log("returned: " + p);
+					return p;
+				}
 			},
 			function(status, why)
 			{
-				p.done(status + ": " + why, null);
-				
+				if(GameForestVerboseMessaging)
+				{
+					alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
+				}
+			});
+	}
+	
+	this.getStat				= function (statName, allCheck)
+	{
+		var p = { };
+		var statOut = null;
+		
+		sendRequest("/game/stats?getstat=" + statName + "&gameid=" + this.gameId + "&all=" + allCheck, "GET",
+			function(result)
+			{
+				if(result.ResponseType == 0) 
+				{
+					p = JSON.parse(result.AdditionalData);
+					console.log(p);
+					console.log("name... "+p.stat_name);
+					console.log("value... "+p.stat_value);
+					statOut = p.stat_id;
+				}
+				else
+				{
+					p = JSON.parse(result.AdditionalData);
+					
+					return p;
+				}
+			},
+			function(status, why)
+			{
 				if(GameForestVerboseMessaging)
 				{
 					alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
@@ -517,29 +552,28 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 	
 	// function to update a tracked stat
 	// IMPORTANT: THIS ONLY WORKS WITH statValue BEING AN INT
-	this.updateStat				= function (statId, statValue)
+	this.updateStat				= function (statName, statValue)
 	{
-		var p = new promise.Promise();
-		
-		sendRequest("/game/stats?updatestat=" + statId + "&gameid=" + this.gameId + "&statvalue=" + statValue, "POST",
+		sendRequest("/game/stats?updatestat=" + statName + "&gameid=" + this.gameId + "&statvalue=" + statValue, "POST",
 			function(result)
 			{
 				if(result.ResponseType == 0)
-					p.Done(JSON.parse(result.AdditionalData));
+				{
+					var p = JSON.parse(result.AdditionalData);
+					return p;
+				}
 				else
-					p.Done(result.ResponseType + " " + result.AdditionalData);
+				{
+					var p = result.ResponseType + ": " + result.AdditionalData;
+				}
 			},
 			function(status, why)
 			{
-				p.done(status + ": " + why, null);
-				
 				if(GameForestVerboseMessaging)
 				{
 					alert("Error in updateStat function: [status=" + status + "] [reason=" + why + "]");
 				}
 			});
-			
-		return p;
 	}
 	
     // function to retrieve the game data

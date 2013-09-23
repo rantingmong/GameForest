@@ -156,21 +156,13 @@ namespace GameForestCore.Services
                 if (allcheck == false)
                 {
                     if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
-                        (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 0))
+                        (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 1))
                     {
                         var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", stat)));
 
-                        for (int x = 0; x < result.Count; x++)
-                        {
-                            if (result[x].stat_name == stat)
-                            {
-                                returnJSON = JsonConvert.SerializeObject(result[x]);
+                        returnJSON = JsonConvert.SerializeObject(result[0]);
 
-                                return constructResponse(GFXResponseType.Normal, returnJSON);
-                            }
-                        }
-
-                        return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
+                        return constructResponse(GFXResponseType.Normal, returnJSON);
                     }
                     else
                     {
@@ -190,7 +182,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse                  UpdateStat          (string statId, string gameId, int stat_value)
+        public GFXRestResponse                  UpdateStat          (string statName, string gameId, int stat_value)
         {
             List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
 
@@ -199,11 +191,11 @@ namespace GameForestCore.Services
 
             try
             {
-                var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_id = '{0}'", statId)))[0];
+                var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statName)))[0];
 
                 result.stat_value = stat_value;
 
-                statTable.Update(string.Format("stat_id = '{0}'", statId), result);
+                statTable.Update(string.Format("stat_name = '{0}'", statName), result);
             }
             catch (Exception exp)
             {
