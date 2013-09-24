@@ -58,12 +58,14 @@ var selectedTileMsg                 = "";
 
 var highlightBox                    = "lightGray";
 
-// stat values
-
+// Names of the stats I want to track
 var xWins							= "X Wins";
 var oWins							= "O Wins";
-var xwinId = null;
-var owinId = null;
+
+// Arrays to store data of the stats I'm tracking
+// Data fetched from the database is pushed into these arrays
+var statValList 					= new Array(); // stat value
+var statNameList					= new Array(); // stat name
 
 // clams "value" from "min" to "max"
 Math.clamp                          = function (value, min, max)
@@ -341,14 +343,14 @@ GameForest.prototype.onGameChoose   = function ()
 
     $("#sampleGameChooseScreen").show();
 	
+	// Track number of wins X and O have
+	// If they are already tracked, nothing is performed
 	gf.trackStat(xWins);
 	gf.trackStat(oWins);
 	
-	xwinId = gf.getStat(xWins, false);
-	console.log(xwinId);
-	
-	owinId = gf.getStat(oWins, false);
-	console.log(owinId);
+	// Fetch the current number of wins X and O have
+	gf.getStatVal(xWins, false, statValList, statNameList, gf.cbStat); 
+	gf.getStatVal(oWins, false, statValList, statNameList, gf.cbStat); 
 };
 
 GameForest.prototype.onTurnSelect   = function (originalTurn)
@@ -438,7 +440,13 @@ GameForest.prototype.onTurnStart    = function ()
     if (c1 == 15 || c2 == 15 || c3 == 15 || c4 == 15 || c5 == 15 || c6 == 15 || c7 == 15 || c8 == 15)
     {
         finished = true;
-
+		
+		for(var i = 0; i < statNameList.length; i++)
+			if(statNameList[i] == oWins)
+				var updatedOWins = statValList[i] + 1;
+				
+		gf.updateStat(oWins, updatedOWins);
+		
         // O wins
         gf.finishGame("O");
     }
@@ -446,7 +454,13 @@ GameForest.prototype.onTurnStart    = function ()
     if (c1 == 12 || c2 == 12 || c3 == 12 || c4 == 12 || c5 == 12 || c6 == 12 || c7 == 12 || c8 == 12)
     {
         finished = true;
-
+		
+		for(var i = 0; i < statNameList.length; i++)
+			if(statNameList[i] == xWins)
+				var updatedXWins = statValList[i] + 1;
+				
+		gf.updateStat(xWins, updatedXWins);
+		
         // X wins
         gf.finishGame("X");
     }
@@ -512,6 +526,6 @@ GameForest.prototype.onUpdateData   = function (key, updatedData)
 GameForest.prototype.onGameFinish   = function (tallyList)
 {
     alert(tallyList);
-
+	
     gf.navigateToGame();
 };

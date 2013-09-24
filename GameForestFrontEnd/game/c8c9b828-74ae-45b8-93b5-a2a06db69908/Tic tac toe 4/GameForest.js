@@ -516,7 +516,44 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 			});
 	}
 	
-	this.getStat				= function (statName, allCheck)
+	/******
+	this.getStatVal = function (
+		statName = the name of the statistic you want to fetch, should be same as
+				   in trackStat
+		allCheck = boolean, should be set to FALSE
+		statValList = array of stat value, each value you fetch for your game
+					  will be pushed to this array
+		statNameList= array of stat names, this is to identify which statistic gets added
+		              to the array first
+		callback = this.cbStat, callback function to push stat value into array
+		)
+		
+	statValList and statNameList are designed this way
+	because the calls to fetch statistics are asynchronous 
+	and thus you won't always get the stats in the same
+	order. 
+	
+	this.cbStat	    = function (
+		statList = array of stats
+		data	 = statistic fetched from the database
+		)
+	THIS ONLY WORKS FOR INTEGER VALUE STATS
+	******/
+	
+	this.cbStat					= function (statVals, statNames, data) 
+	{
+		console.log(data);
+		var statName = data.stat_name;
+		statNames.push(statName); // debug
+		var statVal = data.stat_value;
+		statVals.push(statVal); // debug
+		
+		// How to match names to value below, DEBUG
+		for(var i = 0; i < statNames.length; i++)
+			console.log(statNames[i] + ": " + statVals[i]);
+	}
+	
+	this.getStatVal				= function (statName, allCheck, statValList, statNameList, callback)
 	{
 		var p = { };
 		var statOut = null;
@@ -527,27 +564,26 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 				if(result.ResponseType == 0) 
 				{
 					p = JSON.parse(result.AdditionalData);
-					console.log(p);
 					console.log("name... "+p.stat_name);
 					console.log("value... "+p.stat_value);
-					statOut = p.stat_id;
+					
+					// callback is "this.cbStat" 
+					callback(statValList, statNameList, p);
 				}
 				else
 				{
 					p = JSON.parse(result.AdditionalData);
 					
-					return p;
+					callback(statList, p);
 				}
 			},
 			function(status, why)
 			{
 				if(GameForestVerboseMessaging)
 				{
-					alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
+					alert("Error in getStat function: [status=" + status + "] [reason=" + why + "]");
 				}
 			});
-		
-		return p;
 	}
 	
 	// function to update a tracked stat
