@@ -16,6 +16,9 @@ GameForestVerboseMessaging          = false;
 
 // gameforest callback methods
 
+function onDocumentReady() {
+};
+
 GameForest.prototype.onGameStart    = function ()
 {
     

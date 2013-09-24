@@ -6,18 +6,18 @@
 'use strict';
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
-var GameForestVerboseMessaging  = false;
+var GameForestVerboseMessaging              = false;
 
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-var GameForestCloudUrl          = "game-forest.cloudapp.net";
+var GameForestCloudUrl                      = "game-forest.cloudapp.net";
 
-var GFX_STATUS_LOBBY            = 0,
-    GFX_STATUS_CHOOSE           = 1,
-    GFX_STATUS_PLAYING          = 2,
-    GFX_STATUS_FINISHED         = 4;
+var GFX_STATUS_LOBBY                        = 0,
+    GFX_STATUS_CHOOSE                       = 1,
+    GFX_STATUS_PLAYING                      = 2,
+    GFX_STATUS_FINISHED                     = 4;
 
 // Game Forest client API
-var GameForest                  = function (gameId, lobbyId, sessionId)
+var GameForest                              = function (gameId, lobbyId, sessionId)
 {
     // checker to see if gameforest can initialize
     if (!Guid.isGuid(gameId)    ||
@@ -152,6 +152,14 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
             {
                 alert("Connection is closed with the server.");
             }
+
+            // if the user is playing and this suddenly went up. we know the user is disconnected from the internet.
+            if (pGfxObject.lobbyStatus == GFX_STATUS_PLAYING)
+            {
+                // call
+                GameForest.prototype.onGDI();
+                GameForest.prototype.onGameDisconnected();
+            }
         };
         this.wsConnection.onmessage = function (message)
         {
@@ -160,7 +168,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                 pGfxObject.heartbeat();
 
-            }, 30000);
+            }, 15000);
 
             var parse = JSON.parse(message.data);
 
@@ -168,6 +176,12 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
             switch (parse.Subject)
             {
+                case GFX_PLAYER_DISCONNECTED:
+
+                    // show the window that a user is disconnected
+                    GameForest.prototype.onGPDI();
+                    GameForest.prototype.onPlayerDisconnected(JSON.parse(parse.Message));
+                    break;
                 case GFX_ASK_DATA:
                 case GFX_ASK_USER_DATA:
                 case GFX_SEND_DATA:
@@ -207,6 +221,11 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
                     pGfxObject.connectionId = parse.Message;
                     constructWSRequest(pGfxObject.wsConnection, pGfxObject.connectionId, pGfxObject.sessionId, GFX_INIT_CONNECTION, "");
+                    break;
+                case GFX_STOP_CONNECTION:
+
+                    pGfxObject.wsConnection.close();
+
                     break;
                 case GFX_GAME_START:
 
@@ -558,6 +577,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
             },
             function(status, why) {
 
+                // we know the user is not connected from the Internet.
             });
     };
 
@@ -592,6 +612,21 @@ GameForest.prototype.onGameStartSignal      = function ()
     $("#gfxButtonStart").removeAttr("disabled");
     
     // TODO: ADD CLEAR INTERVAL THINGY HERE
+};
+
+GameForest.prototype.onGPDI                 = function ()
+{
+
+};
+
+GameForest.prototype.onGRDI                 = function ()
+{
+
+};
+
+GameForest.prototype.onGDI                  = function ()
+{
+
 };
 
 // override these methods in your game
@@ -646,6 +681,11 @@ GameForest.prototype.onPlayerDisconnected   = function (who)
 
 // method to override when a player is reconnected
 GameForest.prototype.onPlayerReconnected    = function (who)
+{
+
+};
+
+GameForest.prototype.onGameDisconnected     = function ()
 {
 
 };

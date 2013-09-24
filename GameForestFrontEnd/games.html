@@ -9,7 +9,6 @@
 <body>
     <div class="container">
         <br>
-        <!-- NAVBAR -->
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -32,16 +31,12 @@
                         </ul>
                     </li>
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div id="createGameDialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -90,8 +85,7 @@
                                     <td>Password</td>
                                 </tr>
                             </thead>
-                            <tbody id="lobbyList">
-                            </tbody>
+                            <tbody id="lobbyList"></tbody>
                         </table>
                     </div>
                     <div class="modal-footer">
@@ -100,7 +94,6 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <div class="col-sm-2">
                 <ul class="nav nav-pills nav-stacked">
@@ -136,14 +129,12 @@
                     </div>
                 </div>
                 <br>
-
-                <!-- END OF GAMES LIST DIV -->
             </div>
-            <!-- END OF FIRST ROW -->
         </div>
     </div>
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+
     <script type="text/javascript">
 
         $(document).ready(function ()
@@ -151,15 +142,14 @@
             $("#alertDialog").hide();
 
             // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-
-            var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
+            var showLogin           = true;
+            var heartBeatResponse   = $.ajax({
+                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  true,
             });
 
-            response.success(function (data)
+            heartBeatResponse.success(function (data)
             {
                 if (data.ResponseType != 0)
                 {
@@ -175,9 +165,9 @@
                 {
                     // then async get user's information
                     var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
+                        url:    "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type:   "GET",
+                        async:  true,
                     });
 
                     userResponse.success(function (data)
@@ -198,26 +188,31 @@
                 }
 
                 var gameResponse = $.ajax({
-                    url: "http://localhost:1193/service/game?maxcount=100",
-                    type: "GET",
-                    async: true
+                    url:    "http://localhost:1193/service/game?maxcount=1000",
+                    type:   "GET",
+                    async:  true
                 });
 
-                gameResponse.success(function (gData) {
-                    if (gData.ResponseType == 0) {
+                gameResponse.success(function (gData)
+                {
+                    if (gData.ResponseType == 0)
+                    {
                         var gameList = JSON.parse(gData.AdditionalData);
 
                         var x = 0,
                             y = 0;
 
-                        if (gameList.length > 0) {
-                            for (var i = 0; i < gameList.length; i++) {
+                        if (gameList.length > 0)
+                        {
+                            for (var i = 0; i < gameList.length; i++)
+                            {
                                 var gameInfo = gameList[i];
 
                                 var mcolid = i % 4;
                                 var addElm = null;
 
-                                switch (mcolid) {
+                                switch (mcolid)
+                                {
                                     case 0:
                                         addElm = $("#gameListColumn1");
                                         break;
@@ -239,60 +234,55 @@
                                 addElm.append('<div class="panel panel-default"><div class="panel-footer">' + gameInfo.Name + '</div><div class="panel-body"><img class="img-responsive" src="http://placehold.it/250x250&text=G1" /></div><div class="panel-footer text-right"><button class="btn btn-sm btn-primary" type="button" onclick="showCreateDialog(\'' + gameInfo.GameID + '\')">Create</button> <button class="btn btn-sm btn-info" type="button" onclick="showJoinDialog(\'' + gameInfo.GameID + '\')">Join</button></div></div>');
                             }
                         }
-                        else {
+                        else
+                        {
                             $("#headerNoGames").show();
                         }
                     }
-                    else {
+                    else
+                    {
 
                     }
                 });
-
-                gameResponse.fail(function (gData) {
-
-
-                });
             });
 
-            response.fail(function (data)
+            heartBeatResponse.fail(function (data)
             {
                 localStorage.setItem('user-session', null);
                 window.location.href = "index.html";
             });
         });
 
-        function createLobby()
+        function createLobby        ()
         {
-            var name = $("#inputName").val();
-            var gameId = $("#inputGameId").val();
-            var password = $("#inputPassword").val();
-            var sessionId = localStorage.getItem("user-session");
-            var isprivate = false;
+            var name        = $("#inputName").val(),
+                gameId      = $("#inputGameId").val(),
+                password    = $("#inputPassword").val(),
+                sessionId   = localStorage.getItem("user-session"),
+                isprivate   = false;
 
             if (name == null || name.length <= 0)
                 name = "Untitled lobby";
 
-            var responseURL = "http://localhost:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate;
-
-            var response = $.ajax({
-                url: responseURL,
-                type: "POST",
-                async: true,
+            var createLobbyResponse = $.ajax({
+                url:    "http://localhost:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate,
+                type:   "POST",
+                async:  true,
             });
 
-            response.success(function (data)
+            createLobbyResponse.success(function (data)
             {
                 if (data.ResponseType == 0)
                 {
                     $("#createGameDialog").modal("hide");
-                    
+
                     localStorage.setItem("lobby-owner", true);
                     localStorage.setItem("lobby-session", data.AdditionalData);
-                    
+
                     var gameResponse = $.ajax({
-                        url: "http://localhost:1193/service/game/" + gameId,
-                        type: "GET",
-                        async: false
+                        url:    "http://localhost:1193/service/game/" + gameId,
+                        type:   "GET",
+                        async:  false
                     });
 
                     gameResponse.success(function (gameData)
@@ -319,27 +309,27 @@
                 }
             });
 
-            response.fail(function (cuar, te, ro)
+            createLobbyResponse.fail(function (cuar, te, ro)
             {
                 alert("Lobby creation failed!");
             });
         }
 
-        function showCreateDialog(gameId)
+        function showCreateDialog   (gameId)
         {
             $("#createGameDialog").modal("show");
             $("#inputGameId").val(gameId);
         }
 
-        function showJoinDialog(gameId)
+        function showJoinDialog     (gameId)
         {
             $("#joinGameDialog").modal("show");
             $("#lobbyList").html("");
 
             var lobbyResponse = $.ajax({
-                url:    "http://localhost:1193/service/lobby?maxcount=1000",
-                type:   "GET",
-                async:  true,
+                url: "http://localhost:1193/service/lobby?maxcount=1000",
+                type: "GET",
+                async: true,
             });
 
             lobbyResponse.success(function (data)
@@ -353,9 +343,9 @@
                         var lobby = lobbies[i];
 
                         var gameInfoResponse = $.ajax({
-                            url:    "http://localhost:1193/service/game/" + lobby.GameID,
-                            type:   "GET",
-                            async:  false
+                            url: "http://localhost:1193/service/game/" + lobby.GameID,
+                            type: "GET",
+                            async: false
                         });
 
                         gameInfoResponse.success(function (theData)
@@ -364,11 +354,11 @@
                             {
                                 var gameInfo = JSON.parse(theData.AdditionalData);
 
-                                var gameName    = gameInfo.Name;
-                                var gameId      = gameInfo.GameID;
+                                var gameName = gameInfo.Name;
+                                var gameId = gameInfo.GameID;
 
-                                var lobiName    = lobby.Name;
-                                var lobbyId     = lobby.LobbyID;
+                                var lobiName = lobby.Name;
+                                var lobbyId = lobby.LobbyID;
 
                                 var userCount = 0;
                                 var maxUsers = gameInfo.MaxPlayers;
@@ -377,14 +367,15 @@
 
                                 var userCountResponse = $.ajax({
 
-                                    url:    userCountURL,
-                                    type:   "GET",
-                                    async:  false
+                                    url: userCountURL,
+                                    type: "GET",
+                                    async: false
                                 });
 
                                 userCountResponse.success(function (userCountData)
                                 {
-                                    if (userCountData.ResponseType == 0) {
+                                    if (userCountData.ResponseType == 0)
+                                    {
                                         userCount = parseInt(userCountData.AdditionalData);
 
                                         //prepare for table insertion
@@ -410,12 +401,14 @@
                 }
             });
 
-            lobbyResponse.fail(function (c, t, x) {
+            lobbyResponse.fail(function (c, t, x)
+            {
 
             });
         }
 
-        function joinGame(lobbyId, gameId) {
+        function joinGame           (lobbyId, gameId)
+        {
             var joinGameResponse = $.ajax({
 
                 url: "http://localhost:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
@@ -423,30 +416,34 @@
                 type: "POST"
             });
 
-            joinGameResponse.success(function(data) {
+            joinGameResponse.success(function (data)
+            {
 
-                if (data.ResponseType == 0) {
-
+                if (data.ResponseType == 0)
+                {
                     localStorage.setItem("lobby-owner", false);
                     localStorage.setItem("lobby-session", data.AdditionalData);
 
                     var gameResponse = $.ajax({
-                        url: "http://localhost:1193/service/game/" + gameId,
-                        type: "GET",
-                        async: true
+                        url:    "http://localhost:1193/service/game/" + gameId,
+                        type:   "GET",
+                        async:  true
                     });
 
-                    gameResponse.success(function (gameData) {
-                        if (gameData.ResponseType == 0) {
+                    gameResponse.success(function (gameData)
+                    {
+                        if (gameData.ResponseType == 0)
+                        {
                             var gameInfo = JSON.parse(gameData.AdditionalData);
 
                             localStorage.setItem("lobby-game", gameInfo.GameID);
-                            
+
                             // get game link
                             window.location.href = gameInfo.RelativeLink + "/index.html";
                         }
                     });
-                } else {
+                } else
+                {
 
                     alert("Cannot join you to the lobby. " + data.AdditionalData);
                 }

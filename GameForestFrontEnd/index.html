@@ -10,9 +10,6 @@
 <body>
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
-
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -43,10 +40,6 @@
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div class="row">
 
             <div id="alertDialog" class="alert alert-danger" style="display: none"></div>
@@ -94,10 +87,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF FIRST ROW -->
-        <!-- SECOND ROW -->
-
         <div class="row">
             <div class="col-xs-4">
                 <div class="panel panel-info">
@@ -109,7 +98,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xs-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -120,7 +108,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xs-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -132,12 +119,11 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF SECOND ROW -->
-
     </div>
+
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+
     <script type="text/javascript">
 
         $(document).ready(function ()
@@ -266,8 +252,7 @@
                 });
             }
         }
-
-        function onLogout()
+        function onLogout   ()
         {
             var request = $.ajax({
                 url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),

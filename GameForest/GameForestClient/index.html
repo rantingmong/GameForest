@@ -3,46 +3,64 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Tic Tac Toe</title>
+    <title>Game Forest game</title><!--Change this to your game's title.-->
     <link rel="stylesheet" href="app.css" type="text/css" />
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+
+    <style type="text/css">
+
+        #gameForestDisconnectWindow {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: rgba(1, 1, 1, 0.5);
+            text-align: center;
+            display: none;
+        }
+
+    </style>
 </head>
 <body onunload="unload();">
 
     <!--This is where you will place your game-->
-    <div id="gameForestGameWindow" class="container" style="display: none">
+    <div id="gameForestGameWindow" style="display: none" class="container">
+        <div style="text-align: center">
+            <button class="btn btn-primary" onclick="testShowDisconnect();">Click me</button>
+        </div>
+    </div>
 
+    <!--Disconnection window. Do not customize unless you know what you're doing.-->
+    <div id="gameForestDisconnectWindow">
+        <div style="margin: auto; width: 400px; margin-top: 30px" class="well well-lg">
+            <div id="gameForestClientDisconnected">
+                <h3>&lt;client&gt; was disconnected!</h3>
+                <p>Waiting for the client to reconnect in <b id="gameForestCountdownWait">(n)</b> seconds.</p>
+            </div>
+            <div id="gameForestPlayerDisconnected" style="display: none">
+                <h3>You are disconnected from the game.</h3>
+                <p>You will be kicked out in<b id="gameForestCountdownKill">(n)</b> seconds.</p>
+            </div>
+        </div>
     </div>
 
     <!--GameForest stuff. Do not customize unless you know what you're doing.-->
-    <div id="gameForestLobbyWindow" class="container">
+    <div id="gameForestLobbyWindow" class="container" style="display: normal">
         <div class="page-header">
-            <h1>Lobby <small>Game 1</small></h1>
+            <h1>Lobby <small id="gameForestLobbyName">Game 1</small></h1>
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <ul class="pager">
-                    <li class="previous"><button class="btn btn-warning pull-left" id="gfxButtonLeave">Leave</button></li>
-                    <li class="next"><button class="btn btn-primary pull-right" id="gfxButtonStart" disabled>Start game</button></li>
-                </ul>
-            </div>
-            <br>
-            <div class="col-sm-8">
-                <div class="panel panel-default" id="gfxUserList">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="gfxButtonStart" disabled>Start game</button>
+                    <button type="button" class="btn btn-warning" id="gfxButtonLeave">Leave lobby</button>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="well">
-                    <textarea class="form-control chat" rows="8"></textarea>
-                    <br>
-                    <form>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="focusedInput" placeholder="Chat">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button" id="buttonSendChat">Send</button>
-                            </span>
-                        </div>
-                    </form>
+            <br>
+            <div class="col-sm-12">
+                <div class="panel panel-default" id="gfxUserList">
                 </div>
             </div>
         </div>
@@ -60,22 +78,35 @@
 
         var userUpdateInterval = null;
 
-        var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
-                                new Guid(localStorage.getItem("lobby-session")),
-                                new Guid(localStorage.getItem("user-session")));
-
-        $("#gfxButtonLeave").click(function ()
+        $(document).ready(function ()
         {
-            // navigate to main page
-            window.location.href = "../../../games.html";
-        });
+            var getLobbyRequest = $.ajax({
+                url:    "http://localhost:1193/service/lobby/" + localStorage.getItem("lobby-session"),
+                type:   "DELETE",
+                async:  false
+            });
 
-        function documentReady  ()
-        {
+            getLobbyRequest.success(function (result)
+            {
+                var lobbyData = JSON.parse(result);
+
+                $("#gameForestLobbyName").html(lobbyData.Name);
+            });
+
+            $("#gfxButtonLeave").click(function ()
+            {
+                // navigate to main page
+                window.location.href = "../../../games.html";
+            });
+
+            /*var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
+                                    new Guid(localStorage.getItem("lobby-session")),
+                                    new Guid(localStorage.getItem("user-session")));*/
+
             // setup timer for user list
-            userUpdateInterval = setInterval(updateUserList, 5000);
+            // userUpdateInterval = setInterval(updateUserList, 5000);
 
-            gf.start();
+            // gf.start();
 
             // check if user is owner or not
             var isowner = localStorage.getItem("lobby-owner");
@@ -84,16 +115,19 @@
             {
                 $("#gfxButtonStart").removeAttr("disabled");
                 $("#gfxButtonStart").html("Start game");
+
                 $("#gfxButtonStart").click(function ()
                 {
-                    gf.startGame();
                     $("#gfxButtonStart").prop("disabled", true);
                     $("#gfxButtonStart").html("Waiting for other players...");
+
+                    gf.startGame();
                 });
             }
             else
             {
                 $("#gfxButtonStart").html("Ready");
+
                 $("#gfxButtonStart").click(function ()
                 {
                     gf.readyGame();
@@ -101,25 +135,25 @@
             }
 
             onDocumentReady();
-        }
+        });
 
-        function unload         ()
+        function unload             ()
         {
-            $.ajax({
+            /*$.ajax({
                 url:    "http://localhost:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "DELETE",
                 async:  false
-            });
+            });*/
 
-            gf.stop();
+            //gf.stop();
         }
 
-        function updateUserList ()
+        function updateUserList     ()
         {
             var response = $.ajax({
-                url:    "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
-                type:   "GET",
-                async:  false
+                url: "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                type: "GET",
+                async: false
             });
 
             response.success(function (data)
@@ -135,9 +169,9 @@
                         var item = userList[i];
 
                         var userinforesponse = $.ajax({
-                            url:    "http://localhost:1193/service/user/session/" + item.SessionID,
-                            type:   "GET",
-                            async:  false
+                            url: "http://localhost:1193/service/user/session/" + item.SessionID,
+                            type: "GET",
+                            async: false
                         });
 
                         userinforesponse.success(function (itemData)
@@ -151,7 +185,10 @@
             });
         }
 
-        $(document).ready(documentReady);
+        function testShowDisconnect ()
+        {
+            $("#gameForestDisconnectWindow").fadeIn("fast");
+        }
 
     </script>
 </body>

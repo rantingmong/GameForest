@@ -10,9 +10,6 @@
 <body>
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
-
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -43,10 +40,6 @@
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div class="row">
             <div id="alertDialog" class="alert alert-info"></div>
             <div class="modal fade" id="modalPassword" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
@@ -74,9 +67,9 @@
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary" onclick="onChangeUserPassword();">Save changes</button>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                    </div>
+                </div>
+            </div>
             <div class="col-sm-4">
                 <div class="well">
                     <h1 id="profileName">Profile</h1>
@@ -86,7 +79,6 @@
                 <br>
 
                 <div class="well">
-
                 </div>
             </div>
             <div class="col-sm-8">
@@ -115,9 +107,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF FIRST ROW -->
-
     </div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -197,7 +186,7 @@
             });
         });
 
-        function onLogout()
+        function onLogout               ()
         {
             var request = $.ajax({
                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
@@ -218,7 +207,7 @@
             });
         }
 
-        function onChangeUserInfo()
+        function onChangeUserInfo       ()
         {
             var error = false;
 
@@ -276,7 +265,7 @@
 
         }
         
-        function onChangeUserPassword()
+        function onChangeUserPassword   ()
         {
             var pc = $("#passwordCurrent").val();
             var p1 = $("#passwordNew1").val();
