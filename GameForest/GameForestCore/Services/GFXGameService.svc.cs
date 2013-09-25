@@ -169,9 +169,18 @@ namespace GameForestCore.Services
                         return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
                     }
                 }
-                else
+                else if (allcheck == true)
                 {
-                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statTable.Select(string.Format("GameID = '{0}'", gameId))));
+                    if (statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0)
+                    {
+                        return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statTable.Select(string.Format("GameID = '{0}'", gameId))));
+                    }
+                    else
+                    {
+                        return constructResponse(GFXResponseType.NotFound, "No statistics being tracked");
+                    }
+                } else {
+                    return constructResponse(GFXResponseType.InvalidInput, "allcheck invalid");
                 }
             }
             catch (Exception exp)

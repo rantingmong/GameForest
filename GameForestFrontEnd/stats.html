@@ -8,7 +8,7 @@
 </head>
 <body>
 
-        <div class="container">
+  <div class="container">
         <br>
 
         <!-- NAVBAR -->
@@ -48,7 +48,203 @@
 
         <!-- END OF NAVBAR -->
 
-        </div>
+        <!-- FIRST ROW -->
 
+        <div class="row">
+            <div class="col-sm-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="news.html">News</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li class="active"><a href="stats.html">Stats</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-10">
+                <div class="page-header"><h1>Statistics <small>by Game</small></h1></div>
+                <div id="gameStatList" class="row">
+                    <h3 id="noGamesHeader" style="display:none">No stats being tracked</h3>
+                    <div id="gameStatCol" class="col-sm-12">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- END OF FIRST ROW -->
+   </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#alertDialog").hide();
+
+            // do a heartbeat to ensure the user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true
+            });
+
+            response.success(function (data) {
+
+                if (data.ResponseType != 0) {
+                    showLogin = true;
+                    localStorage.setItem("user-session", null);
+                }
+                else {
+                    showLogin = false;
+                }
+
+                if (showLogin == false) {
+                    // then async get user's information
+                    var userResponse = $.ajax({
+                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data) {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+                    });
+                }
+                else {
+                    localStorage.setItem('user-session', null);
+                    window.location.href = "index.html";
+                }
+
+                var gameResponse = $.ajax({
+                    url: "http://localhost:1193/service/game?maxcount=100",
+                    type: "GET",
+                    async: true
+                });
+
+                gameResponse.success(function (gData) {
+                    if (gData.ResponseType == 0) {
+                        console.log("Step 1: get game list");
+                        var gameList = JSON.parse(gData.AdditionalData);
+                        console.log("GameList set");
+
+                        if (gameList.length > 0) {
+                            console.log("Step 2: Extract games tracking stats");
+                            for (var i = 0; i < gameList.length; i++) {
+                                var gameInfo = gameList[i];
+
+                                var appendElm = null;
+
+                                appendElm = $("#gameStatCol");
+
+                                if (appendElm == null)
+                                    continue;
+
+                                appendElm.append(
+                                    '<div class="panel-title"><b>' +
+                                    gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '</div>'
+                                    );
+
+                                var statResponse = $.ajax({
+                                    url: "http://localhost:1193/service/game/stats?getstat=all&gameid=" + gameInfo.GameID + "&all=true",
+                                    type: "GET",
+                                    async: true
+                                });
+
+                                statResponse.success(function (sData) {
+                                    if (sData.ResponseType == 0) {
+                                        console.log("Step 3: Get stats");
+                                        var statList = JSON.parse(sData.AdditionalData);
+                                        console.log("Stat list set");
+
+                                        if (statList.length > 0) {
+                                            console.log("Step 4: Populate list of stats");
+                                            for (var x = 0; x < statList.length; x++) {
+                                                var statistic = statList[x];
+
+                                                var appendStat = null;
+
+                                                appendStat = $("#gameStatCol");
+
+                                                if (appendStat == null)
+                                                    continue;
+
+                                                console.log("Stat " + (x+1) + ": " + statistic.stat_name);
+                                                appendStat.append("" +
+                                                    statistic.stat_name + ": " + statistic.stat_value + "<br>"
+                                                    );
+                                            }
+                                        } else {
+                                            var appendMsg = null;
+
+                                            appendMsg = $("#gameStatCol");
+
+                                            appendMsg.append(
+                                                "No stats available <br>"
+                                                );
+                                        }
+                                    } else {
+                                        console.log("Error in statResponse");
+                                        var appendMsg = null;
+
+                                        appendMsg = $("#gameStatCol");
+
+                                        appendMsg.append(
+                                            "No stats available <br>"
+                                            );
+                                    }
+                                });
+
+                                statResponse.fail(function (sData) {
+                                    console.log("statResponse failed");
+                                });
+                            }
+
+                        } else {
+                            $("#noGamesHeader").show();
+                        }
+                    } else {
+                        console.log("Error in gameResponse");
+                    }
+                });
+
+                gameResponse.fail(function (gData) {
+                    console.log("gameResponse failed");
+                });
+
+            });
+
+            response.fail(function (data) {
+                localStorage.setItem('user-session', null);
+                window.location.href = "index.html";
+            });
+
+        });
+
+        function onLogout() {
+
+            var request = $.ajax({
+                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async: true,
+                type: "DELETE"
+            });
+
+            request.success(function (data) {
+                if (data.ResponseType != 0) {
+                    // hehe, this is imposible...
+                }
+                else {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>
