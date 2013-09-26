@@ -349,8 +349,9 @@ GameForest.prototype.onGameChoose   = function ()
 	gf.trackStat(oWins);
 	
 	// Fetch the current number of wins X and O have
-	gf.getStatVal(xWins, false, statValList, statNameList, gf.cbStat); 
-	gf.getStatVal(oWins, false, statValList, statNameList, gf.cbStat); 
+	gf.getStatVal(xWins, statValList, statNameList, gf.cbStat); 
+	gf.getStatVal(oWins, statValList, statNameList, gf.cbStat); 
+	
 };
 
 GameForest.prototype.onTurnSelect   = function (originalTurn)

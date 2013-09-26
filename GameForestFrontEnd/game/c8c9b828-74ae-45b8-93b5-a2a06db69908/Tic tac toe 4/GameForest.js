@@ -520,7 +520,6 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 	this.getStatVal = function (
 		statName = the name of the statistic you want to fetch, should be same as
 				   in trackStat
-		allCheck = boolean, should be set to FALSE
 		statValList = array of stat value, each value you fetch for your game
 					  will be pushed to this array
 		statNameList= array of stat names, this is to identify which statistic gets added
@@ -537,28 +536,36 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 		statList = array of stats
 		data	 = statistic fetched from the database
 		)
+		
 	THIS ONLY WORKS FOR INTEGER VALUE STATS
+	
+	example:
+		gf.getStatVal(statName, statValList, statNameList, gf.cbStat);
+		will push statName's name to statNameList,
+		statName's value to statValList
+	
 	******/
 	
 	this.cbStat					= function (statVals, statNames, data) 
 	{
-		console.log(data);
+		console.log(data); // extract stat object
 		var statName = data.stat_name;
-		statNames.push(statName); // debug
+		statNames.push(statName); // push stat's name to list of stat names
 		var statVal = data.stat_value;
-		statVals.push(statVal); // debug
+		statVals.push(statVal); // push the stat's value to list of values, same index
 		
 		// How to match names to value below, DEBUG
 		for(var i = 0; i < statNames.length; i++)
 			console.log(statNames[i] + ": " + statVals[i]);
 	}
 	
-	this.getStatVal				= function (statName, allCheck, statValList, statNameList, callback)
+	this.getStatVal				= function (statName, statValList, statNameList, callback)
 	{
 		var p = { };
 		var statOut = null;
 		
-		sendRequest("/game/stats?getstat=" + statName + "&gameid=" + this.gameId + "&all=" + allCheck, "GET",
+		// DO NOT CHANGE false 
+		sendRequest("/game/stats?getstat=" + statName + "&gameid=" + this.gameId + "&all=false", "GET",
 			function(result)
 			{
 				if(result.ResponseType == 0) 
@@ -574,7 +581,8 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 				{
 					p = JSON.parse(result.AdditionalData);
 					
-					callback(statList, p);
+					console.log("Err");
+					console.log(p)
 				}
 			},
 			function(status, why)
