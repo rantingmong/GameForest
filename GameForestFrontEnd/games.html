@@ -8,6 +8,424 @@
 </head>
 <body>
     <div id="fb-root"></div>
+     <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        // Load Facebook SDK asynchronously...
+        (function (d) {
+            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement('script'); js.id = id; js.async = true;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            ref.parentNode.insertBefore(js, ref);
+        }(document));
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '649841695034246', // App ID 
+                channelUrl: '//localhost:46069/channel.html',
+                status: true, // check login status
+                cookie: true, // enable cookies to allow the server to access the session
+                xfbml: true  // parse XFBML
+            });
+
+            // Initialize when a user has authenticated with FB and this app
+            // Handle events accordingly
+            FB.Event.subscribe('auth.authResponseChange', function (response) {
+
+                if (response.status === 'connected') {
+                    // user is logged in to FB
+                    // has authorized app
+
+                    console.log('Welcome, fetching information');
+
+                    FB.api('/me', function (response) {
+
+                        var fbid = response.id;
+                        var fbuser = response.username;
+                        var fname = response.first_name;
+                        var lname = response.last_name;
+
+                        var request = $.ajax({
+                            url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
+                            async: true,
+                            type: "POST"
+                        });
+
+                        request.done(function (msg) {
+                            if (msg.ResponseType != 0) {
+                                // show error (maybe in an error div?)
+                                $("#alertDialog").show();
+                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                            }
+                            else {
+                                // store session ID to local storage
+                                localStorage.setItem("user-session", msg.AdditionalData);
+                                console.log("sessionid: " + localStorage.getItem("user-session"));
+                            }
+                        });
+
+                        request.fail(function (nothing, textStatus, something) {
+                            $("#alertDialog").show();
+
+                            $("#alertDialog").css("class", "alert alert-danger");
+                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+
+                            $("buttonSignIn").button('reset');
+                        });
+
+                        var userResponse = $.ajax({
+                            url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                            type: "GET",
+                            async: true
+                        });
+
+                        userResponse.success(function (data) {
+                            // set user name to linkProfile
+                            var adata = JSON.parse(data.AdditionalData);
+
+                            $("#fbLogout").show();
+                            $("#linkLogout").hide();
+                            $("#linkProfile").show();
+
+                            $("#linkProfile").html(adata.Username);
+                        });
+                    })
+
+                    document.getElementById('fbLogout').addEventListener('click', function () {
+                        var request = $.ajax({
+                            url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                            async: true,
+                            type: "DELETE"
+                        });
+
+                        request.success(function (data) {
+                            if (data.ResponseType != 0) {
+                                // hehe, this is imposible...
+                            }
+                            else {
+                                FB.logout(function () {
+                                    // wipe user
+                                    window.location.reload(true);
+                                });
+                            }
+                        });
+                    });
+
+                } else if (response.status === 'not_authorized') {
+                    // user is logged in to FB
+                    // has not authorized app
+
+                } else {
+                    // user is not logged in to FB
+                    // has not authorized app
+
+                }
+            });
+
+
+        }
+
+        $(document).ready(function () {
+            $("#alertDialog").hide();
+
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true,
+            });
+
+            response.success(function (data) {
+                if (data.ResponseType != 0) {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else {
+                    showLogin = false;
+                }
+
+                if (showLogin == false) {
+                    // then async get user's information
+                    var userResponse = $.ajax({
+                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data) {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+                    });
+                }
+                else {
+                    localStorage.setItem('user-session', null);
+                    window.location.href = "index.html";
+                }
+
+                var gameResponse = $.ajax({
+                    url: "http://localhost:1193/service/game?maxcount=100",
+                    type: "GET",
+                    async: true
+                });
+
+                gameResponse.success(function (gData) {
+                    if (gData.ResponseType == 0) {
+                        var gameList = JSON.parse(gData.AdditionalData);
+
+                        var x = 0,
+                            y = 0;
+
+                        if (gameList.length > 0) {
+                            for (var i = 0; i < gameList.length; i++) {
+                                var gameInfo = gameList[i];
+
+                                var mcolid = i % 4;
+                                var addElm = null;
+
+                                switch (mcolid) {
+                                    case 0:
+                                        addElm = $("#gameListColumn1");
+                                        break;
+                                    case 1:
+                                        addElm = $("#gameListColumn2");
+                                        break;
+                                    case 2:
+                                        addElm = $("#gameListColumn3");
+                                        break;
+                                    case 3:
+                                        addElm = $("#gameListColumn4");
+                                        break;
+                                }
+
+                                if (addElm == null)
+                                    continue;
+
+                                // add game to game list
+                                addElm.append('<div class="panel panel-default"><div class="panel-footer">' + gameInfo.Name + '</div><div class="panel-body"><img class="img-responsive" src="http://placehold.it/250x250&text=G1" /></div><div class="panel-footer text-right"><button class="btn btn-sm btn-primary" type="button" onclick="showCreateDialog(\'' + gameInfo.GameID + '\')">Create</button> <button class="btn btn-sm btn-info" type="button" onclick="showJoinDialog(\'' + gameInfo.GameID + '\')">Join</button></div></div>');
+                            }
+                        }
+                        else {
+                            $("#headerNoGames").show();
+                        }
+                    }
+                    else {
+
+                    }
+                });
+
+                gameResponse.fail(function (gData) {
+
+
+                });
+            });
+
+            response.fail(function (data) {
+                localStorage.setItem('user-session', null);
+                window.location.href = "index.html";
+            });
+        });
+
+        function createLobby() {
+            var name = $("#inputName").val();
+            var gameId = $("#inputGameId").val();
+            var password = $("#inputPassword").val();
+            var sessionId = localStorage.getItem("user-session");
+            var isprivate = false;
+
+            if (name == null || name.length <= 0)
+                name = "Untitled lobby";
+
+            var responseURL = "http://localhost:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate;
+
+            var response = $.ajax({
+                url: responseURL,
+                type: "POST",
+                async: true,
+            });
+
+            response.success(function (data) {
+                if (data.ResponseType == 0) {
+                    $("#createGameDialog").modal("hide");
+
+                    localStorage.setItem("lobby-owner", true);
+                    localStorage.setItem("lobby-session", data.AdditionalData);
+
+                    var gameResponse = $.ajax({
+                        url: "http://localhost:1193/service/game/" + gameId,
+                        type: "GET",
+                        async: false
+                    });
+
+                    gameResponse.success(function (gameData) {
+                        if (gameData.ResponseType == 0) {
+                            var gameInfo = JSON.parse(gameData.AdditionalData);
+
+                            localStorage.setItem("lobby-game", gameInfo.GameID);
+
+                            // get game link
+                            window.location.href = gameInfo.RelativeLink + "/index.html";
+                        }
+                    });
+
+                    gameResponse.fail(function (c, t, x) {
+                        // this should not happen...
+                    });
+                }
+                else {
+                    alert("Lobby creation failed! " + data.AdditionalData);
+                }
+            });
+
+            response.fail(function (cuar, te, ro) {
+                alert("Lobby creation failed!");
+            });
+        }
+
+        function showCreateDialog(gameId) {
+            $("#createGameDialog").modal("show");
+            $("#inputGameId").val(gameId);
+        }
+
+        function showJoinDialog(gameId) {
+            $("#joinGameDialog").modal("show");
+            $("#lobbyList").html("");
+
+            var lobbyResponse = $.ajax({
+                url: "http://localhost:1193/service/lobby?maxcount=1000",
+                type: "GET",
+                async: true,
+            });
+
+            lobbyResponse.success(function (data) {
+                if (data.ResponseType == 0) {
+                    var lobbies = JSON.parse(data.AdditionalData);
+
+                    for (var i = 0; i < lobbies.length; i++) {
+                        var lobby = lobbies[i];
+
+                        var gameInfoResponse = $.ajax({
+                            url: "http://localhost:1193/service/game/" + lobby.GameID,
+                            type: "GET",
+                            async: false
+                        });
+
+                        gameInfoResponse.success(function (theData) {
+                            if (theData.ResponseType == 0) {
+                                var gameInfo = JSON.parse(theData.AdditionalData);
+
+                                var gameName = gameInfo.Name;
+                                var gameId = gameInfo.GameID;
+
+                                var lobiName = lobby.Name;
+                                var lobbyId = lobby.LobbyID;
+
+                                var userCount = 0;
+                                var maxUsers = gameInfo.MaxPlayers;
+
+                                var userCountURL = "http://localhost:1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID;
+
+                                var userCountResponse = $.ajax({
+
+                                    url: userCountURL,
+                                    type: "GET",
+                                    async: false
+                                });
+
+                                userCountResponse.success(function (userCountData) {
+                                    if (userCountData.ResponseType == 0) {
+                                        userCount = parseInt(userCountData.AdditionalData);
+
+                                        //prepare for table insertion
+                                        $("#lobbyList").append("<tr><td>" + gameName + "</td><td>" + lobiName + "</td><td>" + userCount + "/" + maxUsers + '</td><td>None</td><td><a class="btn btn-primary" onclick="joinGame(\'' + lobbyId + '\', \'' + gameId + '\')">Join</a></td></tr>');
+                                    }
+                                });
+                            }
+                            else {
+
+                            }
+                        });
+
+                        gameInfoResponse.fail(function (c, w, y) {
+
+                        });
+                    }
+                }
+                else {
+
+                }
+            });
+
+            lobbyResponse.fail(function (c, t, x) {
+
+            });
+        }
+
+        function joinGame(lobbyId, gameId) {
+            var joinGameResponse = $.ajax({
+
+                url: "http://localhost:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
+                async: true,
+                type: "POST"
+            });
+
+            joinGameResponse.success(function (data) {
+
+                if (data.ResponseType == 0) {
+
+                    localStorage.setItem("lobby-owner", false);
+                    localStorage.setItem("lobby-session", data.AdditionalData);
+
+                    var gameResponse = $.ajax({
+                        url: "http://localhost:1193/service/game/" + gameId,
+                        type: "GET",
+                        async: true
+                    });
+
+                    gameResponse.success(function (gameData) {
+                        if (gameData.ResponseType == 0) {
+                            var gameInfo = JSON.parse(gameData.AdditionalData);
+
+                            localStorage.setItem("lobby-game", gameInfo.GameID);
+
+                            // get game link
+                            window.location.href = gameInfo.RelativeLink + "/index.html";
+                        }
+                    });
+                } else {
+
+                    alert("Cannot join you to the lobby. " + data.AdditionalData);
+                }
+            });
+        }
+
+        function onLogout() {
+
+            var request = $.ajax({
+                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async: true,
+                type: "DELETE"
+            });
+
+            request.success(function (data) {
+                if (data.ResponseType != 0) {
+                    // hehe, this is imposible...
+                }
+                else {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
     <div class="container">
         <br>
         <!-- NAVBAR -->
@@ -146,450 +564,6 @@
             <!-- END OF FIRST ROW -->
         </div>
     </div>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-
-        // Load Facebook SDK asynchronously...
-        (function (d) {
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '649841695034246', // App ID 
-                channelUrl: '//localhost:46069/channel.html',
-                status: true, // check login status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
-
-            // Initialize when a user has authenticated with FB and this app
-            // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response) {
-
-                if (response.status === 'connected') {
-                    // user is logged in to FB
-                    // has authorized app
-
-                    console.log('Welcome, fetching information');
-
-                    FB.api('/me', function (response) {
-
-                        var fbid = response.id;
-                        var emailAdd = response.email;
-                        var fname = response.first_name;
-                        var lname = response.last_name;
-
-                        var request = $.ajax({
-                            url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + emailAdd + "&firstname=" + fname + "&lastname=" + lname,
-                            async: true,
-                            type: "POST"
-                        });
-
-                        request.done(function (msg) {
-                            if (msg.ResponseType != 0) {
-                                // show error (maybe in an error div?)
-                                $("#alertDialog").show();
-                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                            }
-                            else {
-                                // store session ID to local storage
-                                localStorage.setItem("user-session", msg.AdditionalData);
-                                console.log("sessionid: " + localStorage.getItem("user-session"));
-                            }
-                        });
-
-                        request.fail(function (nothing, textStatus, something) {
-                            $("#alertDialog").show();
-
-                            $("#alertDialog").css("class", "alert alert-danger");
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        var userResponse = $.ajax({
-                            url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                            type: "GET",
-                            async: true
-                        });
-
-                        userResponse.success(function (data) {
-                            // set user name to linkProfile
-                            var adata = JSON.parse(data.AdditionalData);
-
-                            $("#fbLogout").show();
-                            $("#linkLogout").hide();
-                            $("#linkProfile").show();
-
-                            $("#linkProfile").html(adata.Username);
-                        });
-                    })
-
-                    document.getElementById('fbLogout').addEventListener('click', function () {
-                        var request = $.ajax({
-                            url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                            async: true,
-                            type: "DELETE"
-                        });
-
-                        request.success(function (data) {
-                            if (data.ResponseType != 0) {
-                                // hehe, this is imposible...
-                            }
-                            else {
-                                FB.logout(function () {
-                                    // wipe user
-                                    window.location.reload(true);
-                                });
-                            }
-                        });
-                    });
-
-                } else if (response.status === 'not_authorized') {
-                    // user is logged in to FB
-                    // has not authorized app
-
-                } else {
-                    // user is not logged in to FB
-                    // has not authorized app
-
-                }
-            });
-
-
-        }
-
-        $(document).ready(function ()
-        {
-            $("#alertDialog").hide();
-
-            // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-
-            var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
-            });
-
-            response.success(function (data)
-            {
-                if (data.ResponseType != 0)
-                {
-                    showLogin = true;
-                    localStorage.setItem('user-session', null);
-                }
-                else
-                {
-                    showLogin = false;
-                }
-
-                if (showLogin == false)
-                {
-                    // then async get user's information
-                    var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
-                    });
-
-                    userResponse.success(function (data)
-                    {
-                        // set user name to linkProfile
-                        var adata = JSON.parse(data.AdditionalData);
-
-                        $("#linkLogout").show();
-                        $("#linkProfile").show();
-
-                        $("#linkProfile").html(adata.Username);
-                    });
-                }
-                else
-                {
-                    localStorage.setItem('user-session', null);
-                    window.location.href = "index.html";
-                }
-
-                var gameResponse = $.ajax({
-                    url: "http://localhost:1193/service/game?maxcount=100",
-                    type: "GET",
-                    async: true
-                });
-
-                gameResponse.success(function (gData) {
-                    if (gData.ResponseType == 0) {
-                        var gameList = JSON.parse(gData.AdditionalData);
-
-                        var x = 0,
-                            y = 0;
-
-                        if (gameList.length > 0) {
-                            for (var i = 0; i < gameList.length; i++) {
-                                var gameInfo = gameList[i];
-
-                                var mcolid = i % 4;
-                                var addElm = null;
-
-                                switch (mcolid) {
-                                    case 0:
-                                        addElm = $("#gameListColumn1");
-                                        break;
-                                    case 1:
-                                        addElm = $("#gameListColumn2");
-                                        break;
-                                    case 2:
-                                        addElm = $("#gameListColumn3");
-                                        break;
-                                    case 3:
-                                        addElm = $("#gameListColumn4");
-                                        break;
-                                }
-
-                                if (addElm == null)
-                                    continue;
-
-                                // add game to game list
-                                addElm.append('<div class="panel panel-default"><div class="panel-footer">' + gameInfo.Name + '</div><div class="panel-body"><img class="img-responsive" src="http://placehold.it/250x250&text=G1" /></div><div class="panel-footer text-right"><button class="btn btn-sm btn-primary" type="button" onclick="showCreateDialog(\'' + gameInfo.GameID + '\')">Create</button> <button class="btn btn-sm btn-info" type="button" onclick="showJoinDialog(\'' + gameInfo.GameID + '\')">Join</button></div></div>');
-                            }
-                        }
-                        else {
-                            $("#headerNoGames").show();
-                        }
-                    }
-                    else {
-
-                    }
-                });
-
-                gameResponse.fail(function (gData) {
-
-
-                });
-            });
-
-            response.fail(function (data)
-            {
-                localStorage.setItem('user-session', null);
-                window.location.href = "index.html";
-            });
-        });
-
-        function createLobby()
-        {
-            var name = $("#inputName").val();
-            var gameId = $("#inputGameId").val();
-            var password = $("#inputPassword").val();
-            var sessionId = localStorage.getItem("user-session");
-            var isprivate = false;
-
-            if (name == null || name.length <= 0)
-                name = "Untitled lobby";
-
-            var responseURL = "http://localhost:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate;
-
-            var response = $.ajax({
-                url: responseURL,
-                type: "POST",
-                async: true,
-            });
-
-            response.success(function (data)
-            {
-                if (data.ResponseType == 0)
-                {
-                    $("#createGameDialog").modal("hide");
-                    
-                    localStorage.setItem("lobby-owner", true);
-                    localStorage.setItem("lobby-session", data.AdditionalData);
-                    
-                    var gameResponse = $.ajax({
-                        url: "http://localhost:1193/service/game/" + gameId,
-                        type: "GET",
-                        async: false
-                    });
-
-                    gameResponse.success(function (gameData)
-                    {
-                        if (gameData.ResponseType == 0)
-                        {
-                            var gameInfo = JSON.parse(gameData.AdditionalData);
-
-                            localStorage.setItem("lobby-game", gameInfo.GameID);
-
-                            // get game link
-                            window.location.href = gameInfo.RelativeLink + "/index.html";
-                        }
-                    });
-
-                    gameResponse.fail(function (c, t, x)
-                    {
-                        // this should not happen...
-                    });
-                }
-                else
-                {
-                    alert("Lobby creation failed! " + data.AdditionalData);
-                }
-            });
-
-            response.fail(function (cuar, te, ro)
-            {
-                alert("Lobby creation failed!");
-            });
-        }
-
-        function showCreateDialog(gameId)
-        {
-            $("#createGameDialog").modal("show");
-            $("#inputGameId").val(gameId);
-        }
-
-        function showJoinDialog(gameId)
-        {
-            $("#joinGameDialog").modal("show");
-            $("#lobbyList").html("");
-
-            var lobbyResponse = $.ajax({
-                url:    "http://localhost:1193/service/lobby?maxcount=1000",
-                type:   "GET",
-                async:  true,
-            });
-
-            lobbyResponse.success(function (data)
-            {
-                if (data.ResponseType == 0)
-                {
-                    var lobbies = JSON.parse(data.AdditionalData);
-
-                    for (var i = 0; i < lobbies.length; i++)
-                    {
-                        var lobby = lobbies[i];
-
-                        var gameInfoResponse = $.ajax({
-                            url:    "http://localhost:1193/service/game/" + lobby.GameID,
-                            type:   "GET",
-                            async:  false
-                        });
-
-                        gameInfoResponse.success(function (theData)
-                        {
-                            if (theData.ResponseType == 0)
-                            {
-                                var gameInfo = JSON.parse(theData.AdditionalData);
-
-                                var gameName    = gameInfo.Name;
-                                var gameId      = gameInfo.GameID;
-
-                                var lobiName    = lobby.Name;
-                                var lobbyId     = lobby.LobbyID;
-
-                                var userCount = 0;
-                                var maxUsers = gameInfo.MaxPlayers;
-
-                                var userCountURL = "http://localhost:1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID;
-
-                                var userCountResponse = $.ajax({
-
-                                    url:    userCountURL,
-                                    type:   "GET",
-                                    async:  false
-                                });
-
-                                userCountResponse.success(function (userCountData)
-                                {
-                                    if (userCountData.ResponseType == 0) {
-                                        userCount = parseInt(userCountData.AdditionalData);
-
-                                        //prepare for table insertion
-                                        $("#lobbyList").append("<tr><td>" + gameName + "</td><td>" + lobiName + "</td><td>" + userCount + "/" + maxUsers + '</td><td>None</td><td><a class="btn btn-primary" onclick="joinGame(\'' + lobbyId + '\', \'' + gameId + '\')">Join</a></td></tr>');
-                                    }
-                                });
-                            }
-                            else
-                            {
-
-                            }
-                        });
-
-                        gameInfoResponse.fail(function (c, w, y)
-                        {
-
-                        });
-                    }
-                }
-                else
-                {
-
-                }
-            });
-
-            lobbyResponse.fail(function (c, t, x) {
-
-            });
-        }
-
-        function joinGame(lobbyId, gameId) {
-            var joinGameResponse = $.ajax({
-
-                url: "http://localhost:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
-                async: true,
-                type: "POST"
-            });
-
-            joinGameResponse.success(function(data) {
-
-                if (data.ResponseType == 0) {
-
-                    localStorage.setItem("lobby-owner", false);
-                    localStorage.setItem("lobby-session", data.AdditionalData);
-
-                    var gameResponse = $.ajax({
-                        url: "http://localhost:1193/service/game/" + gameId,
-                        type: "GET",
-                        async: true
-                    });
-
-                    gameResponse.success(function (gameData) {
-                        if (gameData.ResponseType == 0) {
-                            var gameInfo = JSON.parse(gameData.AdditionalData);
-
-                            localStorage.setItem("lobby-game", gameInfo.GameID);
-                            
-                            // get game link
-                            window.location.href = gameInfo.RelativeLink + "/index.html";
-                        }
-                    });
-                } else {
-
-                    alert("Cannot join you to the lobby. " + data.AdditionalData);
-                }
-            });
-        }
-
-        function onLogout() {
-
-            var request = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                async: true,
-                type: "DELETE"
-            });
-
-            request.success(function (data) {
-                if (data.ResponseType != 0) {
-                    // hehe, this is imposible...
-                }
-                else {
-                    window.location.reload(true);
-                }
-            });
-        }
-
-    </script>
+   
 </body>
 </html>

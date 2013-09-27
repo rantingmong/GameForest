@@ -44,12 +44,12 @@
                     FB.api('/me', function (response) {
 
                         var fbid = response.id;
-                        var emailAdd = response.email;
+                        var fbuser = response.username;
                         var fname = response.first_name;
                         var lname = response.last_name;
 
                         var request = $.ajax({
-                            url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + emailAdd + "&firstname=" + fname + "&lastname=" + lname,
+                            url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
                             async: true,
                             type: "POST"
                         });
@@ -66,7 +66,7 @@
                                 console.log("sessionid: " + localStorage.getItem("user-session"));
                                 if (localStorage.getItem("user-session") == "REDIRECT")
                                     window.location.href = "profile.html";
-                                    //window.location.reload(true);
+                                    window.location.reload(true);
                             }
 
                             $("buttonSignIn").button('reset');
@@ -273,6 +273,10 @@
                         // hehe, this is imposible...
                     }
                     else {
+                        FB.logout(function () {
+                            // wipe user
+                            window.location.reload(true);
+                        });
                         window.location.reload(true);
                     }
                 });
@@ -429,7 +433,7 @@
                 <div class="well" id="fb-info-well">
                     <h4>Using FaceBook Login</h4>
                     <h5>Logging in using your FaceBook credentials will generate an account on GameForest
-                        using your main email (for FaceBook) as your username and 'debugger' as your 
+                        using your FaceBook <b>username</b> and 'debugger' as your 
                         password. Kindly change the generated password.
                     </h5>
                 </div>

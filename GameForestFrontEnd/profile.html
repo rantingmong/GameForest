@@ -9,6 +9,8 @@
 </head>
 <body>
     <div id="fb-root"></div>
+        <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
      <script type="text/javascript">
 
          var originalUsername = "";
@@ -44,12 +46,12 @@
                      FB.api('/me', function (response) {
 
                          var fbid = response.id;
-                         var emailAdd = response.email;
+                         var fbuser = response.username;
                          var fname = response.first_name;
                          var lname = response.last_name;
 
                          var request = $.ajax({
-                             url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + emailAdd + "&firstname=" + fname + "&lastname=" + lname,
+                             url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
                              async: true,
                              type: "POST"
                          });
@@ -415,8 +417,7 @@
         <!-- END OF FIRST ROW -->
 
     </div>
-    <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+
    
 </body>
 </html>

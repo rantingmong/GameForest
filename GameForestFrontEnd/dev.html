@@ -8,6 +8,216 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
+        <div id="fb-root"></div>
+        <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+     <script type="text/javascript">
+
+         var originalUsername = "";
+
+         // Load Facebook SDK asynchronously...
+         (function (d) {
+             var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+             if (d.getElementById(id)) { return; }
+             js = d.createElement('script'); js.id = id; js.async = true;
+             js.src = "//connect.facebook.net/en_US/all.js";
+             ref.parentNode.insertBefore(js, ref);
+         }(document));
+
+         window.fbAsyncInit = function () {
+             FB.init({
+                 appId: '649841695034246', // App ID 
+                 channelUrl: '//localhost:46069/channel.html',
+                 status: true, // check login status
+                 cookie: true, // enable cookies to allow the server to access the session
+                 xfbml: true  // parse XFBML
+             });
+
+             // Initialize when a user has authenticated with FB and this app
+             // Handle events accordingly
+             FB.Event.subscribe('auth.authResponseChange', function (response) {
+
+                 if (response.status === 'connected') {
+                     // user is logged in to FB
+                     // has authorized app
+
+                     console.log('Welcome, fetching information');
+
+                     FB.api('/me', function (response) {
+
+                         var fbid = response.id;
+                         var fbuser = response.username;
+                         var fname = response.first_name;
+                         var lname = response.last_name;
+
+                         var request = $.ajax({
+                             url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
+                             async: true,
+                             type: "POST"
+                         });
+
+                         request.done(function (msg) {
+                             if (msg.ResponseType != 0) {
+                                 // show error (maybe in an error div?)
+                                 $("#alertDialog").show();
+                                 $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                             }
+                             else {
+                                 // store session ID to local storage
+                                 localStorage.setItem("user-session", msg.AdditionalData);
+                                 console.log("sessionid: " + localStorage.getItem("user-session"));
+                             }
+                         });
+
+                         request.fail(function (nothing, textStatus, something) {
+                             $("#alertDialog").show();
+
+                             $("#alertDialog").css("class", "alert alert-danger");
+                             $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+
+                             $("buttonSignIn").button('reset');
+                         });
+
+                         var userResponse = $.ajax({
+                             url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                             type: "GET",
+                             async: true
+                         });
+
+                         userResponse.success(function (data) {
+                             // set user name to linkProfile
+                             var adata = JSON.parse(data.AdditionalData);
+
+                             $("#fbLogout").show();
+                             $("#linkLogout").hide();
+                             $("#linkProfile").show();
+
+                             $("#linkProfile").html(adata.Username);
+                         });
+                     })
+
+                     document.getElementById('fbLogout').addEventListener('click', function () {
+                         var request = $.ajax({
+                             url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                             async: true,
+                             type: "DELETE"
+                         });
+
+                         request.success(function (data) {
+                             if (data.ResponseType != 0) {
+                                 // hehe, this is imposible...
+                             }
+                             else {
+                                 FB.logout(function () {
+                                     // wipe user
+                                     window.location.reload(true);
+                                 });
+                             }
+                         });
+                     });
+
+                 } else if (response.status === 'not_authorized') {
+                     // user is logged in to FB
+                     // has not authorized app
+
+                     document.getElementById('fb-log-well').style.display = 'block';
+                     document.getElementById('fb-auth-in').style.display = 'none';
+                 } else {
+                     // user is not logged in to FB
+                     // has not authorized app
+
+                     document.getElementById('fb-log-well').style.display = 'block';
+                     document.getElementById('fb-auth-in').style.display = 'none';
+                 }
+             });
+
+
+         }
+
+         $(document).ready(function () {
+             $("#alertDialog").hide();
+
+             // do a heartbeat to confirm user's session is still valid
+             var showLogin = true;
+
+             var response = $.ajax({
+                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                 type: "PUT",
+                 async: false,
+             });
+
+             response.success(function (data) {
+                 if (data.ResponseType != 0) {
+                     showLogin = true;
+                     localStorage.setItem('user-session', null);
+                 }
+                 else {
+                     showLogin = false;
+                 }
+
+                 if (showLogin == false) {
+                     $("#login-well").hide();
+                     $("#userinfo-well").show();
+
+                     // then async get user's information
+
+                     var userResponse = $.ajax({
+                         url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                         type: "GET",
+                         async: false,
+                     });
+
+                     userResponse.success(function (data) {
+                         // set user name to linkProfile
+                         var adata = JSON.parse(data.AdditionalData);
+
+                         $("#linkLogout").show();
+                         $("#linkProfile").show();
+
+                         $("#linkProfile").html(adata.Username);
+
+                         // set profile data here!
+                         $("#profileName").html(adata.Username);
+
+                         $("#firstName").val(adata.FirstName);
+                         $("#lastName").val(adata.LastName);
+                         $("#description").val(adata.Description);
+
+                         originalUsername = adata.Username;
+                     });
+                 }
+                 else {
+                     window.location.href = "index.html";
+                 }
+             });
+
+             response.fail(function (data) {
+                 localStorage.setItem('user-session', null);
+
+                 window.location.href = "index.html";
+             });
+         });
+
+         function onLogout() {
+             var request = $.ajax({
+                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                 async: true,
+                 type: "DELETE"
+             });
+
+             request.success(function (data) {
+                 if (data.ResponseType != 0) {
+                     // hehe, this is imposible...
+                 }
+                 else {
+                     FB.logout(function () {
+                         //wipe user
+                     });
+                     window.location.reload(true);
+                 }
+             });
+         }
+         </script>
     <div class="container">
         <br>
 
@@ -39,8 +249,9 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="index.html">Login</a></li>
+                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
+                    <li><a href="index.html" id="fbLogout" style="display: none">Logout (FB User)</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
