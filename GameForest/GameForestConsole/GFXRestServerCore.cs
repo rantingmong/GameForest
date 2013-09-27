@@ -36,7 +36,7 @@ namespace GameForestConsole
 
         public GFXRestServerCore()
         {
-            GFXDatabaseCore.Initialize("Server=localhost;Database=GameForest;Uid=root;Pwd=1234;");
+            GFXDatabaseCore.Initialize("Server=localhost;Database=gameforest;Uid=root;Pwd=1234;");
 
             ServiceMetadataBehavior behavior = new ServiceMetadataBehavior
             {
