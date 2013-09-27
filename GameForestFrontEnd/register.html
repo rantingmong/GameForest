@@ -66,6 +66,7 @@
     </div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/gameforestip.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function()
@@ -103,7 +104,7 @@
             else
             {
                 var request = $.ajax({
-                    url: "http://10.2.180.214:1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
+                    url: "http://" + gameForestIp + ":1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
                     async: true,
                     type: "POST"
                 });

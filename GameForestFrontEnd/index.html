@@ -123,6 +123,7 @@
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/gameforestip.js"></script>
 
     <script type="text/javascript">
 
@@ -134,7 +135,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  false,
             });
@@ -159,7 +160,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://10.2.180.214:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
                         type:   "GET",
                         async:  true,
                     });
@@ -216,7 +217,7 @@
             else
             {
                 var request = $.ajax({
-                    url: "http://10.2.180.214:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                    url: "http://" + gameForestIp + ":1193/service/user/login?username=" + varEmail + "&password=" + varPword,
                     async: true,
                     type: "POST"
                 });
@@ -255,7 +256,7 @@
         function onLogout   ()
         {
             var request = $.ajax({
-                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 async:  true,
                 type:   "DELETE"
             });

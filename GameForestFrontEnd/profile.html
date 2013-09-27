@@ -110,6 +110,7 @@
     </div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/gameforestip.js"></script>
     <script type="text/javascript">
 
         var originalUsername = "";
@@ -122,7 +123,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  false,
             });
@@ -147,7 +148,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://10.2.180.214:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
                         async: false,
                     });
@@ -189,7 +190,7 @@
         function onLogout               ()
         {
             var request = $.ajax({
-                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 async: true,
                 type: "DELETE"
             });
@@ -228,7 +229,7 @@
             }
             else
             {
-                var oorl = "http://10.2.180.214:1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
+                var oorl = "http://" + gameForestIp + ":1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
 
                 var request = $.ajax({
                     url:    oorl,
@@ -276,7 +277,7 @@
                 alert("Passwords must match!");
             }
 
-            var oorl = "http://10.2.180.214:1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
+            var oorl = "http://" + gameForestIp + ":1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
 
             var request = $.ajax({
                 url:    oorl,
