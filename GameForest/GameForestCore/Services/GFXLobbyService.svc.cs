@@ -131,8 +131,7 @@ namespace GameForestCore.Services
                     Order           = 1,
                     OrderOriginal   = 1,
                     Owner           = true,
-                    Status          = 0,
-                    RowId           = lobbySessionTable.Count()
+                    Status          = 0
                 };
 
                 lobbySessionTable.Insert(playerSession);
@@ -192,8 +191,7 @@ namespace GameForestCore.Services
                     Order           = order,
                     OrderOriginal   = order,
                     Owner           = false,
-                    Status          = 0,
-                    RowId           = lobbySessionTable.Count()
+                    Status          = 0
                 };
 
                 lobbySessionTable.Insert(session);
@@ -378,6 +376,7 @@ namespace GameForestCore.Services
             uResult["Name"]         = userRow.FirstName + " " + userRow.LastName;
             uResult["UserId"]       = userRow.UserId;
             uResult["Description"]  = userRow.Description;
+            uResult["Username"]     = userRow.Username;
 
             return uResult;
         }

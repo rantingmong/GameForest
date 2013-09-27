@@ -8,7 +8,7 @@
 
 // gameforest-specific data
 
-GameForestCloudUrl                  = "localhost";
+GameForestCloudUrl                  = "10.2.180.214";
 GameForestVerboseMessaging          = false;
 
 // DOM elements

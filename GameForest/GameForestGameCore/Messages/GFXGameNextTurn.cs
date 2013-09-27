@@ -20,7 +20,7 @@ namespace GameForestCoreWebSocket.Messages
             try
             {
                 // TODO: ADD GAME DATA HERE
-                if (!string.IsNullOrEmpty(info.Message))
+                /*if (!string.IsNullOrEmpty(info.Message))
                 {
                     var entry = JsonConvert.DeserializeObject<Dictionary<string, string>>(info.Message);
 
@@ -29,7 +29,7 @@ namespace GameForestCoreWebSocket.Messages
                         // update game data
                         new GFXGameSendData().DoMessage(server, info, ws);
                     }
-                }
+                }*/
 
                 // get the lobby the player is in
                 var lobbySessions   = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = '{0}'", info.SessionId)));

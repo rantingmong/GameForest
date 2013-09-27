@@ -134,7 +134,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  false,
             });
@@ -159,7 +159,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url:    "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://10.2.180.214:1193/service/user/session/" + localStorage.getItem("user-session"),
                         type:   "GET",
                         async:  true,
                     });
@@ -169,7 +169,7 @@
                         // set user name to linkProfile
                         var adata = JSON.parse(data.AdditionalData);
 
-                        $("#profileHeader").html("Welcome back, " + adata.FirstName);
+                        $("#profileHeader").html("Welcome back, " + adata.Name);
 
                         $("#linkLogout").show();
                         $("#linkProfile").show();
@@ -216,7 +216,7 @@
             else
             {
                 var request = $.ajax({
-                    url: "http://localhost:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                    url: "http://10.2.180.214:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
                     async: true,
                     type: "POST"
                 });
@@ -255,7 +255,7 @@
         function onLogout   ()
         {
             var request = $.ajax({
-                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 async:  true,
                 type:   "DELETE"
             });

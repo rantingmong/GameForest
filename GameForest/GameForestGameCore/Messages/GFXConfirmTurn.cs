@@ -31,7 +31,7 @@ namespace GameForestCoreWebSocket.Messages
                 currentPlayer.Status    = 2;
                 currentPlayer.Order     = Convert.ToInt32(info.Message);
 
-                server.LobbySessionList.Update(string.Format("RowId = '{0}'", currentPlayer.RowId), currentPlayer);
+                server.LobbySessionList.Update(string.Format("SessionId = '{0}'", currentPlayer.SessionID), currentPlayer);
                 
                 var checkPlayers    = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
                 var allOkay         = true;

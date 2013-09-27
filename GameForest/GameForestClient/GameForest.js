@@ -134,6 +134,34 @@ var GameForest                              = function (gameId, lobbyId, session
 
     // ------------------------------------------------------------------------------------------------
 
+    // accessor variables
+    var _sCurrentPlayer         = null;
+    var _sPlayerOrderIndex      = null;
+    var _sPlayerInfo            = null;
+    var _sUserList              = null;
+
+    this.currentPlayer          = function () {
+
+        return _sCurrentPlayer;
+    };
+
+    this.playerOrderIndex       = function () {
+
+        return _sPlayerOrderIndex;
+    };
+
+    this.playerInfo             = function () {
+
+        return _sPlayerInfo;
+    };
+
+    this.userList               = function () {
+
+        return _sUserList;
+    };
+
+    // ------------------------------------------------------------------------------------------------
+
     // function to start the game forest client
     this.start                  = function ()
     {
@@ -242,7 +270,20 @@ var GameForest                              = function (gameId, lobbyId, session
 
                     pGfxObject.lobbyStatus = GFX_STATUS_PLAYING;
 
-                    GameForest.prototype.onGameStart();
+                    pGfxObject.getUserList()
+                        .then(function (error, result) {
+
+                            _sUserList = result;
+
+                            return pGfxObject.getUserInfo();
+                        })
+                        .then(function (error, result) {
+
+                            _sPlayerInfo = result;
+
+                            GameForest.prototype.onGameStart();
+                        });
+
                     break;
                 case GFX_START_CHOICE:
 
@@ -265,13 +306,21 @@ var GameForest                              = function (gameId, lobbyId, session
 
                     console.log("Server is saying my turn has started.");
 
-                    GameForest.prototype.onTurnStart();
+                    pGfxObject.getCurrentPlayer().then(function (error, result) {
+
+                        _sCurrentPlayer = result;
+                        GameForest.prototype.onTurnStart();
+                    });
                     break;
                 case GFX_TURN_CHANGED:
 
                     console.log("Server is informing other players the game's turn have changed.");
 
-                    GameForest.prototype.onTurnChange();
+                    pGfxObject.getCurrentPlayer().then(function (error, result) {
+
+                        _sCurrentPlayer = result;
+                        GameForest.prototype.onTurnChange();
+                    });
                     break;
                 case GFX_TURN_RESOLVE:
 
@@ -315,13 +364,25 @@ var GameForest                              = function (gameId, lobbyId, session
     // ------------------------------------------------------------------------------------------------
 
     // function to inform the server its the next player's turn
-    this.nextTurn               = function ()
+    this.nextTurn               = function (gameData)
     {
-        wsPromise = new promise.Promise();
+        if (typeof gameData != undefined || gameData != null)
+        {
+            var closureObject = this;
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_NEXT_TURN, "");
+            this.sendGameData("defult", gameData).then(function (error, result)
+            {
+                closureObject.nextTurn();
+            });
+        }
+        else
+        {
+            wsPromise = new promise.Promise();
 
-        return wsPromise;
+            constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_NEXT_TURN, "");
+
+            return wsPromise;
+        }
     };
     // function to inform the server the player wants its turn to change order
     this.confirmTurn            = function (changedTurn)

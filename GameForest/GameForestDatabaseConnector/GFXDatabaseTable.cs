@@ -52,6 +52,8 @@ namespace GameForestCore.Database
                 commandIns.ExecuteNonQuery();
 
                 commandIns.Dispose();
+
+                msc.Close();
             }
         }
 
@@ -65,6 +67,8 @@ namespace GameForestCore.Database
                 commandRem.ExecuteNonQuery();
 
                 commandRem.Dispose();
+
+                msc.Close();
             }
         }
 
@@ -95,6 +99,8 @@ namespace GameForestCore.Database
                 commandUpt.ExecuteNonQuery();
 
                 commandUpt.Dispose();
+
+                msc.Close();
             }
         }
 
@@ -135,6 +141,8 @@ namespace GameForestCore.Database
                     commandSel.Dispose();
                 }
 
+                msc.Close();
+
                 return rtlist.ToArray();
             }
         }
@@ -162,6 +170,7 @@ namespace GameForestCore.Database
                 }
                 finally
                 {
+                    msc.Close();
                     commandNum.Dispose();
                 }
             }

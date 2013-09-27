@@ -296,6 +296,7 @@ namespace GameForestCore.Services
             uResult["Name"]         = userRow.FirstName + " " + userRow.LastName;
             uResult["UserId"]       = userRow.UserId;
             uResult["Description"]  = userRow.Description;
+            uResult["Username"]     = userRow.Username;
 
             return JsonConvert.SerializeObject(uResult);
         }

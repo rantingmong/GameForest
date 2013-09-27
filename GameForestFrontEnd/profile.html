@@ -122,9 +122,9 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: false,
+                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  false,
             });
 
             response.success(function (data)
@@ -147,7 +147,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://10.2.180.214:1193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
                         async: false,
                     });
@@ -165,8 +165,8 @@
                         // set profile data here!
                         $("#profileName").html(adata.Username);
 
-                        $("#firstName").val(adata.FirstName);
-                        $("#lastName").val(adata.LastName);
+                        $("#firstName").val(adata.Name);
+                        $("#lastName").val(adata.Name);
                         $("#description").val(adata.Description);
 
                         originalUsername = adata.Username;
@@ -189,7 +189,7 @@
         function onLogout               ()
         {
             var request = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 async: true,
                 type: "DELETE"
             });
@@ -228,7 +228,7 @@
             }
             else
             {
-                var oorl = "http://localhost:1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
+                var oorl = "http://10.2.180.214:1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
 
                 var request = $.ajax({
                     url:    oorl,
@@ -276,7 +276,7 @@
                 alert("Passwords must match!");
             }
 
-            var oorl = "http://localhost:1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
+            var oorl = "http://10.2.180.214:1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
 
             var request = $.ajax({
                 url:    oorl,

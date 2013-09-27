@@ -144,7 +144,7 @@
             // do a heartbeat to confirm user's session is still valid
             var showLogin           = true;
             var heartBeatResponse   = $.ajax({
-                url:    "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://10.2.180.214:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  true,
             });
@@ -165,7 +165,7 @@
                 {
                     // then async get user's information
                     var userResponse = $.ajax({
-                        url:    "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://10.2.180.214:1193/service/user/session/" + localStorage.getItem("user-session"),
                         type:   "GET",
                         async:  true,
                     });
@@ -188,7 +188,7 @@
                 }
 
                 var gameResponse = $.ajax({
-                    url:    "http://localhost:1193/service/game?maxcount=1000",
+                    url: "http://10.2.180.214:1193/service/game?maxcount=1000",
                     type:   "GET",
                     async:  true
                 });
@@ -265,7 +265,7 @@
                 name = "Untitled lobby";
 
             var createLobbyResponse = $.ajax({
-                url:    "http://localhost:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate,
+                url: "http://10.2.180.214:1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate,
                 type:   "POST",
                 async:  true,
             });
@@ -280,7 +280,7 @@
                     localStorage.setItem("lobby-session", data.AdditionalData);
 
                     var gameResponse = $.ajax({
-                        url:    "http://localhost:1193/service/game/" + gameId,
+                        url: "http://10.2.180.214:1193/service/game/" + gameId,
                         type:   "GET",
                         async:  false
                     });
@@ -327,7 +327,7 @@
             $("#lobbyList").html("");
 
             var lobbyResponse = $.ajax({
-                url: "http://localhost:1193/service/lobby?maxcount=1000",
+                url: "http://10.2.180.214:1193/service/lobby?maxcount=1000",
                 type: "GET",
                 async: true,
             });
@@ -343,7 +343,7 @@
                         var lobby = lobbies[i];
 
                         var gameInfoResponse = $.ajax({
-                            url: "http://localhost:1193/service/game/" + lobby.GameID,
+                            url: "http://10.2.180.214:1193/service/game/" + lobby.GameID,
                             type: "GET",
                             async: false
                         });
@@ -363,7 +363,7 @@
                                 var userCount = 0;
                                 var maxUsers = gameInfo.MaxPlayers;
 
-                                var userCountURL = "http://localhost:1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID;
+                                var userCountURL = "http://10.2.180.214:1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID;
 
                                 var userCountResponse = $.ajax({
 
@@ -411,7 +411,7 @@
         {
             var joinGameResponse = $.ajax({
 
-                url: "http://localhost:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://10.2.180.214:1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
                 async: true,
                 type: "POST"
             });
@@ -425,7 +425,7 @@
                     localStorage.setItem("lobby-session", data.AdditionalData);
 
                     var gameResponse = $.ajax({
-                        url:    "http://localhost:1193/service/game/" + gameId,
+                        url: "http://10.2.180.214:1193/service/game/" + gameId,
                         type:   "GET",
                         async:  true
                     });

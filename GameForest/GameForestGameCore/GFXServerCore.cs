@@ -63,7 +63,7 @@ namespace GameForestCoreWebSocket
             get { return lobbySessionList; }
         }
 
-        public  GFXServerCore                           ()
+        public  GFXServerCore                           (string ipAddress = "localhost")
         {
             listenerList.Add(new GFXConfirmTurn());
             listenerList.Add(new GFXGameAskUserData());
@@ -83,13 +83,13 @@ namespace GameForestCoreWebSocket
 
             sessionCheckTimer   = new Timer(new TimerCallback((o) =>
                 {
-                    CheckUserConnectedTick();
+                    //CheckUserConnectedTick();
                 }));
 
             loginCheckTimer.Change(TimeSpan.FromHours(1), TimeSpan.FromHours(1));
             sessionCheckTimer.Change(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
-            server = new WebSocketServer("ws://localhost:8084");
+            server = new WebSocketServer("ws://" + ipAddress + ":8084");
 
             server.Start(socket =>
                 {

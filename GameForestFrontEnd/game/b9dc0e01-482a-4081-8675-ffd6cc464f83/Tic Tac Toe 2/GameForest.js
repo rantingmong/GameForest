@@ -46,7 +46,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     this.connectionId           = "";                       // the unique identifier for the websocket connection
 
-    this.wsConnection           = new WebSocket("ws://localhost:8084");     // websocket object
+    this.wsConnection           = new WebSocket("ws://" + GameForestCloudUrl + ":8084");     // websocket object
 
     // ------------------------------------------------------------------------------------------------
 
@@ -136,17 +136,12 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         this.wsConnection.onopen    = function ()
         {
-            if (GameForestVerboseMessaging)
-            {
-                alert("Connection is opened with the server! Expecting the server to give connection ID...");
-            }
+            alert("Connection is opened with the server! Expecting the server to give connection ID...");
+            
         };
         this.wsConnection.onclose   = function ()
         {
-            if (GameForestVerboseMessaging)
-            {
-                alert("Connection is closed with the server.");
-            }
+            alert("Connection is closed with the server.");
         };
         this.wsConnection.onmessage = function (message)
         {
