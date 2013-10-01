@@ -20,7 +20,7 @@
 	
 	// function to add a NUMERICAL stat to track
 	// IMPORTANT: THIS ONLY WORKS WITH STATS TRACKING INT VALUES (not float nor time)
-	trackStat				= function (statName)
+	function trackstat	(statName)
 	{
 		var p = null;
 		
@@ -39,10 +39,7 @@
 			},
 			function(status, why)
 			{
-				if(GameForestVerboseMessaging)
-				{
 					alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
-				}
 			});
 	}
 	
@@ -76,7 +73,7 @@
 	
 	******/
 	
-	cbStat					= function (statVals, statNames, data) 
+	function cbStat (statVals, statNames, data) 
 	{
 		console.log(data); // extract stat object
 		var statName = data.stat_name;
@@ -89,7 +86,7 @@
 			console.log(statNames[i] + ": " + statVals[i]);
 	}
 	
-	getStatVal				= function (statName, statValList, statNameList, callback)
+	function getStatVal (statName, statValList, statNameList, callback)
 	{
 		var p = { };
 		var statOut = null;
@@ -117,16 +114,13 @@
 			},
 			function(status, why)
 			{
-				if(GameForestVerboseMessaging)
-				{
 					alert("Error in getStat function: [status=" + status + "] [reason=" + why + "]");
-				}
 			});
 	}
 	
 	// function to update a tracked stat
 	// IMPORTANT: THIS ONLY WORKS WITH statValue BEING AN INT
-	updateStat				= function (statName, statValue)
+	function updateStat(statName, statValue)
 	{
 		sendRequest("/game/stats?updatestat=" + statName + "&gameid=" + this.gameId + "&statvalue=" + statValue, "POST",
 			function(result)
@@ -143,9 +137,6 @@
 			},
 			function(status, why)
 			{
-				if(GameForestVerboseMessaging)
-				{
 					alert("Error in updateStat function: [status=" + status + "] [reason=" + why + "]");
-				}
 			});
 	}
