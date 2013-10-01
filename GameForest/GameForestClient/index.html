@@ -28,15 +28,14 @@
     <!--This is where you will place your game-->
     <div id="gameForestGameWindow" style="display: none" class="container">
         <div style="text-align: center">
-            <button class="btn btn-primary" onclick="testShowDisconnect();">Click me</button>
+
         </div>
     </div>
-
     <!--Disconnection window. Do not customize unless you know what you're doing.-->
     <div id="gameForestDisconnectWindow">
         <div style="margin: auto; width: 400px; margin-top: 30px" class="well well-lg">
-            <div id="gameForestClientDisconnected">
-                <h3>&lt;client&gt; was disconnected!</h3>
+            <div id="gameForestClientDisconnected" style="display: none">
+                <h3 id="gameForestDisconnectedPlayer">&lt;client&gt; was disconnected!</h3>
                 <p>Waiting for the client to reconnect in <b id="gameForestCountdownWait">(n)</b> seconds.</p>
             </div>
             <div id="gameForestPlayerDisconnected" style="display: none">
@@ -77,11 +76,11 @@
     <script type="text/javascript">
 
         var userUpdateInterval = null;
-
+        
         $(document).ready(function ()
         {
             var getLobbyRequest = $.ajax({
-                url:    "http://localhost:1193/service/lobby/" + localStorage.getItem("lobby-session"),
+                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/" + localStorage.getItem("lobby-session"),
                 type:   "DELETE",
                 async:  false
             });
@@ -99,14 +98,14 @@
                 window.location.href = "../../../games.html";
             });
 
-            /*var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
+            var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
                                     new Guid(localStorage.getItem("lobby-session")),
-                                    new Guid(localStorage.getItem("user-session")));*/
+                                    new Guid(localStorage.getItem("user-session")));
 
             // setup timer for user list
-            // userUpdateInterval = setInterval(updateUserList, 5000);
+            userUpdateInterval = setInterval(updateUserList, 5000);
 
-            // gf.start();
+            gf.start();
 
             // check if user is owner or not
             var isowner = localStorage.getItem("lobby-owner");
@@ -139,21 +138,21 @@
 
         function unload             ()
         {
-            /*$.ajax({
-                url:    "http://localhost:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+            $.ajax({
+                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "DELETE",
                 async:  false
-            });*/
+            });
 
-            //gf.stop();
+            gf.stop();
         }
 
         function updateUserList     ()
         {
             var response = $.ajax({
-                url: "http://localhost:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
-                type: "GET",
-                async: false
+                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                type:   "GET",
+                async:  true
             });
 
             response.success(function (data)
@@ -169,9 +168,9 @@
                         var item = userList[i];
 
                         var userinforesponse = $.ajax({
-                            url: "http://localhost:1193/service/user/session/" + item.SessionID,
-                            type: "GET",
-                            async: false
+                            url:    "http://" + GameForestCloudUrl + ":1193/service/user/session/" + item.SessionID,
+                            type:   "GET",
+                            async:  true
                         });
 
                         userinforesponse.success(function (itemData)
@@ -183,11 +182,6 @@
                     }
                 }
             });
-        }
-
-        function testShowDisconnect ()
-        {
-            $("#gameForestDisconnectWindow").fadeIn("fast");
         }
 
     </script>

@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+VisualStudioVersion = 12.0.20827.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestClient", "GameForestClient\GameForestClient.csproj", "{FBE56C88-2C51-47EB-B7F3-6DE9E6E612C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestDatabaseConnector", "GameForestDatabaseConnector\GameForestDatabaseConnector.csproj", "{4D8182B9-0284-4C28-829E-652D2D4297D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestConsole", "GameForestConsole\GameForestConsole.csproj", "{8139216D-4DF4-467D-B3B1-9CFA9720221B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestConsoleGui", "GameForestConsole\GameForestConsoleGui.csproj", "{8139216D-4DF4-467D-B3B1-9CFA9720221B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestCore", "GameForestCore\GameForestCore.csproj", "{95B76B85-36C6-424A-A6E9-7F7EBB0230B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestCoreWebSocket", "GameForestGameCore\GameForestCoreWebSocket.csproj", "{1E0D7A59-462B-46BD-9102-A327132D39E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameForestConsoleCmd", "GameForestConsoleCmd\GameForestConsoleCmd.csproj", "{07374754-AD49-43F5-A28B-34EE976BDC72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{1E0D7A59-462B-46BD-9102-A327132D39E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E0D7A59-462B-46BD-9102-A327132D39E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E0D7A59-462B-46BD-9102-A327132D39E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07374754-AD49-43F5-A28B-34EE976BDC72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07374754-AD49-43F5-A28B-34EE976BDC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07374754-AD49-43F5-A28B-34EE976BDC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07374754-AD49-43F5-A28B-34EE976BDC72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

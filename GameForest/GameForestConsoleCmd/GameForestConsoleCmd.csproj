@@ -4,16 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1E0D7A59-462B-46BD-9102-A327132D39E7}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{07374754-AD49-43F5-A28B-34EE976BDC72}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GameForestCoreWebSocket</RootNamespace>
-    <AssemblyName>GameForestCoreWebSocket</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>GameForest</RootNamespace>
+    <AssemblyName>GameForestCmd</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,24 +23,23 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fleck">
-      <HintPath>..\packages\Fleck.0.9.7.22\lib\net40\Fleck.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,34 +47,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GFXDisconnectInfo.cs" />
-    <Compile Include="GFXGameData.cs" />
-    <Compile Include="GFXSocketRequest.cs" />
-    <Compile Include="GFXSocketListener.cs" />
-    <Compile Include="GFXSocketResponse.cs" />
-    <Compile Include="Messages\GFXConfirmTurn.cs" />
-    <Compile Include="Messages\GFXGameAskData.cs" />
-    <Compile Include="Messages\GFXGameAskUserData.cs" />
-    <Compile Include="Messages\GFXGameFinish.cs" />
-    <Compile Include="Messages\GFXGameNextTurn.cs" />
-    <Compile Include="Messages\GFXGameSendData.cs" />
-    <Compile Include="Messages\GFXGameSendUserData.cs" />
-    <Compile Include="Messages\GFXGameStart.cs" />
-    <Compile Include="Messages\GFXGameStartConfirm.cs" />
+    <Compile Include="GFXRestServerCore.cs" />
+    <Compile Include="GFXWebSocketCore.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GFXServerCore.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GameForestCore\GameForestCore.csproj">
+      <Project>{95b76b85-36c6-424a-a6e9-7f7ebb0230b6}</Project>
+      <Name>GameForestCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GameForestDatabaseConnector\GameForestDatabaseConnector.csproj">
       <Project>{4d8182b9-0284-4c28-829e-652d2d4297d7}</Project>
       <Name>GameForestDatabaseConnector</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Execution flow.txt" />
+    <ProjectReference Include="..\GameForestGameCore\GameForestCoreWebSocket.csproj">
+      <Project>{1e0d7a59-462b-46bd-9102-a327132d39e7}</Project>
+      <Name>GameForestCoreWebSocket</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

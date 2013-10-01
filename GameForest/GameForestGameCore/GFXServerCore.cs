@@ -32,6 +32,8 @@ namespace GameForestCoreWebSocket
 
         private List<GFXSocketListener>                 listenerList        = new List<GFXSocketListener>();
 
+        private List<GFXDisconnectInfo>                 disconnectedList    = new List<GFXDisconnectInfo>();
+
         private GFXDatabaseTable<GFXUserRow>            userList            = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
         private GFXDatabaseTable<GFXLoginRow>           sessionList         = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
 
@@ -83,11 +85,11 @@ namespace GameForestCoreWebSocket
 
             sessionCheckTimer   = new Timer(new TimerCallback((o) =>
                 {
-                    //CheckUserConnectedTick();
+                    CheckUserConnectedTick();
                 }));
 
-            loginCheckTimer.Change(TimeSpan.FromHours(1), TimeSpan.FromHours(1));
-            sessionCheckTimer.Change(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+            loginCheckTimer.Change  (TimeSpan.FromHours(1),     TimeSpan.FromHours(1));
+            sessionCheckTimer.Change(TimeSpan.FromSeconds(30),  TimeSpan.FromSeconds(30));
 
             server = new WebSocketServer("ws://" + ipAddress + ":8084");
 
@@ -269,14 +271,25 @@ namespace GameForestCoreWebSocket
 
                             // make a new one-shot timer to wait for the player to reconnect (90 seconds) before we totally remove that player from the game.
                             // NOTE: the clients will wait for 120 seconds (additional 30 seconds) to compensate network lag.
+                            new Timer(new TimerCallback((o) =>
+                                {
+                                    var sessionRow                  = ((GFXLobbySessionRow)((object[])o)[0]);
+                                    var guidOfDisconnectedPlayer    = sessionRow.SessionID;
 
-                            var guidOfDisconnectedPlayer = getLobbySessionResult[0].SessionID;
+                                    // remove user from session list
+                                    this.lobbySessionList.Remove(string.Format("SessionId = '{0}'", guidOfDisconnectedPlayer));
 
-                            // remove user from session list
-                            this.lobbySessionList.Remove(string.Format("SessionId = '{0}'", guidOfDisconnectedPlayer));
+                                    webSocketList.Remove(guidOfDisconnectedPlayer);
+                                    connectionList.Remove(guidOfDisconnectedPlayer);
 
-                            webSocketList.Remove(guidOfDisconnectedPlayer);
-                            connectionList.Remove(guidOfDisconnectedPlayer);
+                                    disconnectedList.Add(new GFXDisconnectInfo
+                                        {
+                                            SessionId   = sessionRow.SessionID,
+                                            UserId      = ((GFXUserRow)((object[])o)[1]).UserId,
+                                            LobbyId     = sessionRow.LobbyID
+                                        });
+                                }), new object[] { getLobbySessionResult, disconnectedPlayerInfo[0] }, 90000, Timeout.Infinite);
+
                         }
                     }
                 }
