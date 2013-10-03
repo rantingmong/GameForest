@@ -61,6 +61,7 @@
     <Content Include="facebooktest.html" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="games.html" />
+    <Content Include="game\ede1a25f-b1d3-4753-974b-5ee34f8d5db1\Tic tac toe\GameForestTracker.js" />
     <Content Include="index.html" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
@@ -69,6 +70,7 @@
     <Content Include="news.html" />
     <Content Include="profile.html" />
     <Content Include="register.html" />
+    <Content Include="stats.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
