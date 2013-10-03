@@ -48,11 +48,11 @@
             </div>
             <div class="col-sm-4">
                 <div class="well">
-                    <textarea class="form-control chat" rows="8"></textarea>
+                    <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
                     <br>
                     <form>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="focusedInput" placeholder="Chat">
+                            <input type="text" class="form-control" id="chattext" placeholder="Chat">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button" id="buttonSendChat">Send</button>
                             </span>
@@ -91,6 +91,9 @@
             userUpdateInterval = setInterval(updateUserList, 5000);
 
             gf.start();
+
+            // start chat services
+            connect();
 
             // check if user is owner or not
             var isowner = localStorage.getItem("lobby-owner");
@@ -166,8 +169,78 @@
             });
         }
 
+        function connect() 
+        {
+            var textarea = document.getElementById("chattext");
+            textarea.onkeydown = keydownHandler;
+
+            if (sessionStorage.username == null)
+                var name = prompt("Input name", "Name");
+            else
+                var name = sessionStorage.username;
+
+            mess.Name   = name;
+            mess.Lobby  = lobbyid
+
+            socket = new WebSocket('ws://localhost:8085/');
+
+            socket.onopen = function()
+            {
+                $("#chatbox").append("Connected\n");
+                socket.send(JSON.stringify(mess));
+            }
+
+            socket.onmessage = function(evt)
+            {
+                var message = JSON.parse(evt.data);
+
+                if (message.Message =="Chat") {
+                    $("#chatbox").append(message.Chat+"\n");
+                    var psconsole = $('#chatbox');
+                    psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+                } else if(message.Message == "Names") {
+                    var list = message.names;
+                    var code = "";
+
+                    for(var i = 0; i < list.length; i++)
+                    {
+                        console.log(list[i]);
+                        code += list[i] + "\n";
+                    }
+                    
+                    // we don't have a list yet of where to place the names
+                    //$("#namesofconnected").val(code);
+                }
+            }
+
+            socket.onclose = function() {
+                $("#chatbox").append("Connection Lost\n");
+            }
+
+            $('#submit').on('click', function (e) {
+                var mes = new Object();
+                mes.Lobby = lobbyid;
+                mes.Message = "Mess";
+                mes.Mess = $("#chattext").val();
+                socket.send(JSON.stringify(mes));
+                $("#chattext").val("");     
+            });
+        }
+
+        function keydownHandler(evt) {
+            if(evt.keyCode == 13) {
+                var mes = new Object();
+                mes.Lobby = lobbyid;
+                mes.Message = "Mess";
+                mes.Mess = $("#chattext").val();
+                socket.send(JSON.stringify(mes));
+                $("#chattext").val("");
+            }
+        }
+
         $(document).ready(documentReady);
 
     </script>
 </body>
 </html>
+
