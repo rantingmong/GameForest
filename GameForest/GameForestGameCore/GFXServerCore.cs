@@ -85,7 +85,7 @@ namespace GameForestCoreWebSocket
 
             sessionCheckTimer   = new Timer(new TimerCallback((o) =>
                 {
-                    CheckUserConnectedTick();
+                    // CheckUserConnectedTick();
                 }));
 
             loginCheckTimer.Change  (TimeSpan.FromHours(1),     TimeSpan.FromHours(1));
@@ -97,6 +97,8 @@ namespace GameForestCoreWebSocket
                 {
                     socket.OnOpen       = () =>
                         {
+                            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "WebSocket", "A client wants to connect!");
+
                             // a client wants to connect! give it a new connection id
                             Guid guid = Guid.NewGuid();
 
@@ -127,8 +129,8 @@ namespace GameForestCoreWebSocket
                                 if (verifyList.Contains(info.ConnectionId))
                                 {
                                     // connection id verified! we can add the session id to the connection list
-                                    webSocketList.Add(info.SessionId, socket);
-                                    connectionList.Add(info.SessionId, info.ConnectionId);
+                                    webSocketList   [info.SessionId] = socket;
+                                    connectionList  [info.SessionId] = info.ConnectionId;
 
                                     // and remove the key from verify list (for safety purposes :) )
                                     verifyList.Remove(info.ConnectionId);

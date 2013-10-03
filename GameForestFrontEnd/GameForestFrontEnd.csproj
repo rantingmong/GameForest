@@ -64,7 +64,7 @@
     <Content Include="index.html" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
-    <Content Include="js\gameForestIP.js" />
+    <Content Include="js\gameforestip.js" />
     <Content Include="js\jquery.js" />
     <Content Include="news.html" />
     <Content Include="profile.html" />

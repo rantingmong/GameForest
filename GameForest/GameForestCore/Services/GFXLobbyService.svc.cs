@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Linq;
 
 namespace GameForestCore.Services
 {
@@ -253,7 +254,7 @@ namespace GameForestCore.Services
 
                 var returnList = new List<Dictionary<string, object>>();
 
-                foreach (var item in lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)))
+                foreach (var item in lobbySessionTable.Select(string.Format("LobbyId = '{0}'", lobbyid)).OrderBy((entry) => entry.Order))
                 {
                     var sessionList = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", item.SessionID)));
                     var userList    = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", sessionList[0].UserId)));

@@ -6,6 +6,8 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
     <div class="container">
@@ -125,8 +127,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
 
-        var gameForestIp = "game-forest.cloudapp.net";
-
         $(document).ready(function ()
         {
             $("#alertDialog").hide();
@@ -135,7 +135,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  false,
             });
@@ -160,7 +160,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
                         type:   "GET",
                         async:  true,
                     });
@@ -217,7 +217,7 @@
             else
             {
                 var request = $.ajax({
-                    url: "http://" + gameForestIp + ":1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                    url: "http://" + gameForestIP + ":1193/service/user/login?username=" + varEmail + "&password=" + varPword,
                     async: true,
                     type: "POST"
                 });

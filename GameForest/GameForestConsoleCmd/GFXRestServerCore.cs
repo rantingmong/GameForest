@@ -30,7 +30,7 @@ namespace GameForest
         {
             ServiceMetadataBehavior behavior = new ServiceMetadataBehavior
             {
-                HttpGetEnabled = true,
+                HttpGetEnabled  = true,
                 HttpsGetEnabled = true
             };
 
@@ -38,26 +38,22 @@ namespace GameForest
             serviceHostGame = new WebServiceHost(new GFXGameService(), new Uri("http://localhost:1193/service/game"));
             serviceHostLobi = new WebServiceHost(new GFXLobbyService(), new Uri("http://localhost:1193/service/lobby"));
 
-            var uEndpoint = serviceHostUser.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXUserService), new WebHttpBinding
+            var httpBinding = new WebHttpBinding
             {
-                CrossDomainScriptAccessEnabled = true,
-            }, "");
-            var gEndpoint = serviceHostGame.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXGameService), new WebHttpBinding
-            {
-                CrossDomainScriptAccessEnabled = true,
-            }, "");
-            var lEndpoint = serviceHostLobi.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXLobbyService), new WebHttpBinding
-            {
-                CrossDomainScriptAccessEnabled = true,
-            }, "");
+                CrossDomainScriptAccessEnabled = true
+            };
+
+            var uEndpoint = serviceHostUser.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXUserService), httpBinding, "");
+            var gEndpoint = serviceHostGame.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXGameService), httpBinding, "");
+            var lEndpoint = serviceHostLobi.AddServiceEndpoint(typeof(GameForestCore.Services.IGFXLobbyService), httpBinding, "");
 
             uEndpoint.Behaviors.Add(new WebHttpBehavior());
             gEndpoint.Behaviors.Add(new WebHttpBehavior());
             lEndpoint.Behaviors.Add(new WebHttpBehavior());
 
-            uEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
-            gEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
-            lEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
+            uEndpoint.Behaviors.Add(new BehaviorAttribute());
+            gEndpoint.Behaviors.Add(new BehaviorAttribute());
+            lEndpoint.Behaviors.Add(new BehaviorAttribute());
 
             serviceHostUser.Description.Behaviors.Add(behavior);
             serviceHostGame.Description.Behaviors.Add(behavior);

@@ -19,37 +19,110 @@ GameForestVerboseMessaging          = false;
 function onDocumentReady() {
 };
 
-GameForest.prototype.onGameStart    = function ()
-{
-    
-};
-
-GameForest.prototype.onGameChoose   = function ()
+// method to override when the game has started
+GameForest.prototype.onGameStart            = function ()
 {
 
 };
 
-GameForest.prototype.onTurnSelect   = function (originalTurn)
+// method to override when its the player's turn
+GameForest.prototype.onTurnStart            = function ()
 {
 
 };
 
-GameForest.prototype.onTurnStart    = function ()
+// method to override when its the other player's turn
+GameForest.prototype.onTurnChange           = function ()
 {
 
 };
 
-GameForest.prototype.onTurnChange   = function ()
+// method to override when the game's data has changed
+GameForest.prototype.onUpdateData           = function (key, data)
 {
 
 };
 
-GameForest.prototype.onUpdateData   = function (key, updatedData)
+// method to override when the game is finished
+GameForest.prototype.onGameFinish           = function (tallyList)
 {
 
 };
 
-GameForest.prototype.onGameFinish   = function (tallyList)
+// OPTIONAL ADVANCED METHODS -----------------------------------------------------------
+
+/*
+
+// method called when the player clicked the start button
+GameForest.prototype.onGameStartSignal = function ()
+{
+    console.log("Game start signal invoked!");
+
+    $("#gfxButtonStart").removeAttr("disabled");
+};
+
+// method to override when the game should display the choose screen
+GameForest.prototype.onGameChoose = function ()
 {
 
 };
+
+// method to override when its the player's time to change his/her order
+GameForest.prototype.onTurnSelect = function (originalTurn)
+{
+    this.confirmTurn(originalTurn);
+};
+
+// method to override when a player is suddenly disconnected
+GameForest.prototype.onPlayerDisconnected = function (who)
+{
+    $("#gameForestClientDisconnected").show();
+    $("#gameForestPlayerDisconnected").hide();
+
+    $("#gameForestDisconnectedPlayer").html(who.Name + " was disconnected from the game.");
+
+    $("#gameForestDisconnectWindow").fadeIn("fast");
+
+    var countdownTimer = 30;
+
+    setInterval(function ()
+    {
+        $("#gameForestCountdownWait").html(countdownTimer);
+
+        countdownTimer -= 1;
+
+        if (countdownTimer <= 0)
+        {
+
+        }
+    }, 1000);
+};
+
+// method to override when a player is reconnected
+GameForest.prototype.onPlayerReconnected = function ()
+{
+    $("#gameForestDisconnectWindow").fadeOut("fast");
+};
+
+// method to override when the player is disconnected
+GameForest.prototype.onGameDisconnected = function ()
+{
+    $("#gameForestClientDisconnected").hide();
+    $("#gameForestPlayerDisconnected").show();
+
+    $("#gameForestDisconnectWindow").fadeIn("fast");
+
+    var countdownTimer = 30;
+
+    setInterval(function ()
+    {
+        $("#gameForestCountdownKill").html(countdownTimer);
+
+        countdownTimer -= 1;
+
+        this.askForReconnection();
+
+    }, 1000);
+};
+
+*/

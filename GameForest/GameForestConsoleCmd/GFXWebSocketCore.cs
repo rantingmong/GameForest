@@ -15,11 +15,11 @@ namespace GameForest
             get { return isRunning; }
         }
 
-        public                  GFXWebsocketCore    ()
+        public                  GFXWebsocketCore    (string address = "localhost")
         {
             wsThread = new Thread(new ThreadStart(() =>
             {
-                serverCore = new GFXServerCore("game-forest.cloudapp.net");
+                serverCore = new GFXServerCore(address);
 
                 while (isRunning)
                 {
