@@ -60,8 +60,8 @@ var selectedTileMsg                 = "";
 var highlightBox                    = "lightGray";
 
 // Names of the stats I want to track
-var xWins							= "X Wins";
-var oWins							= "O Wins";
+var xWins							= "X Win";
+var oWins							= "O Win";
 
 // Arrays to store data of the stats I'm tracking
 // Data fetched from the database is pushed into these arrays

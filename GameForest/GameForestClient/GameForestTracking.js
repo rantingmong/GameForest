@@ -1,10 +1,3 @@
-	// Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-	var GameForestCloudUrl      = "localhost";
-	var cloudURL                = GameForestCloudUrl,
-        cloudPRT                = 1193;
-
-	var gameId					= new Guid(localStorage.getItem("lobby-game"));
-		
     function sendRequest        (url, type, onSuccess, onError)
     {
         var httpURL = "http://" + cloudURL + ":" + cloudPRT + "/service" + url;
@@ -27,11 +20,11 @@
 	
 	// function to add a NUMERICAL stat to track
 	// IMPORTANT: THIS ONLY WORKS WITH STATS TRACKING INT VALUES (not float nor time)
-	function trackStat	(statName)
+	function trackstat	(statName)
 	{
 		var p = null;
 		
-		sendRequest("/game/stat?addStat=" + statName + "&gameid=" + gameId, "POST",
+		sendRequest("/game/stat?addStat=" + statName + "&gameid=" + this.gameId, "POST",
 			function(result)
 			{
 				if(result.ResponseType == 0) {
@@ -99,7 +92,7 @@
 		var statOut = null;
 		
 		// DO NOT CHANGE false 
-		sendRequest("/game/stats?getstat=" + statName + "&gameid=" + gameId + "&all=false", "GET",
+		sendRequest("/game/stats?getstat=" + statName + "&gameid=" + this.gameId + "&all=false", "GET",
 			function(result)
 			{
 				if(result.ResponseType == 0) 
@@ -129,7 +122,7 @@
 	// IMPORTANT: THIS ONLY WORKS WITH statValue BEING AN INT
 	function updateStat(statName, statValue)
 	{
-		sendRequest("/game/stats?updatestat=" + statName + "&gameid=" + gameId + "&statvalue=" + statValue, "POST",
+		sendRequest("/game/stats?updatestat=" + statName + "&gameid=" + this.gameId + "&statvalue=" + statValue, "POST",
 			function(result)
 			{
 				if(result.ResponseType == 0)

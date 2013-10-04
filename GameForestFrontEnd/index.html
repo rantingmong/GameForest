@@ -66,7 +66,7 @@
                                 console.log("sessionid: " + localStorage.getItem("user-session"));
                                 if (localStorage.getItem("user-session") == "REDIRECT")
                                     window.location.href = "profile.html";
-                                    //window.location.reload(true);
+                                    window.location.reload(true);
                             }
 
                             $("buttonSignIn").button('reset');
