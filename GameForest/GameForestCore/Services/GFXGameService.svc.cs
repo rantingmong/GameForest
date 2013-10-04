@@ -122,7 +122,7 @@ namespace GameForestCore.Services
 
                     statTable.Insert(statistic);
 
-                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statname)));
+                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}' AND GameID = '{1}'", statname, gameId)));
 
                     return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statList[0]));
                 }
@@ -158,7 +158,7 @@ namespace GameForestCore.Services
                     if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
                         (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 1))
                     {
-                        var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", stat)));
+                        var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}' AND GameID = '{1}'", stat, gameId)));
 
                         returnJSON = JsonConvert.SerializeObject(result[0]);
 

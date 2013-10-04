@@ -85,17 +85,13 @@
       <DependentUpon>GFXGameService.svc</DependentUpon>
     </Compile>
     <Compile Include="Services\IGFXGameService.cs" />
-    <Compile Include="Services\GFXFileUpload.ashx.cs">
-      <DependentUpon>GFXFileUpload.ashx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\CustomHeaderMessageInspector.cs" />
-    <Compile Include="Util\EnableCrossOriginResourceSharingBehavior.cs" />
+    <Compile Include="Util\CORS\BehaviorAttribute.cs" />
+    <Compile Include="Util\CORS\MessageInspector.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="Services\GFXFileUpload.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

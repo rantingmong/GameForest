@@ -25,6 +25,7 @@
     <Content Include="Bootstrap\js\bootstrap.js" />
     <Content Include="Bootstrap\js\bootstrap.min.js" />
     <Content Include="GameForest.js" />
+    <Content Include="GameForestTracking.js" />
     <Content Include="GameLogic.js" />
     <Content Include="guid.js" />
     <Content Include="index.html" />

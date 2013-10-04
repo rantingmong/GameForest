@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+</head>
+<body onunload="unload();">
+
+    <!--This is where you will place your game-->
+    <div id="gameForestGameWindow" class="container" style="display: none">
+        <div id="sampleGameChooseScreen" style="display: none" class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h2 style="text-align: center">Choose between O or X:</h2>
+                <div class="col-md-6" style="text-align: center">
+                    <button id="sampleGameButtonChooseO" class="btn btn-success btn-lg" style="margin: auto">I choose O</button>
+                </div>
+                <div class="col-md-6" style="text-align: center">
+                    <button id="sampleGameButtonChooseX" class="btn btn-info btn-lg" style="margin: auto">I choose X</button>
+                </div>
+            </div>
+        </div>
+        <div id="sampleGameActualGame" style="display: none;text-align: center">
+            <canvas id="sampleGameCanvas" width="800" height="480" style="margin: auto; margin-top: 30px">
+
+            </canvas>
+        </div>
+    </div>
+
+    <!--GameForest stuff. Do not customize unless you know what you're doing.-->
+    <div id="gameForestLobbyWindow" class="container">
+        <div class="page-header">
+            <h1>Lobby <small>Game 1</small></h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="pager">
+                    <li class="previous"><button class="btn btn-warning pull-left" id="gfxButtonLeave">Leave</button></li>
+                    <li class="next"><button class="btn btn-primary pull-right" id="gfxButtonStart" disabled>Start game</button></li>
+                </ul>
+            </div>
+            <br>
+            <div class="col-sm-8">
+                <div class="panel panel-default" id="gfxUserList">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="well">
+                    <textarea class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="focusedInput" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="buttonSendChat">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="guid.js"></script>
+    <script src="jquery.js"></script>
+    <script src="promise.js"></script>
+
+    <script src="Bootstrap/js/bootstrap.min.js"></script>
+    <script src="GameForest.js"></script>
+    <script src="GameLogic.js"></script>
+
+    <script type="text/javascript">
+
+        var userUpdateInterval = null;
+
+        var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
+                                new Guid(localStorage.getItem("lobby-session")),
+                                new Guid(localStorage.getItem("user-session")));
+
+        $("#gfxButtonLeave").click(function ()
+        {
+            // navigate to main page
+            window.location.href = "../../../games.html";
+        });
+
+        function documentReady  ()
+        {
+            // setup timer for user list
+            userUpdateInterval = setInterval(updateUserList, 5000);
+
+            gf.start();
+
+            // check if user is owner or not
+            var isowner = localStorage.getItem("lobby-owner");
+
+            if (isowner == "true")
+            {
+                $("#gfxButtonStart").removeAttr("disabled");
+                $("#gfxButtonStart").html("Start game");
+                $("#gfxButtonStart").click(function ()
+                {
+                    gf.startGame();
+                    $("#gfxButtonStart").prop("disabled", true);
+                    $("#gfxButtonStart").html("Waiting for other players...");
+                });
+            }
+            else
+            {
+                $("#gfxButtonStart").html("Ready");
+                $("#gfxButtonStart").click(function ()
+                {
+                    gf.readyGame();
+                });
+            }
+
+            onDocumentReady();
+        }
+
+        function unload         ()
+        {
+            $.ajax({
+                url: "http://10.2.180.214:1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "DELETE",
+                async:  false
+            });
+
+            gf.stop();
+        }
+
+        function updateUserList ()
+        {
+            var response = $.ajax({
+                url: "http://10.2.180.214:1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                type:   "GET",
+                async:  false
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    $("#gfxUserList").html("");
+
+                    var userList = JSON.parse(data.AdditionalData);
+
+                    for (var i = 0; i < userList.length; i++)
+                    {
+                        var item = userList[i];
+                        var text = "<div class='panel-body'><span class='glyphicon glyphicon-user' style='margin-right: 10px'></span>" + item.Name + "</div>";
+
+                        $("#gfxUserList").append(text);
+                    }
+                }
+            });
+        }
+
+        $(document).ready(documentReady);
+
+    </script>
+</body>
+</html>

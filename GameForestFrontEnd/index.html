@@ -6,290 +6,12 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
-<div id="fb-root"></div>
-    <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-
-        // Load Facebook SDK asynchronously...
-        (function (d) {
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '649841695034246', // App ID 
-                channelUrl: '//localhost:46069/channel.html',
-                status: true, // check login status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
-
-            // Initialize when a user has authenticated with FB and this app
-            // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response) {
-
-                if (response.status === 'connected') {
-                    // user is logged in to FB
-                    // has authorized app
-
-                    console.log('Welcome, fetching information');
-
-                    FB.api('/me', function (response) {
-
-                        var fbid = response.id;
-                        var fbuser = response.username;
-                        var fname = response.first_name;
-                        var lname = response.last_name;
-
-                        var request = $.ajax({
-                            url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                            async: true,
-                            type: "POST"
-                        });
-
-                        request.done(function (msg) {
-                            if (msg.ResponseType != 0) {
-                                // show error (maybe in an error div?)
-                                $("#alertDialog").show();
-                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                            }
-                            else {
-                                // store session ID to local storage
-                                localStorage.setItem("user-session", msg.AdditionalData);
-                                console.log("sessionid: " + localStorage.getItem("user-session"));
-                                if (localStorage.getItem("user-session") == "REDIRECT")
-                                    window.location.href = "profile.html";
-                                    window.location.reload(true);
-                            }
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        request.fail(function (nothing, textStatus, something) {
-                            $("#alertDialog").show();
-
-                            $("#alertDialog").css("class", "alert alert-danger");
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        $("#login-well").hide();
-                        $("#userinfo-well").show();
-
-                        var userResponse = $.ajax({
-                            url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                            type: "GET",
-                            async: true
-                        });
-
-                        userResponse.success(function (data) {
-                            // set user name to linkProfile
-                            var adata = JSON.parse(data.AdditionalData);
-
-                            $("#profileHeader").html("Welcome back, " + adata.FirstName);
-
-                            $("#fbLogout").show();
-                            $("#linkLogout").hide();
-                            $("#linkProfile").show();
-
-                            $("#linkProfile").html(adata.Username);
-                        });
-
-                        document.getElementById('fb-log-well').style.display = 'none';
-
-                        document.getElementById('fbuserid').innerHTML = fbid;
-                    })
-                    
-                    document.getElementById('fbLogout').addEventListener('click', function () {
-                        var request = $.ajax({
-                            url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                            async: true,
-                            type: "DELETE"
-                        });
-
-                        request.success(function (data) {
-                            if (data.ResponseType != 0) {
-                                // hehe, this is imposible...
-                            }
-                            else {
-                                FB.logout(function () {
-                                    // wipe user
-                                    window.location.reload(true);
-                                });
-                            }
-                        });
-                    });
-                    
-                } else if (response.status === 'not_authorized') {
-                    // user is logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                    document.getElementById('fb-auth-in').style.display = 'none';
-                } else {
-                    // user is not logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                    document.getElementById('fb-auth-in').style.display = 'none';
-                }
-            });
-            
-
-        }
-
-        $(document).ready(function () {
-            $("#alertDialog").hide();
-
-            // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-
-            var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: false
-            });
-
-            response.success(function (data) {
-                if (data.ResponseType != 0) {
-                    showLogin = true;
-                    localStorage.setItem('user-session', null);
-                }
-                else {
-                    showLogin = false;
-                }
-
-                if (showLogin == false) {
-                    $("#login-well").hide();
-                    document.getElementById('fb-log-well').style.display = 'none';
-                    document.getElementById('auth-in-nofb').style.display = 'block';
-                    $("#userinfo-well").show();
-
-                    // then async get user's information
-
-                    var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true
-                    });
-
-                    userResponse.success(function (data) {
-                        // set user name to linkProfile
-                        var adata = JSON.parse(data.AdditionalData);
-
-                        $("#profileHeader").html("Welcome back, " + adata.FirstName);
-
-                        $("#linkLogout").show();
-                        $("#linkProfile").show();
-
-                        $("#linkProfile").html(adata.Username);
-                    });
-                }
-                else {
-                    $("#login-well").show();
-                    $("#userinfo-well").hide();
-                }
-            });
-
-            response.fail(function (data) {
-                localStorage.setItem('user-session', null);
-
-                $("#login-well").show();
-                $("#userinfo-well").hide();
-            });
-        });
-
-            function signInClick() {
-                $("#alertDialog").hide();
-
-                var error = false;
-
-                var varEmail = $("#inputEmail1").val();
-                var varPword = $("#inputPassword1").val();
-
-                if (varEmail.length == 0 || varEmail == null)
-                    error = true;
-
-                if (varPword.length == 0 || varPword == null)
-                    error = true;
-
-                if (error) {
-                    $("#alertDialog").show();
-                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
-                }
-                else {
-                    var request = $.ajax({
-                        url: "http://localhost:1193/service/user/login?username=" + varEmail + "&password=" + varPword,
-                        async: true,
-                        type: "POST"
-                    });
-
-                    $("buttonSignIn").button('loading');
-
-                    request.done(function (msg) {
-                        if (msg.ResponseType != 0) {
-                            // show error (maybe in an error div?)
-                            $("#alertDialog").show();
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                        }
-                        else {
-                            // store session ID to local storage
-                            localStorage.setItem("user-session", msg.AdditionalData);
-                            window.location.href = "games.html";
-                        }
-
-                        $("buttonSignIn").button('reset');
-                    });
-
-                    request.fail(function (nothing, textStatus, something) {
-                        $("#alertDialog").show();
-
-                        $("#alertDialog").css("class", "alert alert-danger");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                        $("buttonSignIn").button('reset');
-                    });
-                }
-            }
-
-            function onLogout() {
-
-                var request = $.ajax({
-                    url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                    async: true,
-                    type: "DELETE"
-                });
-
-                request.success(function (data) {
-                    if (data.ResponseType != 0) {
-                        // hehe, this is imposible...
-                    }
-                    else {
-                        FB.logout(function () {
-                            // wipe user
-                            window.location.reload(true);
-                        });
-                        window.location.reload(true);
-                    }
-                });
-            }
-
-
-        </script>
-
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
-
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -317,15 +39,10 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display: none">Logout (FB User)</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div class="row">
 
             <div id="alertDialog" class="alert alert-danger" style="display: none"></div>
@@ -373,10 +90,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF FIRST ROW -->
-        <!-- SECOND ROW -->
-
         <div class="row">
             <div class="col-xs-4">
                 <div class="panel panel-info">
@@ -388,7 +101,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xs-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -399,7 +111,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xs-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
@@ -411,38 +122,159 @@
                 </div>
             </div>
         </div>
-        
-        <!-- END OF SECOND ROW -->
-        <!-- THIRD ROW -->
-
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="well" id="fb-log-well">
-                    <h4>Facebook Login</h4>
-                    <fb:login-button width="400px" size="large" scope="email"></fb:login-button>
-                </div>
-                <div class="well" id="fb-auth-in" style="display:none">
-                    <h4>Facebook Debug</h4>
-                    <h5>Logged in as <span id="fbuserid"></span></h5>
-                </div>
-                <div class="well" id="auth-in-nofb" style="display:none">
-                    <h4>Logged in</h4>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="well" id="fb-info-well">
-                    <h4>Using FaceBook Login</h4>
-                    <h5>Logging in using your FaceBook credentials will generate an account on GameForest
-                        using your FaceBook <b>username</b> and 'debugger' as your 
-                        password. Kindly change the generated password.
-                    </h5>
-                </div>
-            </div>
-        </div>
-            
     </div>
-    
-    
-    
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            $("#alertDialog").hide();
+
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  false,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    $("#login-well").hide();
+                    $("#userinfo-well").show();
+
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type:   "GET",
+                        async:  true,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#profileHeader").html("Welcome back, " + adata.Name);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+                    });
+                }
+                else
+                {
+                    $("#login-well").show();
+                    $("#userinfo-well").hide();
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                $("#login-well").show();
+                $("#userinfo-well").hide();
+            });
+        });
+
+        function signInClick()
+        {
+            $("#alertDialog").hide();
+
+            var error = false;
+
+            var varEmail = $("#inputEmail1").val();
+            var varPword = $("#inputPassword1").val();
+
+            if (varEmail.length == 0 || varEmail == null)
+                error = true;
+
+            if (varPword.length == 0 || varPword == null)
+                error = true;
+
+            if (error)
+            {
+                $("#alertDialog").show();
+                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+            }
+            else
+            {
+                var request = $.ajax({
+                    url: "http://" + gameForestIP + ":1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                    async: true,
+                    type: "POST"
+                });
+
+                $("buttonSignIn").button('loading');
+
+                request.done(function (msg)
+                {
+                    if (msg.ResponseType != 0)
+                    {
+                        // show error (maybe in an error div?)
+                        $("#alertDialog").show();
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                    }
+                    else
+                    {
+                        // store session ID to local storage
+                        localStorage.setItem("user-session", msg.AdditionalData);
+                        window.location.href = "games.html";
+                    }
+
+                    $("buttonSignIn").button('reset');
+                });
+
+                request.fail(function (nothing, textStatus, something)
+                {
+                    $("#alertDialog").show();
+
+                    $("#alertDialog").css("class", "alert alert-danger");
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+
+                    $("buttonSignIn").button('reset');
+                });
+            }
+        }
+        function onLogout   ()
+        {
+            var request = $.ajax({
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async:  true,
+                type:   "DELETE"
+            });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    // hehe, this is imposible...
+                }
+                else
+                {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

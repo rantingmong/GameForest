@@ -19,6 +19,18 @@ namespace GameForestCoreWebSocket.Messages
         {
             try
             {
+                // TODO: ADD GAME DATA HERE
+                /*if (!string.IsNullOrEmpty(info.Message))
+                {
+                    var entry = JsonConvert.DeserializeObject<Dictionary<string, string>>(info.Message);
+
+                    if (entry.ContainsKey("GameData"))
+                    {
+                        // update game data
+                        new GFXGameSendData().DoMessage(server, info, ws);
+                    }
+                }*/
+
                 // get the lobby the player is in
                 var lobbySessions   = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("SessionId = '{0}'", info.SessionId)));
 
@@ -56,24 +68,31 @@ namespace GameForestCoreWebSocket.Messages
                 // send GFX_TURN_START to the next client and send GFX_TURN_CHANGED to other clients
                 var players = new List<GFXLobbySessionRow>(server.LobbySessionList.Select(string.Format("LobbyId = '{0}'", currentPlayer.LobbyID)));
 
+                // prepare game data and user list
+                var entries = new Dictionary<string, object>();
+
+                entries["GameData"]     = server.GameDataList[lobby.LobbyID];
+                entries["UserList"]     = players;
+                entries["NextPlayer"]   = nextPlayer;
+
                 foreach (var player in players)
                 {
                     if (player.SessionID == nextPlayer.SessionID)
                     {
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Subject = "GFX_TURN_START",
-                                Message = "",
-                                ResponseCode = GFXResponseType.Normal
+                                Subject         = "GFX_TURN_START",
+                                Message         = JsonConvert.SerializeObject(entries),
+                                ResponseCode    = GFXResponseType.Normal
                             }));
                     }
                     else
                     {
                         server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
-                                Subject = "GFX_TURN_CHANGED",
-                                Message = "",
-                                ResponseCode = GFXResponseType.Normal
+                                Subject         = "GFX_TURN_CHANGED",
+                                Message         = JsonConvert.SerializeObject(entries),
+                                ResponseCode    = GFXResponseType.Normal
                             }));
                     }
                 }

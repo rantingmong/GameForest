@@ -6,309 +6,12 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
-    <div id="fb-root"></div>
-        <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-     <script type="text/javascript">
-
-         var originalUsername = "";
-
-         // Load Facebook SDK asynchronously...
-         (function (d) {
-             var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-             if (d.getElementById(id)) { return; }
-             js = d.createElement('script'); js.id = id; js.async = true;
-             js.src = "//connect.facebook.net/en_US/all.js";
-             ref.parentNode.insertBefore(js, ref);
-         }(document));
-
-         window.fbAsyncInit = function () {
-             FB.init({
-                 appId: '649841695034246', // App ID 
-                 channelUrl: '//localhost:46069/channel.html',
-                 status: true, // check login status
-                 cookie: true, // enable cookies to allow the server to access the session
-                 xfbml: true  // parse XFBML
-             });
-
-             // Initialize when a user has authenticated with FB and this app
-             // Handle events accordingly
-             FB.Event.subscribe('auth.authResponseChange', function (response) {
-
-                 if (response.status === 'connected') {
-                     // user is logged in to FB
-                     // has authorized app
-
-                     console.log('Welcome, fetching information');
-
-                     FB.api('/me', function (response) {
-
-                         var fbid = response.id;
-                         var fbuser = response.username;
-                         var fname = response.first_name;
-                         var lname = response.last_name;
-
-                         var request = $.ajax({
-                             url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                             async: true,
-                             type: "POST"
-                         });
-
-                         request.done(function (msg) {
-                             if (msg.ResponseType != 0) {
-                                 // show error (maybe in an error div?)
-                                 $("#alertDialog").show();
-                                 $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                             }
-                             else {
-                                 // store session ID to local storage
-                                 localStorage.setItem("user-session", msg.AdditionalData);
-                                 console.log("sessionid: " + localStorage.getItem("user-session"));
-                             }
-                         });
-
-                         request.fail(function (nothing, textStatus, something) {
-                             $("#alertDialog").show();
-
-                             $("#alertDialog").css("class", "alert alert-danger");
-                             $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                             $("buttonSignIn").button('reset');
-                         });
-
-                         var userResponse = $.ajax({
-                             url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                             type: "GET",
-                             async: true
-                         });
-
-                         userResponse.success(function (data) {
-                             // set user name to linkProfile
-                             var adata = JSON.parse(data.AdditionalData);
-
-                             $("#fbLogout").show();
-                             $("#linkLogout").hide();
-                             $("#linkProfile").show();
-
-                             $("#linkProfile").html(adata.Username);
-                         });
-                     })
-
-                     document.getElementById('fbLogout').addEventListener('click', function () {
-                         var request = $.ajax({
-                             url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                             async: true,
-                             type: "DELETE"
-                         });
-
-                         request.success(function (data) {
-                             if (data.ResponseType != 0) {
-                                 // hehe, this is imposible...
-                             }
-                             else {
-                                 FB.logout(function () {
-                                     // wipe user
-                                     window.location.reload(true);
-                                 });
-                             }
-                         });
-                     });
-
-                 } else if (response.status === 'not_authorized') {
-                     // user is logged in to FB
-                     // has not authorized app
-
-                     document.getElementById('fb-log-well').style.display = 'block';
-                     document.getElementById('fb-auth-in').style.display = 'none';
-                 } else {
-                     // user is not logged in to FB
-                     // has not authorized app
-
-                     document.getElementById('fb-log-well').style.display = 'block';
-                     document.getElementById('fb-auth-in').style.display = 'none';
-                 }
-             });
-
-
-         }
-
-         $(document).ready(function () {
-             $("#alertDialog").hide();
-
-             // do a heartbeat to confirm user's session is still valid
-             var showLogin = true;
-
-             var response = $.ajax({
-                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                 type: "PUT",
-                 async: false,
-             });
-
-             response.success(function (data) {
-                 if (data.ResponseType != 0) {
-                     showLogin = true;
-                     localStorage.setItem('user-session', null);
-                 }
-                 else {
-                     showLogin = false;
-                 }
-
-                 if (showLogin == false) {
-                     $("#login-well").hide();
-                     $("#userinfo-well").show();
-
-                     // then async get user's information
-
-                     var userResponse = $.ajax({
-                         url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                         type: "GET",
-                         async: false,
-                     });
-
-                     userResponse.success(function (data) {
-                         // set user name to linkProfile
-                         var adata = JSON.parse(data.AdditionalData);
-
-                         $("#linkLogout").show();
-                         $("#linkProfile").show();
-
-                         $("#linkProfile").html(adata.Username);
-
-                         // set profile data here!
-                         $("#profileName").html(adata.Username);
-
-                         $("#firstName").val(adata.FirstName);
-                         $("#lastName").val(adata.LastName);
-                         $("#description").val(adata.Description);
-
-                         originalUsername = adata.Username;
-                     });
-                 }
-                 else {
-                     window.location.href = "index.html";
-                 }
-             });
-
-             response.fail(function (data) {
-                 localStorage.setItem('user-session', null);
-
-                 window.location.href = "index.html";
-             });
-         });
-
-         function onLogout() {
-             var request = $.ajax({
-                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                 async: true,
-                 type: "DELETE"
-             });
-
-             request.success(function (data) {
-                 if (data.ResponseType != 0) {
-                     // hehe, this is imposible...
-                 }
-                 else {
-                     FB.logout(function () {
-                         //wipe user
-                     });
-                     window.location.reload(true);
-                 }
-             });
-         }
-
-         function onChangeUserInfo() {
-             var error = false;
-
-             // get input text's values
-             var fn = $("#firstName").val();
-             var ln = $("#lastName").val();
-             var dx = $("#description").val();
-
-             // verify the user's data
-             if (fn == null) error = true;
-             if (ln == null) error = true;
-
-             if (error) {
-                 // show a dialog...
-                 $("#alertDialog").show();
-                 $("#alertDialog").html("There is an error in some of your entries. Please fix it.");
-             }
-             else {
-                 var oorl = "http://localhost:1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
-
-                 var request = $.ajax({
-                     url: oorl,
-                     type: "PUT",
-                     async: true,
-                 });
-
-                 request.success(function (data) {
-                     if (data.ResponseType == 0) {
-                         // show a dialog...
-                         $("#alertDialog").show();
-                         $("#alertDialog").html("User information updated! Will refresh in a short while...");
-
-                         setTimeout(function () {
-                             window.location.reload(true);
-                         }, 5000);
-                     }
-                     else {
-                         $("#alertDialog").show();
-                         $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + data.AdditionalData);
-                     }
-                 });
-
-                 request.fail(function (cu, art, ero) {
-                     $("#alertDialog").show();
-                     $("#alertDialog").html("Something went wrong. :(");
-                 });
-             }
-
-         }
-
-         function onChangeUserPassword() {
-             var pc = $("#passwordCurrent").val();
-             var p1 = $("#passwordNew1").val();
-             var p2 = $("#passwordNew2").val();
-
-             if (p1 != p2) {
-                 alert("Passwords must match!");
-             }
-
-             var oorl = "http://localhost:1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
-
-             var request = $.ajax({
-                 url: oorl,
-                 type: "PUT",
-                 async: true,
-             });
-
-             request.success(function (data) {
-                 if (data.ResponseType == 0) {
-                     // password change success
-                     $("#alertDialog").show();
-                     $("#alertDialog").html("Password chage successful!");
-
-                     $("#modalPassword").modal("hide");
-                 }
-                 else {
-                     alert("There was a problem in processing your request.")
-                 }
-             });
-
-             request.fail(function (data) {
-                 alert("There was a problem in processing your request.")
-             });
-         }
-
-    </script>
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
-
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -329,22 +32,16 @@
                             <li><a href="news.html">News</a></li>
                             <li><a href="games.html">Games</a></li>
                             <li><a href="dev.html">Developer</a></li>
-                            <li><a href="stats.html">Stats</a></li>
                         </ul>
                     </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="index.html" id="fbLogout" style="display: none">Logout (FB User)</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div class="row">
             <div id="alertDialog" class="alert alert-info"></div>
             <div class="modal fade" id="modalPassword" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
@@ -372,9 +69,9 @@
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary" onclick="onChangeUserPassword();">Save changes</button>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                    </div>
+                </div>
+            </div>
             <div class="col-sm-4">
                 <div class="well">
                     <h1 id="profileName">Profile</h1>
@@ -384,7 +81,6 @@
                 <br>
 
                 <div class="well">
-
                 </div>
             </div>
             <div class="col-sm-8">
@@ -413,11 +109,206 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF FIRST ROW -->
-
     </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
 
-   
+        var originalUsername    = "";
+        var gameForestIp        = gameForestIP;
+
+        $(document).ready(function ()
+        {
+            $("#alertDialog").hide();
+
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  false,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    $("#login-well").hide();
+                    $("#userinfo-well").show();
+
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: false,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+
+                        // set profile data here!
+                        $("#profileName").html(adata.Username);
+
+                        $("#firstName").val(adata.Name);
+                        $("#lastName").val(adata.Name);
+                        $("#description").val(adata.Description);
+
+                        originalUsername = adata.Username;
+                    });
+                }
+                else
+                {
+                    window.location.href = "index.html";
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                window.location.href = "index.html";
+            });
+        });
+
+        function onLogout               ()
+        {
+            var request = $.ajax({
+                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async: true,
+                type: "DELETE"
+            });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    // hehe, this is imposible...
+                }
+                else
+                {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+        function onChangeUserInfo       ()
+        {
+            var error = false;
+
+            // get input text's values
+            var fn = $("#firstName").val();
+            var ln = $("#lastName").val();
+            var dx = $("#description").val();
+
+            // verify the user's data
+            if (fn == null) error = true;
+            if (ln == null) error = true;
+
+            if (error)
+            {
+                // show a dialog...
+                $("#alertDialog").show();
+                $("#alertDialog").html("There is an error in some of your entries. Please fix it.");
+            }
+            else
+            {
+                var oorl = "http://" + gameForestIp + ":1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
+
+                var request = $.ajax({
+                    url:    oorl,
+                    type:   "PUT",
+                    async:  true,
+                });
+
+                request.success(function (data)
+                {
+                    if (data.ResponseType == 0)
+                    {
+                        // show a dialog...
+                        $("#alertDialog").show();
+                        $("#alertDialog").html("User information updated! Will refresh in a short while...");
+
+                        setTimeout(function ()
+                        {
+                            window.location.reload(true);
+                        }, 5000);
+                    }
+                    else
+                    {
+                        $("#alertDialog").show();
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + data.AdditionalData);
+                    }
+                });
+
+                request.fail(function (cu, art, ero)
+                {
+                    $("#alertDialog").show();
+                    $("#alertDialog").html("Something went wrong. :(");
+                });
+            }
+
+        }
+        
+        function onChangeUserPassword   ()
+        {
+            var pc = $("#passwordCurrent").val();
+            var p1 = $("#passwordNew1").val();
+            var p2 = $("#passwordNew2").val();
+
+            if (p1 != p2)
+            {
+                alert("Passwords must match!");
+            }
+
+            var oorl = "http://" + gameForestIp + ":1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
+
+            var request = $.ajax({
+                url:    oorl,
+                type:   "PUT",
+                async:  true,
+            });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    // password change success
+                    $("#alertDialog").show();
+                    $("#alertDialog").html("Password chage successful!");
+
+                    $("#modalPassword").modal("hide");
+                }
+                else
+                {
+                    alert("There was a problem in processing your request.")
+                }
+            });
+
+            request.fail(function (data)
+            {
+                alert("There was a problem in processing your request.")
+            });
+        }
+
+    </script>
 </body>
 </html>

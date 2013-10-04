@@ -6,18 +6,18 @@
 'use strict';
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
-var GameForestVerboseMessaging  = false;
+var GameForestVerboseMessaging              = false;
 
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-var GameForestCloudUrl          = "game-forest.cloudapp.net";
+var GameForestCloudUrl                      = "game-forest.cloudapp.net";
 
-var GFX_STATUS_LOBBY            = 0,
-    GFX_STATUS_CHOOSE           = 1,
-    GFX_STATUS_PLAYING          = 2,
-    GFX_STATUS_FINISHED         = 4;
+var GFX_STATUS_LOBBY                        = 0,
+    GFX_STATUS_CHOOSE                       = 1,
+    GFX_STATUS_PLAYING                      = 2,
+    GFX_STATUS_FINISHED                     = 4;
 
 // Game Forest client API
-var GameForest                  = function (gameId, lobbyId, sessionId)
+var GameForest                              = function (gameId, lobbyId, sessionId)
 {
     // checker to see if gameforest can initialize
     if (!Guid.isGuid(gameId)    ||
@@ -46,7 +46,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     this.connectionId           = "";                       // the unique identifier for the websocket connection
 
-    this.wsConnection           = new WebSocket("ws://localhost:8084");     // websocket object
+    this.wsConnection           = new WebSocket("ws://" + GameForestCloudUrl +":8084");     // websocket object
 
     // ------------------------------------------------------------------------------------------------
 
@@ -94,38 +94,89 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
     var cloudURL                = GameForestCloudUrl,
         cloudPRT                = 1193,
-        wsPromise               = new promise.Promise();    // promise instance for websocket messages
+        wsPromise               = new promise.Promise();        // promise instance for websocket messages
 
     // internal game forest messages
 
-    var GFX_INIT_CONNECTION     = "GFX_INIT_CONNECTION",    // message to initiate connection with a game forest server
-        GFX_STOP_CONNECTION     = "GFX_STOP_CONNECTION",    // message to terminate connection with a game forest server
+    var GFX_INIT_CONNECTION     = "GFX_INIT_CONNECTION",        // message to initiate connection with a game forest server
+        GFX_STOP_CONNECTION     = "GFX_STOP_CONNECTION",        // message to terminate connection with a game forest server
 
     // messages the client will send to the server
 
-        GFX_ASK_DATA            = "GFX_ASK_DATA",           // message to ask for the game's data
-        GFX_ASK_USER_DATA       = "GFX_ASK_USER_DATA",      // message to ask for the user's game data
+        GFX_ASK_DATA            = "GFX_ASK_DATA",               // message to ask for the game's data
+        GFX_ASK_USER_DATA       = "GFX_ASK_USER_DATA",          // message to ask for the user's game data
 
-        GFX_SEND_DATA           = "GFX_SEND_DATA",          // message to send game data
-        GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA",     // message to send user game data
+        GFX_SEND_DATA           = "GFX_SEND_DATA",              // message to send game data
+        GFX_SEND_USER_DATA      = "GFX_SEND_USER_DATA",         // message to send user game data
 
-        GFX_FINISH              = "GFX_GAME_FINISH",        // message to inform the server the game is finished
+        GFX_FINISH              = "GFX_GAME_FINISH",            // message to inform the server the game is finished
 
-        GFX_GAME_START          = "GFX_GAME_START",         // message to inform the server the game should start
-        GFX_GAME_START_CONFIRM  = "GFX_GAME_START_CONFIRM", // message to inform the server the client has acknowledged the GFX_GAME_START message
+        GFX_GAME_START          = "GFX_GAME_START",             // message to inform the server the game should start
+        GFX_GAME_START_CONFIRM  = "GFX_GAME_START_CONFIRM",     // message to inform the server the client has acknowledged the GFX_GAME_START message
 
-        GFX_NEXT_TURN           = "GFX_NEXT_TURN",          // message to inform the server that its the next player's turn
-        GFX_CONFIRM_TURN        = "GFX_CONFIRM_TURN",       // message to change the player's order
+        GFX_NEXT_TURN           = "GFX_NEXT_TURN",              // message to inform the server that its the next player's turn
+        GFX_CONFIRM_TURN        = "GFX_CONFIRM_TURN",           // message to change the player's order
 
     // messages the client will receive from the server
 
-        GFX_START_GAME          = "GFX_START_GAME",         // message to inform the client the game has started
-        GFX_START_CHOICE        = "GFX_START_CHOICE",       // message to inform the client the game should display the order choose screen
-        GFX_GAME_FINISHED       = "GFX_GAME_FINISHED",      // message to inform the client the game has finished
-        GFX_TURN_START          = "GFX_TURN_START",         // message to inform the client its the player's turn
-        GFX_TURN_CHANGED        = "GFX_TURN_CHANGED",       // message to inform the client the player's turn has changed
-        GFX_TURN_RESOLVE        = "GFX_TURN_RESOLVE",       // message to inform the client the player's orders are updated
-        GFX_DATA_CHANGED        = "GFX_DATA_CHANGED";       // message to inform the client the game's data is changed
+        GFX_START_GAME          = "GFX_START_GAME",             // message to inform the client the game has started
+        GFX_START_CHOICE        = "GFX_START_CHOICE",           // message to inform the client the game should display the order choose screen
+        GFX_GAME_FINISHED       = "GFX_GAME_FINISHED",          // message to inform the client the game has finished
+        GFX_TURN_START          = "GFX_TURN_START",             // message to inform the client its the player's turn
+        GFX_TURN_CHANGED        = "GFX_TURN_CHANGED",           // message to inform the client the player's turn has changed
+        GFX_TURN_RESOLVE        = "GFX_TURN_RESOLVE",           // message to inform the client the player's orders are updated
+        GFX_DATA_CHANGED        = "GFX_DATA_CHANGED",           // message to inform the client the game's data is changed
+        
+    // messages for client disconnect and reconnect
+        
+        GFX_PLAYER_DISCONNECTED = "GFX_PLAYER_DISCONNECTED",    // message to inform the client someone was disconnected by the server
+        GFX_PLAYER_RECONNECTED  = "GFX_PLAYER_RECONNECTED",     // message to inform the client someone was reconnected by the server
+
+        GFX_INFORM_RECONNECT    = "GFX_INFORM_RECONNECT";       // message sent by the client to let the server know the client is reconnected
+
+    // ------------------------------------------------------------------------------------------------
+
+    // accessor variables
+
+    var _sCurrentPlayer         = null;
+    var _sPlayerOrderIndex      = null;
+    var _sPlayerInfo            = null;
+    var _sUserList              = null;
+
+    this.currentPlayer          = function ()
+    {
+
+        return _sCurrentPlayer;
+    };
+
+    this.playerOrderIndex       = function () {
+
+        return _sPlayerOrderIndex;
+    };
+
+    this.playerInfo             = function () {
+
+        return _sPlayerInfo;
+    };
+
+    this.userList               = function () {
+
+        return _sUserList;
+    };
+
+    this.nextPlayer             = function (steps)
+    {
+        if (_sUserList == null || _sPlayerOrderIndex == null)
+        {
+            return null;
+        }
+
+        var preStep = parseInt(_sPlayerOrderIndex) + steps - 1;
+        var modStep = preStep % _sUserList.length;
+        var posStep = modStep;
+
+        return _sUserList[posStep];
+    };
 
     // ------------------------------------------------------------------------------------------------
 
@@ -134,131 +185,23 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
     {
         var pGfxObject = this;
 
+        setInterval(function ()
+        {
+            pGfxObject.heartbeat();
+
+        }, 10000);
+
         this.wsConnection.onopen    = function ()
         {
-            if (GameForestVerboseMessaging)
-            {
-                alert("Connection is opened with the server! Expecting the server to give connection ID...");
-            }
+            pGfxObject.wsOnOpen     (pGfxObject);
         };
         this.wsConnection.onclose   = function ()
         {
-            if (GameForestVerboseMessaging)
-            {
-                alert("Connection is closed with the server.");
-            }
+            pGfxObject.wsOnClose    (pGfxObject);
         };
         this.wsConnection.onmessage = function (message)
         {
-            var parse = JSON.parse(message.data);
-
-            console.log(message.data);
-
-            switch (parse.Subject)
-            {
-                case GFX_ASK_DATA:
-                case GFX_ASK_USER_DATA:
-                case GFX_SEND_DATA:
-                case GFX_SEND_USER_DATA:
-                case GFX_NEXT_TURN:
-                case GFX_CONFIRM_TURN:
-                case GFX_GAME_START_CONFIRM:
-
-                    console.log("Reply recevied! " + message.data);
-
-                    if (parse.ResponseCode === 0)
-                    {
-                        wsPromise.done(null, parse.Message);
-                    } else
-                    {
-                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
-                    }
-                    break;
-                case GFX_FINISH:
-
-                    pGfxObject.lobbyStatus = GFX_STATUS_FINISHED;
-
-                    console.log("Game is finished!");
-
-                    if (parse.ResponseCode === 0)
-                    {
-                        wsPromise.done(null, parse.Message);
-                    } else
-                    {
-                        wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
-                    }
-
-                    break;
-                case GFX_INIT_CONNECTION:
-
-                    console.log("Server acknowledges connection! Yay!!");
-
-                    pGfxObject.connectionId = parse.Message;
-                    constructWSRequest(pGfxObject.wsConnection, pGfxObject.connectionId, pGfxObject.sessionId, GFX_INIT_CONNECTION, "");
-                    break;
-                case GFX_GAME_START:
-
-                    console.log("Server sent a start game signal.");
-
-                    GameForest.prototype.onGameStartSignal();
-                    break;
-                case GFX_START_GAME:
-
-                    console.log("Server sent a start game event! Time to really start the game.");
-
-                    clearInterval(updateUserList);
-
-                    $("#gameForestLobbyWindow").hide();
-                    $("#gameForestGameWindow").show();
-
-                    pGfxObject.lobbyStatus = GFX_STATUS_PLAYING;
-
-                    GameForest.prototype.onGameStart();
-                    break;
-                case GFX_START_CHOICE:
-
-                    console.log("Server is asking the players to choose! Show the choose screen.");
-
-                    $("#gameForestLobbyWindow").hide();
-                    $("#gameForestGameWindow").show();
-
-                    pGfxObject.lobbyStatus = GFX_STATUS_CHOOSE;
-
-                    GameForest.prototype.onGameChoose();
-                    break;
-                case GFX_GAME_FINISHED:
-
-                    console.log("Server is informing players that the game is finished!");
-
-                    GameForest.prototype.onGameFinish(parse.Message);
-                    break;
-                case GFX_TURN_START:
-
-                    console.log("Server is saying my turn has started.");
-
-                    GameForest.prototype.onTurnStart();
-                    break;
-                case GFX_TURN_CHANGED:
-
-                    console.log("Server is informing other players the game's turn have changed.");
-
-                    GameForest.prototype.onTurnChange();
-                    break;
-                case GFX_TURN_RESOLVE:
-
-                    console.log("Server is asking the player to choose his/her order.");
-
-                    GameForest.prototype.onTurnSelect(parse.Message);
-                    break;
-                case GFX_DATA_CHANGED:
-
-                    console.log("Server is informing players the game's data has changed.");
-
-                    var packagedData = JSON.parse(parse.Message);
-
-                    GameForest.prototype.onUpdateData(packagedData.Key, JSON.parse(packagedData.Data));
-                    break;
-            }
+            pGfxObject.wsOnMessage  (pGfxObject, message);
         };
     };
     // function to stop the game forest client
@@ -283,25 +226,233 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         return p;
     };
 
+    // websocket messages -----------------------------------------------------------------------------
+
+    this.wsOnOpen               = function (gfxObject)
+    {
+        if (GameForestVerboseMessaging)
+        {
+            alert("Connection is opened with the server! Expecting the server to give connection ID...");
+        }
+    };
+
+    this.wsOnClose              = function (gfxObject)
+    {
+        if (GameForestVerboseMessaging)
+        {
+            alert("Connection is closed with the server.");
+        }
+
+        // if the user is playing and this suddenly went up. we know the user is disconnected from the internet.
+        if (gfxObject.lobbyStatus == GFX_STATUS_PLAYING)
+        {
+            // call
+            GameForest.prototype.onGameDisconnected();
+        }
+    };
+
+    this.wsOnMessage            = function (gfxObject, message)
+    {
+        var parse = JSON.parse(message.data);
+
+        console.log(message.data);
+
+        switch (parse.Subject)
+        {
+            case GFX_PLAYER_DISCONNECTED:
+
+                GameForest.prototype.onPlayerDisconnected(JSON.parse(parse.Message));
+                break;
+            case GFX_PLAYER_RECONNECTED:
+
+                GameForest.prototype.onPlayerReconnected();
+                break;
+            case GFX_ASK_DATA:
+            case GFX_ASK_USER_DATA:
+            case GFX_SEND_DATA:
+            case GFX_SEND_USER_DATA:
+            case GFX_NEXT_TURN:
+            case GFX_CONFIRM_TURN:
+            case GFX_GAME_START_CONFIRM:
+
+                console.log("Reply recevied! " + message.data);
+
+                if (parse.ResponseCode === 0)
+                {
+                    wsPromise.done(null, parse.Message);
+                } else
+                {
+                    wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
+                }
+                break;
+            case GFX_FINISH:
+
+                this.lobbyStatus = GFX_STATUS_FINISHED;
+
+                console.log("Game is finished!");
+
+                if (parse.ResponseCode === 0)
+                {
+                    wsPromise.done(null, parse.Message);
+                } else
+                {
+                    wsPromise.done(parse.ResponseCode + ":" + parse.Message, null);
+                }
+
+                break;
+            case GFX_INIT_CONNECTION:
+
+                console.log("Server acknowledges connection, yay!!");
+
+                gfxObject.connectionId = parse.Message;
+                constructWSRequest(gfxObject.wsConnection, gfxObject.connectionId, gfxObject.sessionId, GFX_INIT_CONNECTION, "");
+                break;
+            case GFX_STOP_CONNECTION:
+
+                gfxObject.wsConnection.close();
+
+                break;
+            case GFX_GAME_START:
+
+                console.log("Server sent a start game signal.");
+
+                GameForest.prototype.onGameStartSignal();
+                break;
+            case GFX_START_GAME:
+
+                console.log("Server sent a start game event! Time to really start the game.");
+
+                $("#gameForestLobbyWindow").hide();
+                $("#gameForestGameWindow").show();
+
+                gfxObject.lobbyStatus = GFX_STATUS_PLAYING;
+
+                gfxObject.getUserList()
+                    .then(function (error, result) {
+
+                        _sUserList = result;
+
+                        return gfxObject.getUserInfo();
+                    })
+                    .then(function (error, result) {
+
+                        _sPlayerInfo = result;
+
+                        GameForest.prototype.onGameStart();
+                    });
+
+                break;
+            case GFX_START_CHOICE:
+
+                console.log("Server is asking the players to choose! Show the choose screen.");
+
+                $("#gameForestLobbyWindow").hide();
+                $("#gameForestGameWindow").show();
+
+                gfxObject.lobbyStatus = GFX_STATUS_CHOOSE;
+
+                GameForest.prototype.onGameChoose();
+                break;
+            case GFX_GAME_FINISHED:
+
+                console.log("Server is informing players that the game is finished!");
+
+                GameForest.prototype.onGameFinish(parse.Message);
+                break;
+            case GFX_TURN_START:
+
+                console.log("Server is saying my turn has started.");
+
+                gfxObject.getCurrentPlayer().then(function (error, result)
+                {
+                    _sCurrentPlayer = result;
+                    GameForest.prototype.onTurnStart();
+                });
+                break;
+            case GFX_TURN_CHANGED:
+
+                console.log("Server is informing other players the game's turn have changed.");
+
+                gfxObject.getCurrentPlayer().then(function (error, result)
+                {
+                    _sCurrentPlayer = result;
+                    GameForest.prototype.onTurnChange();
+                });
+                break;
+            case GFX_TURN_RESOLVE:
+
+                console.log("Server is asking the player to choose his/her order.");
+
+                GameForest.prototype.onTurnSelect(parse.Message);
+                break;
+            case GFX_DATA_CHANGED:
+
+                console.log("Server is informing players the game's data has changed.");
+
+                var packagedData = JSON.parse(parse.Message);
+
+                GameForest.prototype.onUpdateData(packagedData.Key, JSON.parse(packagedData.Data));
+                break;
+        }
+    };
+
     // ------------------------------------------------------------------------------------------------
 
     // function to inform the server its the next player's turn
-    this.nextTurn               = function ()
+    this.nextTurn               = function (gameData)
     {
-        wsPromise = new promise.Promise();
+        if (typeof gameData != undefined || gameData != null)
+        {
+            var closureObject = this;
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_NEXT_TURN, "");
+            this.sendGameData("default", gameData).then(function (error, result)
+            {
+                constructWSRequest(
+                    closureObject.wsConnection,
+                    closureObject.connectionId,
+                    closureObject.sessionId,
+                    GFX_NEXT_TURN,
+                    "");
+            });
+        }
+        else
+        {
+            wsPromise = new promise.Promise();
 
-        return wsPromise;
+            constructWSRequest(
+                this.wsConnection,
+                this.connectionId,
+                this.sessionId,
+                GFX_NEXT_TURN,
+                "");
+
+            return wsPromise;
+        }
     };
+
     // function to inform the server the player wants its turn to change order
-    this.confirmTurn            = function (changedTurn)
+    this.confirmTurn            = function (changedTurn, gameData)
     {
-        wsPromise = new promise.Promise();
+        if (typeof gameData != undefined && gameData != null)
+        {
+            var closure = this;
 
-        constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_CONFIRM_TURN, changedTurn);
+            this.sendGameData("choose", gameData).then(function (error, result)
+            {
+                _sPlayerOrderIndex = changedTurn;
 
-        return wsPromise;
+                constructWSRequest(closure.wsConnection, closure.connectionId, closure.sessionId, GFX_CONFIRM_TURN, changedTurn);
+            });
+        }
+        else
+        {
+            wsPromise           = new promise.Promise();
+            _sPlayerOrderIndex  = changedTurn;
+
+            constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_CONFIRM_TURN, changedTurn);
+
+            return wsPromise;
+        }
     };
     
     // function to get the lobby's current state (lobby, choose, playing)
@@ -337,6 +488,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return p;
     };
+
     // function to get the next player "steps" from the player calling this function
     this.getNextPlayer          = function (steps)
     {
@@ -388,6 +540,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return p;
     };
+
     // function to get the user's information
     this.getUserInfo            = function (username)
     {
@@ -437,6 +590,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         
         return p;
     };
+
     // function to get the lobby's user list
     this.getUserList            = function ()
     {
@@ -462,6 +616,7 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return p;
     };
+
     // function to get the game's information
     this.getGameInfo            = function ()
     {
@@ -541,6 +696,23 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
         return wsPromise;
     };
 
+    // function to inform the server the user is active
+    this.heartbeat              = function () {
+        sendRequest("/user/login?usersessionid=" + this.sessionId, "PUT",
+            function(result) {
+
+            },
+            function (status, why)
+            {
+                // if the user is playing and this suddenly went up. we know the user is disconnected from the internet.
+                if (this.lobbyStatus == GFX_STATUS_PLAYING)
+                {
+                    // call
+                    GameForest.prototype.onGameDisconnected();
+                }
+            });
+    };
+
     this.startGame              = function ()
     {
         wsPromise = new promise.Promise();
@@ -557,55 +729,141 @@ var GameForest                  = function (gameId, lobbyId, sessionId)
 
         return wsPromise;
     };
+
+    // function to inform the server the client is now back online and ready to reconnect
+    this.askForReconnection     = function ()
+    {
+        var pGfxObject = this;
+
+        // send a AJAX request first
+        sendRequest("/user/reconnect?" + this.sessionId + "&" + this.lobbyId, "POST",
+            function (result)
+            {
+                // if request is successful, we remake the websocket and ask the server for an updated game data via a message
+                pGfxObject.wsConnection = new WebSocket("ws://" + GameForestCloudUrl + ":8084");
+
+                pGfxObject.wsConnection.onopen      = pGfxObject.wsOnOpen;
+                pGfxObject.wsConnection.onclose     = pGfxObject.wsOnClose;
+                pGfxObject.wsConnection.onmessage   = pGfxObject.wsOnMessage;
+
+                constructWSRequest(pGfxObject.wsConnection, pGfxObject.connectionId, GFX_INFORM_RECONNECT, 
+                    {
+                        "SessionId" : pGfxObject.sessionId,
+                        "LobbyId"   : pGfxObject.lobbyId,
+                        "UserId"    : _sUserList.UserId
+                    });
+            },
+            function (status, why)
+            {
+                // if request is not successful, we just ignore it and wait for the client to call the server again
+            });
+    };
 };
 
-GameForest.prototype.onGameStartSignal  = function ()
+// override these methods in your game
+
+// REQUIRED METHODS --------------------------------------------------------------------
+
+// method to override when the game has started
+GameForest.prototype.onGameStart            = function ()
+{
+
+};
+
+// method to override when its the player's turn
+GameForest.prototype.onTurnStart            = function ()
+{
+
+};
+
+// method to override when its the other player's turn
+GameForest.prototype.onTurnChange           = function ()
+{
+
+};
+
+// method to override when the game's data has changed
+GameForest.prototype.onUpdateData           = function (key, data)
+{
+
+};
+
+// method to override when the game is finished
+GameForest.prototype.onGameFinish           = function (tallyList)
+{
+
+};
+
+// OPTIONAL ADVANCED METHODS -----------------------------------------------------------
+
+// method called when the player clicked the start button
+GameForest.prototype.onGameStartSignal      = function ()
 {
     console.log("Game start signal invoked!");
 
     $("#gfxButtonStart").removeAttr("disabled");
 };
 
-// override these methods in your game
-
-// method to override when the game has started
-GameForest.prototype.onGameStart        = function ()
-{
-
-};
-
 // method to override when the game should display the choose screen
-GameForest.prototype.onGameChoose       = function ()
-{
-
-};
-
-// method to override when its the player's turn
-GameForest.prototype.onTurnStart        = function ()
-{
-
-};
-
-// method to override when its the other player's turn
-GameForest.prototype.onTurnChange       = function ()
+GameForest.prototype.onGameChoose           = function ()
 {
 
 };
 
 // method to override when its the player's time to change his/her order
-GameForest.prototype.onTurnSelect       = function (originalTurn)
+GameForest.prototype.onTurnSelect           = function (originalTurn)
 {
-
+    gf.confirmTurn(originalTurn);
 };
 
-// method to override when the game's data has changed
-GameForest.prototype.onUpdateData       = function (key, data)
+// method to override when a player (not this player) is disconnected
+GameForest.prototype.onPlayerDisconnected   = function (who)
 {
+    $("#gameForestClientDisconnected").show();
+    $("#gameForestPlayerDisconnected").hide();
 
+    $("#gameForestDisconnectedPlayer").html(who.Name + " was disconnected from the game.");
+
+    $("#gameForestDisconnectWindow").fadeIn("fast");
+
+    var countdownTimer = 30;
+
+    setInterval(function ()
+    {
+        $("#gameForestCountdownWait").html(countdownTimer);
+
+        countdownTimer -= 1;
+
+        if (countdownTimer <= 0)
+        {
+
+        }
+    }, 1000);
 };
 
-// method to override when the game is finished
-GameForest.prototype.onGameFinish       = function (tallyList)
+// method to override when a player is reconnected
+GameForest.prototype.onPlayerReconnected    = function ()
 {
+    $("#gameForestDisconnectWindow").fadeOut("fast");
+};
 
+// method to override when this player is disconnected
+GameForest.prototype.onGameDisconnected     = function ()
+{
+    $("#gameForestClientDisconnected").hide();
+    $("#gameForestPlayerDisconnected").show();
+
+    $("#gameForestDisconnectWindow").fadeIn("fast");
+
+    var countdownTimer = 30;
+
+    setInterval(function()
+    {
+        $("#gameForestCountdownKill").html(countdownTimer);
+
+        countdownTimer -= 1;
+
+        gf.askForReconnection();
+
+    }, 1000);
 };

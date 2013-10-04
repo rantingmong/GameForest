@@ -7,8 +7,6 @@ namespace GameForestCore.Database
 {
     public struct GFXLobbySessionRow
     {
-        public int  RowId           { get; set; }
-
         public Guid LobbyID         { get; set; }
 
         public Guid SessionID       { get; set; }
@@ -34,12 +32,12 @@ namespace GameForestCore.Database
 
         public IEnumerable<string>  TableColumns
         {
-            get { return new[] { "LobbyId", "SessionId", "IsOwner", "PlayerOrder", "PlayerOrderOriginal", "Status", "RowId" }; }
+            get { return new[] { "LobbyId", "SessionId", "IsOwner", "PlayerOrder", "PlayerOrderOriginal", "Status" }; }
         }
 
         public IEnumerable<string>  ToStringValues  (GFXLobbySessionRow data)
         {
-            var returnData = new string[7];
+            var returnData = new string[6];
 
             returnData[0] = GFXDatabaseCore.ToSQLString(data.LobbyID.ToString());
             returnData[1] = GFXDatabaseCore.ToSQLString(data.SessionID.ToString());
@@ -47,7 +45,6 @@ namespace GameForestCore.Database
             returnData[3] = Convert.ToString(data.Order);
             returnData[4] = Convert.ToString(data.OrderOriginal);
             returnData[5] = Convert.ToString(data.Status);
-            returnData[6] = Convert.ToString(data.RowId);
 
             return returnData;
         }
@@ -61,8 +58,7 @@ namespace GameForestCore.Database
                 Owner           = reader.GetBoolean("IsOwner"),
                 Order           = reader.GetInt32("PlayerOrder"),
                 OrderOriginal   = reader.GetInt32("PlayerOrderOriginal"),
-                Status          = reader.GetInt32("Status"),
-                RowId           = reader.GetInt32("RowId")
+                Status          = reader.GetInt32("Status")
             };
         }
     }

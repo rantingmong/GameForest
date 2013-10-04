@@ -1,314 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GameForest | News</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameForest | News</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
-  <link href="css/style.css" rel="stylesheet">
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-        <div id="fb-root"></div>
-        <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-     <script type="text/javascript">
+    <div class="container">
+        <br>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">GameForest</a>
+            </div>
 
-         var originalUsername = "";
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="news.html">News</a></li>
+                            <li><a href="games.html">Games</a></li>
+                            <li><a href="dev.html">Developer</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
-         // Load Facebook SDK asynchronously...
-         (function (d) {
-             var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-             if (d.getElementById(id)) { return; }
-             js = d.createElement('script'); js.id = id; js.async = true;
-             js.src = "//connect.facebook.net/en_US/all.js";
-             ref.parentNode.insertBefore(js, ref);
-         }(document));
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="profile.html">Profile</a></li>
+                    <li><a href="index.html">Login</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col-sm-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="news.html">News</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-10">
+                <div class="well">
+                    <div class="media">
+                        <a class="pull-left" href="#">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="N1">
+                        </a>
+                        <div class="media-body">
+                            <h4 class="media-heading">News 1</h4>
+                            <p>Lorem ipsum dolor.</p>
+                        </div>
+                    </div>
 
-         window.fbAsyncInit = function () {
-             FB.init({
-                 appId: '649841695034246', // App ID 
-                 channelUrl: '//localhost:46069/channel.html',
-                 status: true, // check login status
-                 cookie: true, // enable cookies to allow the server to access the session
-                 xfbml: true  // parse XFBML
-             });
+                    <div class="media">
+                        <a class="pull-left" href="#">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="N2">
+                        </a>
+                        <div class="media-body">
+                            <h4 class="media-heading">News 2</h4>
+                            <p>Lorem ipsum dolor.</p>
+                        </div>
+                    </div>
 
-             // Initialize when a user has authenticated with FB and this app
-             // Handle events accordingly
-             FB.Event.subscribe('auth.authResponseChange', function (response) {
-
-                 if (response.status === 'connected') {
-                     // user is logged in to FB
-                     // has authorized app
-
-                     console.log('Welcome, fetching information');
-
-                     FB.api('/me', function (response) {
-
-                         var fbid = response.id;
-                         var fbuser = response.username;
-                         var fname = response.first_name;
-                         var lname = response.last_name;
-
-                         var request = $.ajax({
-                             url: "http://localhost:1193/service/user/fbconnect?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                             async: true,
-                             type: "POST"
-                         });
-
-                         request.done(function (msg) {
-                             if (msg.ResponseType != 0) {
-                                 // show error (maybe in an error div?)
-                                 $("#alertDialog").show();
-                                 $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                             }
-                             else {
-                                 // store session ID to local storage
-                                 localStorage.setItem("user-session", msg.AdditionalData);
-                                 console.log("sessionid: " + localStorage.getItem("user-session"));
-                             }
-                         });
-
-                         request.fail(function (nothing, textStatus, something) {
-                             $("#alertDialog").show();
-
-                             $("#alertDialog").css("class", "alert alert-danger");
-                             $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                             $("buttonSignIn").button('reset');
-                         });
-
-                         var userResponse = $.ajax({
-                             url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                             type: "GET",
-                             async: true
-                         });
-
-                         userResponse.success(function (data) {
-                             // set user name to linkProfile
-                             var adata = JSON.parse(data.AdditionalData);
-
-                             $("#fbLogout").show();
-                             $("#linkLogout").hide();
-                             $("#linkProfile").show();
-
-                             $("#linkProfile").html(adata.Username);
-                         });
-                     })
-
-                     document.getElementById('fbLogout').addEventListener('click', function () {
-                         var request = $.ajax({
-                             url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                             async: true,
-                             type: "DELETE"
-                         });
-
-                         request.success(function (data) {
-                             if (data.ResponseType != 0) {
-                                 // hehe, this is imposible...
-                             }
-                             else {
-                                 FB.logout(function () {
-                                     // wipe user
-                                     window.location.reload(true);
-                                 });
-                             }
-                         });
-                     });
-
-                 } else if (response.status === 'not_authorized') {
-                     // user is logged in to FB
-                     // has not authorized app
-
-                     document.getElementById('fb-log-well').style.display = 'block';
-                     document.getElementById('fb-auth-in').style.display = 'none';
-                 } else {
-                     // user is not logged in to FB
-                     // has not authorized app
-
-                     document.getElementById('fb-log-well').style.display = 'block';
-                     document.getElementById('fb-auth-in').style.display = 'none';
-                 }
-             });
-
-
-         }
-
-         $(document).ready(function () {
-             $("#alertDialog").hide();
-
-             // do a heartbeat to confirm user's session is still valid
-             var showLogin = true;
-
-             var response = $.ajax({
-                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                 type: "PUT",
-                 async: false,
-             });
-
-             response.success(function (data) {
-                 if (data.ResponseType != 0) {
-                     showLogin = true;
-                     localStorage.setItem('user-session', null);
-                 }
-                 else {
-                     showLogin = false;
-                 }
-
-                 if (showLogin == false) {
-                     $("#login-well").hide();
-                     $("#userinfo-well").show();
-
-                     // then async get user's information
-
-                     var userResponse = $.ajax({
-                         url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
-                         type: "GET",
-                         async: false,
-                     });
-
-                     userResponse.success(function (data) {
-                         // set user name to linkProfile
-                         var adata = JSON.parse(data.AdditionalData);
-
-                         $("#linkLogout").show();
-                         $("#linkProfile").show();
-
-                         $("#linkProfile").html(adata.Username);
-
-                         // set profile data here!
-                         $("#profileName").html(adata.Username);
-
-                         $("#firstName").val(adata.FirstName);
-                         $("#lastName").val(adata.LastName);
-                         $("#description").val(adata.Description);
-
-                         originalUsername = adata.Username;
-                     });
-                 }
-                 else {
-                     window.location.href = "index.html";
-                 }
-             });
-
-             response.fail(function (data) {
-                 localStorage.setItem('user-session', null);
-
-                 window.location.href = "index.html";
-             });
-         });
-
-         function onLogout() {
-             var request = $.ajax({
-                 url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                 async: true,
-                 type: "DELETE"
-             });
-
-             request.success(function (data) {
-                 if (data.ResponseType != 0) {
-                     // hehe, this is imposible...
-                 }
-                 else {
-                     FB.logout(function () {
-                         //wipe user
-                     });
-                     window.location.reload(true);
-                 }
-             });
-         }
-</script>
-  <div class="container">
-    <br>
-
-    <!-- NAVBAR -->
-
-    <nav class="navbar navbar-default" role="navigation">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">GameForest</a>
-      </div>
-
-      <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="index.html">Home</a></li>
-          <li class="dropdown">
-            <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="news.html">News</a></li>
-              <li><a href="games.html">Games</a></li>
-              <li><a href="dev.html">Developer</a></li>
-              <li><a href="stats.html">Stats</a></li>
-            </ul>
-          </li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="profile.html">Profile</a></li>
-          <li><a href="index.html">Login</a></li>
-        </ul>
-      </div>
-    </nav>
-
-    <!-- END OF NAVBAR -->
-
-    <!-- FIRST ROW -->
-    
-    <div class="row">
-      <div class="col-sm-2">
-        <ul class="nav nav-pills nav-stacked">
-         <li class="active"><a href="news.html">News</a></li>
-         <li><a href="games.html">Games</a></li>
-         <li><a href="dev.html">Developer</a></li>
-         <li><a href="stats.html">Stats</a></li>
-       </ul>
-     </div>
-     <div class="col-sm-10">
-      <div class="well">
-        <div class="media">
-          <a class="pull-left" href="#">
-            <img class="media-object" src="http://placehold.it/64x64" alt="N1">
-          </a>
-          <div class="media-body">
-            <h4 class="media-heading">News 1</h4>
-            <p>Lorem ipsum dolor.</p>
-          </div>
+                    <div class="media">
+                        <a class="pull-left" href="#">
+                            <img class="media-object" src="http://placehold.it/64x64" alt="N3">
+                        </a>
+                        <div class="media-body">
+                            <h4 class="media-heading">News 3</h4>
+                            <p>Lorem ipsum dolor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="media">
-          <a class="pull-left" href="#">
-            <img class="media-object" src="http://placehold.it/64x64" alt="N2">
-          </a>
-          <div class="media-body">
-            <h4 class="media-heading">News 2</h4>
-            <p>Lorem ipsum dolor.</p>
-          </div>
-        </div>
-
-        <div class="media">
-          <a class="pull-left" href="#">
-            <img class="media-object" src="http://placehold.it/64x64" alt="N3">
-          </a>
-          <div class="media-body">
-            <h4 class="media-heading">News 3</h4>
-            <p>Lorem ipsum dolor.</p>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-
-  <!-- END OF FIRST ROW -->
-
-  <!-- SECOND ROW -->
-
-  <!-- END OF SECOND ROW -->
-
-</div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>

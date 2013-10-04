@@ -6,12 +6,12 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -32,7 +32,6 @@
                             <li><a href="news.html">News</a></li>
                             <li><a href="games.html">Games</a></li>
                             <li><a href="dev.html">Developer</a></li>
-                            <li><a href="stats.html">Stats</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -43,18 +42,12 @@
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-        <!-- FIRST ROW -->
-
         <div class="row">
-
             <div id="alertDialog" class="alert alert-danger"></div>
             <div class="col-sm-8 col-sm-offset-2">
                 <div class="page-header">
                     <h1>Register User</h1>
                 </div>
-
                 <div class="jumbotron">
                     <div class="form-group">
                         <label for="username">Username</label>
@@ -72,13 +65,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- END OF FIRST ROW -->
-
     </div>
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
+
+        var gameForestIp = gameForestIP;
 
         $(document).ready(function()
         {
@@ -115,7 +107,7 @@
             else
             {
                 var request = $.ajax({
-                    url: "http://localhost:1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
+                    url: "http://" + gameForestIp + ":1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
                     async: true,
                     type: "POST"
                 });

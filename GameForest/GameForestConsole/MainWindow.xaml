@@ -1,7 +1,7 @@
 ﻿<Window x:Class="GameForestConsole.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Game Forest console" Height="480" Width="800" WindowStartupLocation="CenterScreen" MinWidth="800" MinHeight="480" Closing="Window_Closing">
+        Title="Game Forest console" Height="480" Width="800" WindowStartupLocation="CenterScreen" MinWidth="800" MinHeight="480" Closing="Window_Closing" WindowState="Maximized">
     <Grid>
     	<Grid.ColumnDefinitions>
     		<ColumnDefinition Width="250"/>
@@ -35,9 +35,11 @@
     			<Grid.ColumnDefinitions>
     				<ColumnDefinition/>
     				<ColumnDefinition/>
+    				<ColumnDefinition/>
     			</Grid.ColumnDefinitions>
     			<Button x:Name="buttonStart" Content="Start" Margin="5" Click="buttonStart_Click"/>
     			<Button x:Name="buttonStop" Content="Stop" Grid.Column="1" Margin="5" Click="buttonStop_Click" IsEnabled="False"/>
+    			<Button x:Name="buttonSettings" Content="Settings" Grid.Column="2" Margin="5"/>
     		</Grid>
     	</Grid>
     	<Grid Grid.Column="1" Margin="0,-1,0,1">

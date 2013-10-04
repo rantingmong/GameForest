@@ -38,13 +38,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\ICSharpCode.SharpZipLib.dll.0.85.4.369\lib\net20\ICSharpCode.SharpZipLib.dll</HintPath>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System" />
@@ -62,12 +61,12 @@
     <Content Include="facebooktest.html" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="games.html" />
-    <Content Include="channel.html" />
+    <Content Include="game\ede1a25f-b1d3-4753-974b-5ee34f8d5db1\Tic tac toe\GameForestTracker.js" />
     <Content Include="index.html" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\gameforestip.js" />
     <Content Include="js\jquery.js" />
-    <Content Include="main.html" />
     <Content Include="news.html" />
     <Content Include="profile.html" />
     <Content Include="register.html" />
@@ -87,6 +86,9 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

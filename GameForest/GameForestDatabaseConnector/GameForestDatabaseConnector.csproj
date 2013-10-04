@@ -53,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GFXStatRow.cs" />
     <Compile Include="GFXChatRow.cs" />
     <Compile Include="GFXChatroomRow.cs" />
     <Compile Include="GFXDatabaseCore.cs" />
@@ -65,6 +64,7 @@
     <Compile Include="GFXLobbyRow.cs" />
     <Compile Include="GFXLobbySessionRow.cs" />
     <Compile Include="GFXLoginRow.cs" />
+    <Compile Include="GFXStatRow.cs" />
     <Compile Include="GFXUserRow.cs" />
     <Compile Include="Logger\GFXLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

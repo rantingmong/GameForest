@@ -29,7 +29,7 @@ namespace GameForestCoreWebSocket.Messages
                 GFXLobbySessionRow currentPlayer = lobbySessions[0];
                 currentPlayer.Status = 1;
 
-                server.LobbySessionList.Update(string.Format("RowId = '{0}'", currentPlayer.RowId), currentPlayer);
+                server.LobbySessionList.Update(string.Format("SessionId = '{0}'", currentPlayer.SessionID), currentPlayer);
 
                 // send message to other connected players
                 bool gameReallyStart = true;

@@ -53,7 +53,7 @@ namespace GameForestCore.Database
                 SessionId       = Guid.Parse(reader.GetString(0)),
                 UserId          = Guid.Parse(reader.GetString(1)),
                 LastHeartbeat   = DateTime.FromFileTime(reader.GetInt64(2)),
-                UserStatus      = (GFXLoginStatus)reader.GetInt32(3),
+                UserStatus      = (GFXLoginStatus)reader.GetInt32(3)
             };
         }
     }

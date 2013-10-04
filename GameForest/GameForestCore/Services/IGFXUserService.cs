@@ -33,8 +33,5 @@ namespace GameForestCore.Services
 
         [OperationContract, WebInvoke(UriTemplate = "/register?username={username}&password={password}", ResponseFormat = WebMessageFormat.Json, Method = "DELETE")]
         GFXRestResponse Unregister(string username, string password);
-
-        [OperationContract, WebInvoke(UriTemplate = "/fbconnect?fbid={fbid}&username={email}&firstname={fname}&lastname={lname}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse FBConnect(string fbid, string email, string fname, string lname);
     }
 }

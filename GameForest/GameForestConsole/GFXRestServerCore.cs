@@ -65,9 +65,9 @@ namespace GameForestConsole
             gEndpoint.Behaviors.Add(new WebHttpBehavior());
             lEndpoint.Behaviors.Add(new WebHttpBehavior());
 
-            uEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
-            gEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
-            lEndpoint.Behaviors.Add(new EnableCrossOriginResourceSharingBehavior());
+            uEndpoint.Behaviors.Add(new BehaviorAttribute());
+            gEndpoint.Behaviors.Add(new BehaviorAttribute());
+            lEndpoint.Behaviors.Add(new BehaviorAttribute());
 
             serviceHostUser.Description.Behaviors.Add(behavior);
             serviceHostGame.Description.Behaviors.Add(behavior);

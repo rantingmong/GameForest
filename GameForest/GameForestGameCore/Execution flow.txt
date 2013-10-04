@@ -29,6 +29,7 @@ When the "player" sends the message GFX_NEXT_TURN to the server:
 - the server locks the last player from uploading data (uploading data should be before sending GFX_NEXT_TURN
   which should be automatically handled by the SDK's API.)
 - the server grants the next player access to modifying the data of the game.
+- the server gets data relevant for the next player to get (game data, user list, etc.)
 
 This will be the flow of the game until someone sends a GFX_GAME_FINISH to the server.
 

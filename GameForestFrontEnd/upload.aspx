@@ -65,14 +65,6 @@
                 </div>
                 <form runat="server">
                     <div class="form-group">
-                        <label for="inputUserId">User ID (don't change this):</label>
-                        <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputSessionId">Session ID (don't change this):</label>
-                        <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group">
                         <label for="inputGameName">Game name:</label>
                         <asp:TextBox ID="inputGameName" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
@@ -87,6 +79,14 @@
                     <div class="form-group">
                         <label for="inputDescription">Description of the game:</label>
                         <asp:TextBox ID="inputDescription" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputUserId">User ID:</label>
+                        <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputSessionId">Session ID:</label>
+                        <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
                     <asp:FileUpload ID="FileUpload" runat="server" />
                     <br />

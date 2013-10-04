@@ -24,7 +24,7 @@ namespace GameForestConsole
         {
             wsThread = new Thread(new ThreadStart(() =>
                 {
-                    serverCore = new GFXServerCore();
+                    serverCore = new GFXServerCore("game-forest.cloudapp.net");
 
                     while (isRunning)
                     {

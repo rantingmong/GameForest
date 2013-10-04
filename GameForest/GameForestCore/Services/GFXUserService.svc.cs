@@ -5,17 +5,16 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
-using System.ServiceModel.Activation;
 
 namespace GameForestCore.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GFXUserService : IGFXUserService
     {
-        private readonly GFXDatabaseTable<GFXUserRow> userTable;
-        private readonly GFXDatabaseTable<GFXLoginRow> loginTable;
+        private readonly GFXDatabaseTable<GFXUserRow>       userTable;
+        private readonly GFXDatabaseTable<GFXLoginRow>      loginTable;
 
-        public GFXUserService()
+        public                      GFXUserService          ()
         {
             userTable = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             loginTable = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
@@ -23,30 +22,26 @@ namespace GameForestCore.Services
 
         // ----------------------------------------------------------------------------------------------------------------
 
-        public GFXRestResponse GetUserInfo(string username)
+        public  GFXRestResponse     GetUserInfo             (string username)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username or user id cannot be found.");
 
             try
             {
-                Guid userId;
-                string returnJSON;
+                Guid    userId      = Guid.Empty;
+                var     results     = new List<GFXUserRow>();
 
                 if (Guid.TryParse(username, out userId))
                 {
-                    var result = new List<GFXUserRow>(userTable.Select(string.Format("userid = '{0}'", userId)));
-
-                    returnJSON = JsonConvert.SerializeObject(result[0]);
+                    results.AddRange(userTable.Select(string.Format("userid = '{0}'", userId)));
                 }
                 else
                 {
-                    var result = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", username)));
-
-                    returnJSON = JsonConvert.SerializeObject(result[0]);
+                    results.AddRange(userTable.Select(string.Format("username = '{0}'", username)));
                 }
-
-                return constructResponse(GFXResponseType.Normal, returnJSON);
+                
+                return constructResponse(GFXResponseType.Normal, userInfoToJson(results[0]));
             }
             catch (Exception exp)
             {
@@ -56,21 +51,17 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse GetUserInfoFromSession(string usersessionid)
+        public  GFXRestResponse     GetUserInfoFromSession  (string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "Session cannot be found.");
 
             try
             {// get user id from session id
-                var users = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
+                var session = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)));
+                var results = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", session[0].UserId)));
 
-                if (users.Count <= 0)
-                    return constructResponse(GFXResponseType.NotFound, "There are no users with that session id.");
-
-                var userInfos = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", users[0].UserId)));
-
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(userInfos[0]));
+                return constructResponse(GFXResponseType.Normal, userInfoToJson(results[0]));
             }
             catch (Exception exp)
             {
@@ -80,7 +71,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse SetUserInfo(string username, string firstname, string lastname, string description, string usersessionid)
+        public  GFXRestResponse     SetUserInfo             (string username, string firstname, string lastname, string description, string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User not logged in.");
@@ -125,7 +116,7 @@ namespace GameForestCore.Services
             return constructResponse(GFXResponseType.Normal, "Success!");
         }
 
-        public GFXRestResponse Register(string username, string password)
+        public  GFXRestResponse     Register                (string username, string password)
         {
             if (userExists(username))
                 return constructResponse(GFXResponseType.DuplicateEntry, "Username already exists!");
@@ -145,8 +136,7 @@ namespace GameForestCore.Services
                     LastName = "User",
                     Username = username,
                     Password = password,
-                    UserId = Guid.NewGuid(),
-                    fb_id = "0"
+                    UserId = Guid.NewGuid()
                 });
 
                 return constructResponse(GFXResponseType.Normal, "Success!");
@@ -159,7 +149,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse Unregister(string username, string password)
+        public  GFXRestResponse     Unregister              (string username, string password)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username not found!");
@@ -184,7 +174,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse Login(string username, string password)
+        public  GFXRestResponse     Login                   (string username, string password)
         {
             if (!userExists(username))
                 return constructResponse(GFXResponseType.NotFound, "Username or user id not found!");
@@ -218,7 +208,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse Logout(string usersessionid)
+        public  GFXRestResponse     Logout                  (string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -237,7 +227,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse Heartbeat(string usersessionid)
+        public  GFXRestResponse     Heartbeat               (string usersessionid)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -265,7 +255,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse ChangePassword(string usersessionid, string oldpassword, string newpassword)
+        public  GFXRestResponse     ChangePassword          (string usersessionid, string oldpassword, string newpassword)
         {
             if (!sessionExists(usersessionid))
                 return constructResponse(GFXResponseType.NotFound, "User session not found!");
@@ -297,87 +287,21 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse FBConnect(string fbid, string email, string fname, string lname)
-        {
-            if (!userExists(email))
-            {
-                try 
-                {
-                    userTable.Insert(new GFXUserRow
-                    {
-                        Description = "",
-                        FirstName = fname,
-                        LastName = lname,
-                        Username = email,
-                        Password = "debugger",
-                        UserId = Guid.NewGuid(),
-                        fb_id = fbid
-                    });
-
-                    return constructResponse(GFXResponseType.Normal, "REDIRECT");
-                }
-                catch (Exception exp)
-                {
-                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
-
-                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-                }
-            }
-
-            if (userExists(email))
-            {
-                try
-                {
-                    var sessionId = Guid.NewGuid();
-                    var userId = getUserId(email);
-
-                    if (userId == Guid.Empty)
-                        return constructResponse(GFXResponseType.RuntimeError, "Error in finding user id");
-
-                    if (loginTable.Count(string.Format("UserId = '{0}'", userId)) == 0)
-                    {
-                        loginTable.Insert(new GFXLoginRow
-                        {
-                            LastHeartbeat = DateTime.Now,
-                            UserId = userId,
-                            SessionId = sessionId,
-                            UserStatus = GFXLoginStatus.MENU
-                        });
-
-                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                    }
-                    else
-                    {
-                        var result = new List<GFXLoginRow>(loginTable.Select(string.Format("UserId = '{0}'", userId)));
-
-                        if (result.Count <= 0)
-                            return constructResponse(GFXResponseType.NotFound, "Session expired");
-
-                        var user = result[0];
-
-                        user.LastHeartbeat = DateTime.Now;
-
-                        loginTable.Update(string.Format("UserId = '{0}'", userId), user);
-
-                        sessionId = user.SessionId;
-
-                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                    } 
-                }
-                catch (Exception exp)
-                {
-                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
-
-                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-                }
-            }
-
-            return constructResponse(GFXResponseType.Normal, "[User|FBConn] Something went wrong");
-        }
-
         // ----------------------------------------------------------------------------------------------------------------
 
-        private bool userExists(string user)
+        private string              userInfoToJson          (GFXUserRow userRow)
+        {
+            var uResult = new Dictionary<string, object>();
+
+            uResult["Name"]         = userRow.FirstName + " " + userRow.LastName;
+            uResult["UserId"]       = userRow.UserId;
+            uResult["Description"]  = userRow.Description;
+            uResult["Username"]     = userRow.Username;
+
+            return JsonConvert.SerializeObject(uResult);
+        }
+
+        private bool                userExists              (string user)
         {
             Guid userId;
 
@@ -387,12 +311,12 @@ namespace GameForestCore.Services
             return this.userTable.Count(string.Format("username = '{0}'", user)) == 1;
         }
 
-        private bool sessionExists(string sessionid)
+        private bool                sessionExists           (string sessionid)
         {
-            return loginTable.Count(string.Format("SessionId = '{0}'", sessionid)) == 1;
+            return loginTable.Count(string.Format("sessionid = '{0}'", sessionid)) == 1;
         }
 
-        private bool passwordMatch(string username, string password)
+        private bool                passwordMatch           (string username, string password)
         {
             var asd = new List<GFXUserRow>(userTable.Select(string.Format("username = '{0}'", username)));
 
@@ -404,7 +328,7 @@ namespace GameForestCore.Services
             return false;
         }
 
-        private Guid getUserId(string input)
+        private Guid                getUserId               (string input)
         {
             Guid sessionId;
 
@@ -422,7 +346,7 @@ namespace GameForestCore.Services
             }
         }
 
-        private GFXRestResponse constructResponse(GFXResponseType responseType, string payload)
+        private GFXRestResponse     constructResponse       (GFXResponseType responseType, string payload)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "constructResponse", "Returning result with type" + responseType + " and payload " + payload);
 
