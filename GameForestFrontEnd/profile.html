@@ -1,7 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>GameForest | Profile</title>
+
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
@@ -22,20 +24,13 @@
                 </button>
                 <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="games.html">Games</a></li>
-                            <li><a href="dev.html">Developer</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li><a href="stats.html">Stats</a></li>
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
@@ -125,9 +120,9 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url:    "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
-                async:  false,
+                async:  true,
             });
 
             response.success(function (data)
@@ -150,9 +145,9 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: false,
+                        url:    "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type:   "GET",
+                        async:  true,
                     });
 
                     userResponse.success(function (data)
@@ -168,8 +163,8 @@
                         // set profile data here!
                         $("#profileName").html(adata.Username);
 
-                        $("#firstName").val(adata.Name);
-                        $("#lastName").val(adata.Name);
+                        $("#firstName").val(adata.NameFirst);
+                        $("#lastName").val(adata.NameLast);
                         $("#description").val(adata.Description);
 
                         originalUsername = adata.Username;
@@ -192,18 +187,14 @@
         function onLogout               ()
         {
             var request = $.ajax({
-                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                async: true,
-                type: "DELETE"
+                url:    "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                async:  true,
+                type:   "DELETE"
             });
 
             request.success(function (data)
             {
-                if (data.ResponseType != 0)
-                {
-                    // hehe, this is imposible...
-                }
-                else
+                if (data.ResponseType == 0)
                 {
                     window.location.reload(true);
                 }

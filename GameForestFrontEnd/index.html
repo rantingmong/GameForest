@@ -1,7 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>GameForest</title>
+
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
@@ -22,21 +24,13 @@
                 </button>
                 <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="games.html">Games</a></li>
-                            <li><a href="dev.html">Developer</a></li>
-                            <li><a href="stats.html">Stats</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li><a href="stats.html">Stats</a></li>
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
@@ -44,8 +38,6 @@
             </div>
         </nav>
         <div class="row">
-
-            <div id="alertDialog" class="alert alert-danger" style="display: none"></div>
             <div class="col-sm-8">
                 <div class="jumbotron">
                     <h1>Game Forest</h1>
@@ -55,12 +47,11 @@
             <div class="col-sm-4">
                 <div class="well" id="userinfo-well" style="display: none">
                     <h3 id="profileHeader">Welcome back, &lt;username&gt;</h3>
-                    <h5>Some info</h5>
-                    <h5>More info</h5>
-                    <h5>Hala info</h5>
-                    <h5>Haha info</h5>
                 </div>
                 <div class="well" id="login-well">
+                    <div id="alertDialog" class="alert alert-danger col-sm-12" style="display: none; z-index: 100"></div>
+                    <h3>Login</h3>
+                    <br/>
                     <div class="form-group">
                         <div class="col-lg-12">
                             <input type="email" class="form-control" id="inputEmail1" placeholder="Email">
@@ -90,42 +81,11 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-4">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Game 1</h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <img class="img-responsive" src="http://placehold.it/500x250&text=G1" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-4">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Game 1</h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <img class="img-responsive" src="http://placehold.it/500x250&text=G2" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-4">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Game 1</h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <img class="img-responsive" src="http://placehold.it/500x250&text=G3" />
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function ()
@@ -137,8 +97,8 @@
 
             var response = $.ajax({
                 url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type:   "PUT",
-                async:  false,
+                type: "PUT",
+                async: false,
             });
 
             response.success(function (data)
@@ -162,8 +122,8 @@
 
                     var userResponse = $.ajax({
                         url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type:   "GET",
-                        async:  true,
+                        type: "GET",
+                        async: true,
                     });
 
                     userResponse.success(function (data)
@@ -231,7 +191,7 @@
                     {
                         // show error (maybe in an error div?)
                         $("#alertDialog").show();
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Cannot sign in! Check your username and password.");
                     }
                     else
                     {
@@ -254,21 +214,17 @@
                 });
             }
         }
-        function onLogout   ()
+        function onLogout()
         {
             var request = $.ajax({
                 url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                async:  true,
-                type:   "DELETE"
+                async: true,
+                type: "DELETE"
             });
 
             request.success(function (data)
             {
-                if (data.ResponseType != 0)
-                {
-                    // hehe, this is imposible...
-                }
-                else
+                if (data.ResponseType == 0)
                 {
                     window.location.reload(true);
                 }

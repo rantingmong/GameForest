@@ -32,7 +32,26 @@ namespace GameForestCore.Services
             {
                 List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select("", maxCount));
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(gameList));
+                List<Dictionary<string, object>> returnGameList = new List<Dictionary<string, object>>();
+
+                foreach (var game in gameList)
+                {
+                    var user = new List<GFXUserRow>( userTable.Select(string.Format("UserId = '{0}'", game.Creator)));
+
+                    var item = new Dictionary<string, object>();
+
+                    item["Name"]        = game.Name;
+                    item["GameID"]      = game.GameID;
+                    item["MinPlayers"]  = game.MinPlayers;
+                    item["MaxPlayers"]  = game.MaxPlayers;
+                    item["Description"] = game.Description;
+                    item["Creator"]     = user[0].Username;
+                    item["CreatorName"] = user[0].FirstName + " " + user[0].LastName;
+
+                    returnGameList.Add(item);
+                }
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(returnGameList));
             }
             catch (Exception exp)
             {
@@ -60,6 +79,44 @@ namespace GameForestCore.Services
             catch (Exception exp)
             {
                 GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameInfo", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse                  GetUserGames        (string username)
+        {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserGames", "Fetching user's game list...");
+
+            try
+            {
+                List<GFXUserRow> userList = new List<GFXUserRow>(userTable.Select(string.Format("Username = '{0}'", username)));
+                List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("Creator = '{0}'", userList[0].UserId)));
+
+                List<Dictionary<string, object>> returnGameList = new List<Dictionary<string, object>>();
+
+                foreach (var game in gameList)
+                {
+                    var user = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", game.Creator)));
+
+                    var item = new Dictionary<string, object>();
+
+                    item["Name"]        = game.Name;
+                    item["GameID"]      = game.GameID;
+                    item["MinPlayers"]  = game.MinPlayers;
+                    item["MaxPlayers"]  = game.MaxPlayers;
+                    item["Description"] = game.Description;
+                    item["Creator"]     = user[0].Username;
+                    item["CreatorName"] = user[0].FirstName + " " + user[0].LastName;
+
+                    returnGameList.Add(item);
+                }
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(returnGameList));
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }

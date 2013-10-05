@@ -97,6 +97,7 @@
     </div>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/gameforestip.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -105,7 +106,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type: "PUT",
                 async: false,
             });
@@ -127,7 +128,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
                         async: true,
                     });
