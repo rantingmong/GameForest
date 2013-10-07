@@ -1,19 +1,19 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
     <title>GameForest | Statistics</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen"/>
-    <link href="css/style.css" rel="stylesheet"/>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen" />
+    <link href="css/style.css" rel="stylesheet" />
 
     <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
-  <div class="container">
-        <br/>
-
-        <!-- NAVBAR -->
-
+    <div class="container">
+        <br />
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -24,43 +24,21 @@
                 </button>
                 <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="games.html">Games</a></li>
-                            <li><a href="dev.html">Developer</a></li>
-                            <li><a href="stats.html">Stats</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li><a href="stats.html">Stats</a></li>
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display: none">Logout (FB User)</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-
-        <!-- FIRST ROW -->
-
         <div class="row">
-            <div class="col-sm-2">
-                <ul class="nav nav-pills nav-stacked">
-                    <li><a href="news.html">News</a></li>
-                    <li><a href="games.html">Games</a></li>
-                    <li><a href="dev.html">Developer</a></li>
-                    <li class="active"><a href="stats.html">Stats</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-10">
+            <div class="col-sm-12">
                 <div class="page-header"><h1>Statistics <small>by Game</small></h1></div>
                 <div id="gameStatList" class="row">
                     <h3 id="noGamesHeader" style="display:none">No stats being tracked</h3>
@@ -70,31 +48,26 @@
                 </div>
             </div>
         </div>
-        
-        <!-- END OF FIRST ROW -->
-   </div>
-    <script src="http://code.jquery.com/jquery.js"></script>
+    </div>
+    <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function ()
         {
-            
-
             $("#alertDialog").hide();
 
             // do a heartbeat to ensure the user's session is still valid
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true
+                url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  true
             });
 
             response.success(function (data)
             {
-
                 if (data.ResponseType != 0)
                 {
                     showLogin = true;
@@ -109,9 +82,9 @@
                 {
                     // then async get user's information
                     var userResponse = $.ajax({
-                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
+                        url:    "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type:   "GET",
+                        async:  true,
                     });
 
                     userResponse.success(function (data)
@@ -147,13 +120,13 @@
 
                         if (gameList.length > 0)
                         {
-                            var i; 
+                            var i;
 
                             console.log("Step 2: Extract games tracking stats");
                             for (i = 0; i < gameList.length; i++)
                             {
                                 var gameInfo = gameList[i];
-                                
+
                                 console.log("Game : " + i);
 
                                 var appendElm = null;
@@ -164,9 +137,9 @@
                                     continue;
 
                                 appendElm.append(
-                                    '<div id="'+ gameInfo.GameID +'" class="panel-title"><b>' +
+                                    '<div id="' + gameInfo.GameID + '" class="panel-title"><b>' +
                                     gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '<br/></div>'
-                                    ); 
+                                    );
 
                                 var statResponse = $.ajax({
                                     url: "http://" + gameForestIP + ":1193/service/game/stats?getstat=all&gameid=" + gameInfo.GameID + "&all=true",

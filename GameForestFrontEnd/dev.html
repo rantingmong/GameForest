@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html ng-app>
 <head>
     <title>GameForest | Developer</title>
+
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
     <div class="container">
@@ -20,44 +24,149 @@
                 </button>
                 <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="games.html">Games</a></li>
-                            <li><a href="dev.html">Developer</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li><a href="stats.html">Stats</a></li>
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="index.html">Login</a></li>
+                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
         <div class="row">
-            <div class="col-sm-2">
-                <ul class="nav nav-pills nav-stacked">
-                    <li><a href="news.html">News</a></li>
-                    <li><a href="games.html">Games</a></li>
-                    <li class="active"><a href="dev.html">Developer</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-10">
-                <div class="well">
-                    <h2>Share your game to the world today!</h2>
-                    <br/>
-                    <a class="btn btn-primary" href="upload.aspx">Upload your game to GameForest</a>
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>Developer</h1>
                 </div>
+                <a class="btn btn-success" href="upload.aspx">Upload game</a>
+                <a class="btn btn-primary" href="/dev/GameForest.zip">Download template and samples</a>
+                <a class="btn btn-default pull-right" href="/docu">GameForest documentation</a>
+                <br />
+                <br />
+                <h4>Your games</h4>
+                <table style="width: 100%" class="table table-hover" ng-controller="gameListController">
+                    <thead>
+                        <tr>
+                            <td style="width: 60%">Name</td>
+                            <td style="width: 20%">Last updated</td>
+                            <td style="width: 20%"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="game in gameList">
+                            <td style="vertical-align: middle">{{game.Name}}</td>
+                            <td style="vertical-align: middle">{{game.LastUpdate}}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                        Actions <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a>Statistics</a></li>
+                                        <li><a href="{{game.UpdateURL}}">Update</a></li>
+                                        <li><a>Delete</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+            var heartBeatResponse = $.ajax({
+                url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  true,
+            });
+
+            heartBeatResponse.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    // then async get user's information
+                    var userResponse = $.ajax({
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+                    });
+                }
+                else
+                {
+                    localStorage.setItem('user-session', null);
+                    window.location.href = "index.html";
+                }
+            });
+
+            heartBeatResponse.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+                window.location.href = "index.html";
+            });
+        });
+
+        function gameListController($scope)
+        {
+            $scope.gameList = [
+
+                {
+                    "Name":         "Sample game 1",
+                    "LastUpdate":   "10/10/2013",
+                    "UpdateURL" :   "update?gameid=samplegame1"
+                },
+                {
+                    "Name":         "Sample game 2",
+                    "LastUpdate":   "10/10/2013",
+                    "UpdateURL":    "update?gameid=samplegame1"
+                },
+                {
+                    "Name":         "Sample game 3",
+                    "LastUpdate":   "10/10/2013",
+                    "UpdateURL":    "update?gameid=samplegame1"
+                },
+                {
+                    "Name":         "Sample game 4",
+                    "LastUpdate":   "10/10/2013",
+                    "UpdateURL":    "update?gameid=samplegame1"
+                }
+            ];
+        }
+
+    </script>
 </body>
 </html>

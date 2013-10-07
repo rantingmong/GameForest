@@ -12,9 +12,6 @@
 <body>
     <div class="container">
         <br>
-
-        <!-- NAVBAR -->
-
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -25,43 +22,24 @@
                 </button>
                 <a class="navbar-brand" href="index.html">GameForest</a>
             </div>
-
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a href="main.html" class="dropdown-toggle" data-toggle="dropdown">Main <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="news.html">News</a></li>
-                            <li><a href="games.html">Games</a></li>
-                            <li><a href="dev.html">Developer</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="dev.html">Developer</a></li>
+                    <li><a href="stats.html">Stats</a></li>
                 </ul>
-                
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
                     <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
                 </ul>
             </div>
         </nav>
-
-        <!-- END OF NAVBAR -->
-
-        <!-- FIRST ROW -->
-        
         <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
         <div class="row">
-            <div class="col-sm-2">
-                <ul class="nav nav-pills nav-stacked">
-                    <li><a href="news.html">News</a></li>
-                    <li><a href="games.html">Games</a></li>
-                    <li class="active"><a href="dev.html">Developer</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-10">
-                <div class="well">
-                    <h2>Upload game</h2>
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>Upload game</h1>
                 </div>
                 <form runat="server">
                     <div class="form-group">
@@ -80,11 +58,11 @@
                         <label for="inputDescription">Description of the game:</label>
                         <asp:TextBox ID="inputDescription" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none">
                         <label for="inputUserId">User ID:</label>
                         <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none">
                         <label for="inputSessionId">Session ID:</label>
                         <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
@@ -97,6 +75,7 @@
     </div>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/gameforestip.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -105,7 +84,7 @@
             var showLogin = true;
 
             var response = $.ajax({
-                url: "http://localhost:1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type: "PUT",
                 async: false,
             });
@@ -127,7 +106,7 @@
                     // then async get user's information
 
                     var userResponse = $.ajax({
-                        url: "http://localhost:1193/service/user/session/" + localStorage.getItem("user-session"),
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
                         type: "GET",
                         async: true,
                     });
