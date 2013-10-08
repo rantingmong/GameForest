@@ -13,16 +13,7 @@ namespace GameForestCore.Services
         [OperationContract, WebInvoke(UriTemplate = "/{gameId}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetGameInfo(string gameId);
 
-        [OperationContract, WebInvoke(UriTemplate = "/stats?getstat={stat}&gameid={gameid}&all={allcheck}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
-        GFXRestResponse GetStat(string stat, string gameId, bool allcheck);
-
         [OperationContract, WebInvoke(UriTemplate = "?name={name}&description={description}&minplayers={minPlayers}&maxplayers={maxPlayers}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
         GFXRestResponse CreateGame(string name, string description, int minPlayers, int maxPlayers, string usersessionid);
-
-        [OperationContract, WebInvoke(UriTemplate = "/stat?addstat={statname}&gameid={gameId}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse AddStat(string statname, string gameId);
-
-        [OperationContract, WebInvoke(UriTemplate = "/stats?updatestat={statname}&gameid={gameId}&statvalue={stat_value}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse UpdateStat(string statname, string gameId, int stat_value);
     }
 }

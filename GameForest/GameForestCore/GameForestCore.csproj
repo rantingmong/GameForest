@@ -69,6 +69,7 @@
     <Content Include="Services\GFXUserService.svc" />
     <Content Include="Services\GFXLobbyService.svc" />
     <Content Include="Services\GFXGameService.svc" />
+    <Content Include="Services\GFXStatsService.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +87,10 @@
     </Compile>
     <Compile Include="Services\IGFXGameService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IGFXStatsService.cs" />
+    <Compile Include="Services\GFXStatsService.svc.cs">
+      <DependentUpon>GFXStatsService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Util\CORS\BehaviorAttribute.cs" />
     <Compile Include="Util\CORS\MessageInspector.cs" />
   </ItemGroup>

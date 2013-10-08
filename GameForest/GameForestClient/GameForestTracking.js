@@ -1,9 +1,10 @@
 /// <reference path="GameForest.js" />
 
-var GameForestTracker   = function(gameId)
+var GameForestTracker   = function(gameId, sessionId)
 {
     // checker to see if gameforest can initialize
-    if (!Guid.isGuid(gameId))
+    if (!Guid.isGuid(gameId) 	||
+		!Guid.isGuid(sessionId))
     {
         console.error("Parameters required to start GameForest is either missing or in an invalid state.");
 
@@ -42,7 +43,7 @@ var GameForestTracker   = function(gameId)
     {
         var p = null;
 
-        sendRequest("/game/stat?addStat=" + statName + "&gameid=" + gameId, "POST",
+        sendRequest("stats/stat?addStat=" + statName + "&gameid=" + gameId, "POST",
             function (result)
             {
                 if (result.ResponseType == 0)
@@ -62,6 +63,53 @@ var GameForestTracker   = function(gameId)
                 alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
             });
     }
+	
+	this.trackUserStat = function(statName)
+	{
+		var p = null;
+		var x = null;
+		var id = null;
+		
+		sendRequest("/user/session" + this.sessionId, "GET",
+			function(result)
+			{
+				if(result.ResponseType == 0)
+				{
+					p = JSON.parse(result.AdditionalData);
+					id = p.UserId;
+					console.log(id);
+					
+					sendRequest("/stats/stat?adduserstat=" + statName + "&gameid=" this.gameId + "&userid=" id, "POST",
+						function(result)
+						{
+							if (result.ResponseType == 0)
+							{
+								p = JSON.parse(result.AdditionalData);
+								return p;
+							}
+							else
+							{
+								p = "Err: " + JSON.parse(result.AdditionalData);
+								console.log("returned: " + p);
+								return p;
+							}
+						},
+						function(status,why)
+						{
+							alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
+						});
+				}
+				else
+				{
+					p = "Err: " + JSON.parse(result.AdditionalData);
+                    console.log("returned: " + p); 
+				}
+			},
+			function(status, why)
+			{
+				alert("Error in trackUserStat function: [status=" + status + "] [reason=" + why + "]");
+			});
+	}
 
     /******
     this.getStatVal = function (
@@ -78,41 +126,15 @@ var GameForestTracker   = function(gameId)
     because the calls to fetch statistics are asynchronous 
     and thus you won't always get the stats in the same
     order. 
-
-    this.cbStat	    = function (
-        statList = array of stats
-        data	 = statistic fetched from the database
-        )
-    
-    THIS ONLY WORKS FOR INTEGER VALUE STATS
-
-    example:
-        gf.getStatVal(statName, statValList, statNameList, gf.cbStat);
-        will push statName's name to statNameList,
-        statName's value to statValList
-
     ******/
 
-    this.cbStat = function(statVals, statNames, data)
-    {
-        console.log(data); // extract stat object
-        var statName = data.stat_name;
-        statNames.push(statName); // push stat's name to list of stat names
-        var statVal = data.stat_value;
-        statVals.push(statVal); // push the stat's value to list of values, same index
-
-        // How to match names to value below, DEBUG
-        for (var i = 0; i < statNames.length; i++)
-            console.log(statNames[i] + ": " + statVals[i]);
-    }
-
-    this.getStatVal = function(statName, statValList, statNameList, callback)
+    this.getStatVal = function(statName, statValList, statNameList)
     {
         var p = {};
         var statOut = null;
         
         // DO NOT CHANGE false 
-        sendRequest("/game/stats?getstat=" + statName + "&gameid=" + gameId + "&all=false", "GET",
+        sendRequest("/stats/stats?getstat=" + statName + "&gameid=" + gameId + "&all=false", "GET",
             function (result)
             {
                 if (result.ResponseType == 0)
@@ -121,8 +143,16 @@ var GameForestTracker   = function(gameId)
                     console.log("name... " + p.stat_name);
                     console.log("value... " + p.stat_value);
 
-                    // callback is "this.cbStat" 
-                    callback(statValList, statNameList, p);
+                    // callback 
+					console.log(p); // extract stat object
+					var statName = p.stat_name;
+					statNames.push(statName); // push stat's name to list of stat names
+					var statVal = p.stat_value;
+					statVals.push(statVal); // push the stat's value to list of values, same index
+
+					// How to match names to value below, DEBUG
+					for (var i = 0; i < statNames.length; i++)
+						console.log(statNames[i] + ": " + statVals[i]);
                 }
                 else
                 {
@@ -142,7 +172,7 @@ var GameForestTracker   = function(gameId)
     // IMPORTANT: THIS ONLY WORKS WITH statValue BEING AN INT
     this.updateStat = function(statName, statValue)
     {
-        sendRequest("/game/stats?updatestat=" + statName + "&gameid=" + gameId + "&statvalue=" + statValue, "POST",
+        sendRequest("/stats/stats?updatestat=" + statName + "&gameid=" + gameId + "&statvalue=" + statValue, "POST",
             function (result)
             {
                 if (result.ResponseType == 0)
@@ -160,5 +190,52 @@ var GameForestTracker   = function(gameId)
                 alert("Error in updateStat function: [status=" + status + "] [reason=" + why + "]");
             });
     }
-
+	
+	this.updateUserStat = function(statName, statValue)
+	{
+		var p = null;
+		var x = null;
+		var id = null;
+		
+		sendRequest("/user/session" + this.sessionId, "GET",
+			function(result)
+			{
+				if(result.ResponseType == 0)
+				{
+					p = JSON.parse(result.AdditionalData);
+					id = p.UserId;
+					console.log(id);
+					
+					sendRequest("/stats/stats?updateuserstat=" + statName + "&gameid=" this.gameId + "&userid=" id + 
+								"&statvalue=" + statValue, "POST",
+						function(result)
+						{
+							if (result.ResponseType == 0)
+							{
+								p = JSON.parse(result.AdditionalData);
+								return p;
+							}
+							else
+							{
+								p = "Err: " + JSON.parse(result.AdditionalData);
+								console.log("returned: " + p);
+								return p;
+							}
+						},
+						function(status,why)
+						{
+							alert("Error in trackStat function: [status=" + status + "] [reason=" + why + "]");
+						});
+				}
+				else
+				{
+					p = "Err: " + JSON.parse(result.AdditionalData);
+                    console.log("returned: " + p); 
+				}
+			},
+			function(status, why)
+			{
+				alert("Error in updateUserStat function: [status=" + status + "] [reason=" + why + "]");
+			});
+	}
 }

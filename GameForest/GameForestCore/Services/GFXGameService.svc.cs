@@ -14,14 +14,12 @@ namespace GameForestCore.Services
         private GFXDatabaseTable<GFXGameRow>    gameTable;
         private GFXDatabaseTable<GFXUserRow>    userTable;
         private GFXDatabaseTable<GFXLoginRow>   loginTable;
-        private GFXDatabaseTable<GFXStatRow>    statTable;
 
         public GFXGameService                   ()
         {
             userTable   = new GFXDatabaseTable<GFXUserRow>(new GFXUserRowTranslator());
             gameTable   = new GFXDatabaseTable<GFXGameRow>(new GFXGameRowTranslator());
             loginTable  = new GFXDatabaseTable<GFXLoginRow>(new GFXLoginRowTranslator());
-            statTable   = new GFXDatabaseTable<GFXStatRow>(new GFXStatRowTranslator());
         }
 
         public GFXRestResponse                  GetGameList         (int maxCount)
@@ -97,123 +95,6 @@ namespace GameForestCore.Services
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
-        }
-
-        public GFXRestResponse                  AddStat             (string statname, string gameId)
-        {
-            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
-            var statGuid = Guid.NewGuid();
-
-            if (gameList.Count <= 0)
-                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
-
-            try
-            {
-                if ((statTable.Count(string.Format("stat_id = '{0}'", statGuid)) == 0) &&
-                    (statTable.Count(string.Format("stat_name = '{0}'", statname)) == 0))
-                {
-                    GFXStatRow statistic = new GFXStatRow
-                    {
-                        stat_id = statGuid,
-                        GameID = Guid.Parse(gameId),
-                        stat_name = statname,
-                        stat_value = 0
-                    };
-
-                    statTable.Insert(statistic);
-
-                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}' AND GameID = '{1}'", statname, gameId)));
-
-                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statList[0]));
-                }
-                else
-                {
-                    var statList = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statname)));
-
-                    return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statList[0]));
-                }
-            }
-            catch (Exception exp)
-            {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "AddStat", exp.Message);
-
-                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-            }
-        }
-
-        public GFXRestResponse                  GetStat             (string stat, string gameId, bool allcheck)
-        {
-
-            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
-
-            if (gameList.Count <= 0)
-                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
-
-            try
-            {
-                string returnJSON;
-
-                if (allcheck == false)
-                {
-                    if ((statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0) &&
-                        (statTable.Count(string.Format("stat_name = '{0}'", stat)) == 1))
-                    {
-                        var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}' AND GameID = '{1}'", stat, gameId)));
-
-                        returnJSON = JsonConvert.SerializeObject(result[0]);
-
-                        return constructResponse(GFXResponseType.Normal, returnJSON);
-                    }
-                    else
-                    {
-                        return constructResponse(GFXResponseType.NotFound, "Couldn't find statistic");
-                    }
-                }
-                else if (allcheck == true)
-                {
-                    if (statTable.Count(string.Format("GameID = '{0}'", gameId)) > 0)
-                    {
-                        return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(statTable.Select(string.Format("GameID = '{0}'", gameId))));
-                    }
-                    else
-                    {
-                        return constructResponse(GFXResponseType.NotFound, "No statistics being tracked");
-                    }
-                } else {
-                    return constructResponse(GFXResponseType.InvalidInput, "allcheck invalid");
-                }
-            }
-            catch (Exception exp)
-            {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetStat", exp.Message);
-
-                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-            }
-        }
-
-        public GFXRestResponse                  UpdateStat          (string statName, string gameId, int stat_value)
-        {
-            List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameId)));
-
-            if (gameList.Count <= 0)
-                return constructResponse(GFXResponseType.NotSupported, "Game ID does not exist");
-
-            try
-            {
-                var result = new List<GFXStatRow>(statTable.Select(string.Format("stat_name = '{0}'", statName)))[0];
-
-                result.stat_value = stat_value;
-
-                statTable.Update(string.Format("stat_name = '{0}'", statName), result);
-            }
-            catch (Exception exp)
-            {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "UpdateStat", exp.Message);
-
-                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-            }
-
-            return constructResponse(GFXResponseType.Normal, "Update push success!");
         }
 
         // ----------------------------------------------------------------------------------------------------------------
