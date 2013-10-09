@@ -267,9 +267,9 @@
                         var i;
 
                         if (rawGameList.length > 0) {
-                            for (i = 0; i < gameList.length; i++)
-                                if (gameList[i].Creator == devId)
-                                    devGameList.push(gameList[i]);
+                            for (i = 0; i < rawGameList.length; i++)
+                                if (rawGameList[i].Creator == devId)
+                                    devGameList.push(rawGameList[i]);
                         }
 
                         console.log("Game List Set");
