@@ -1,1 +1,1 @@
-﻿var gameForestIP = "localhost";
+﻿var gameForestIP = "10.2.180.214";

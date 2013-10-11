@@ -1,46 +1,46 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Web.UI.WebControls;
-
-using ICSharpCode.SharpZipLib.Zip;
+﻿using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 
-public partial class upload : System.Web.UI.Page
+using System;
+using System.IO;
+using System.Net;
+using System.Web.UI;
+
+public partial class upload : Page
 {
     public enum GFXResponseType
     {
-        Normal = 0,
-        InvalidInput = 1,
+        Normal          = 0,
+        InvalidInput    = 1,
 
-        NotFound = 10,
-        DuplicateEntry = 11,
+        NotFound        = 10,
+        DuplicateEntry  = 11,
 
-        FatalError = 30,
-        RuntimeError = 31,
+        FatalError      = 30,
+        RuntimeError    = 31,
 
-        NotSupported = 50,
+        NotSupported    = 50,
     }
 
     public struct GFXRestResponse
     {
-        public GFXResponseType ResponseType { get; set; }
-        public object AdditionalData { get; set; }
+        public GFXResponseType  ResponseType    { get; set; }
+        public object           AdditionalData  { get; set; }
     }
 
-    protected void Page_Load(object sender, EventArgs e)
+    protected void Page_Load            (object sender, EventArgs e)
     {
         inputUserId.Attributes.Add("readonly", "readonly");
         inputSessionId.Attributes.Add("readonly", "readonly");
     }
-    protected void ButtonSubmit_Click(object sender, EventArgs e)
+    protected void ButtonSubmit_Click   (object sender, EventArgs e)
     {
         var error       = false;
         var basePath    = AppDomain.CurrentDomain.BaseDirectory;
         
-        if (FileUpload.HasFile)
+        if (fileUpload.HasFile)
         {
-            string ext = Path.GetExtension(FileUpload.FileName);
+            string ext = Path.GetExtension(fileUpload.FileName);
 
             if (ext.Contains("zip"))
             {
@@ -54,7 +54,7 @@ public partial class upload : System.Web.UI.Page
                     Directory.CreateDirectory(Path.Combine(basePath, "temp", inputUserId.Text));
                 }
 
-                FileUpload.SaveAs(Path.Combine(basePath, "temp", inputUserId.Text, FileUpload.FileName));
+                fileUpload.SaveAs(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName));
             }
             else
             {
@@ -78,7 +78,7 @@ public partial class upload : System.Web.UI.Page
             try
             {
                 FastZip zipFile = new FastZip();
-                zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, FileUpload.FileName),
+                zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName),
                                    Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text),
                                    null);
 
@@ -103,7 +103,7 @@ public partial class upload : System.Web.UI.Page
                     alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Your zip file does not contain the required gameforest files.";
 
                     Directory.Delete(Path.Combine("games", inputUserId.Text, inputGameName.Text));
-                    File.Delete(Path.Combine(basePath, "temp", FileUpload.FileName));
+                    File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
 
                     return;
                 }
@@ -113,8 +113,8 @@ public partial class upload : System.Web.UI.Page
                 alertDialog.Style["display"] = "normal";
                 alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Zip file decompression failed. Please check if your the file is a valid zip file.";
 
-                if (File.Exists(Path.Combine(basePath, "temp", FileUpload.FileName)))
-                    File.Delete(Path.Combine(basePath, "temp", FileUpload.FileName));
+                if (File.Exists(Path.Combine(basePath, "temp", fileUpload.FileName)))
+                    File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
 
                 return;
             }
