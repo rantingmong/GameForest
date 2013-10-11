@@ -65,7 +65,11 @@
                         <label for="inputSessionId">Session ID:</label>
                         <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
+<<<<<<< HEAD
                     <asp:FileUpload ID="fileUpload" runat="server" />
+=======
+                    <asp:FileUpload ID="FileUpload" runat="server" />
+>>>>>>> origin/analytics
                     <br />
                     <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click"/>
                 </form>
@@ -83,9 +87,15 @@
             var showLogin = true;
 
             var response = $.ajax({
+<<<<<<< HEAD
                 url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  true,
+=======
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: false,
+>>>>>>> origin/analytics
             });
 
             response.success(function (data)
