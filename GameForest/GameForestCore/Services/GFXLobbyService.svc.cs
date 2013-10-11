@@ -378,13 +378,9 @@ namespace GameForestCore.Services
             uResult["UserId"]       = userRow.UserId;
             uResult["Description"]  = userRow.Description;
             uResult["Username"]     = userRow.Username;
-
-<<<<<<< HEAD
             uResult["NameFirst"]    = userRow.FirstName;
             uResult["NameLast"]     = userRow.LastName;
 
-=======
->>>>>>> origin/analytics
             return uResult;
         }
 

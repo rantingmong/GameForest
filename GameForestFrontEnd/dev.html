@@ -12,16 +12,17 @@
     <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
-        <div class="fb-root"></div>
-        <script type="text/javascript">
-            (function (d) {
-                var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-                if (d.getElementById(id)) { return; }
-                js = d.createElement('script'); js.id = id; js.async = true;
-                js.src = "//connect.facebook.net/en_US/all.js";
-                ref.parentNode.insertBefore(js, ref);
-            }(document));
-        </script>
+    <div class="fb-root"></div>
+    <script type="text/javascript">
+        (function (d)
+        {
+            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement('script'); js.id = id; js.async = true;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            ref.parentNode.insertBefore(js, ref);
+        }(document));
+    </script>
     <div class="container">
         <br>
         <nav class="navbar navbar-default" role="navigation">
@@ -56,40 +57,43 @@
                 <a class="btn btn-primary" href="/dev/GameForest.zip">Download template and samples</a>
                 <a class="btn btn-default pull-right" href="/docu">GameForest documentation</a>
                 <br />
+                <h2>Your games</h2>
+                <div id="noGameDiv">
+                    <h3>You don't have any games hosted on GameForest yet.</h3>
+                </div>
+                <div id="theGameList">
+                    <table style="width: 100%" class="table table-hover" ng-controller="gameListController">
+                        <thead>
+                            <tr>
+                                <td style="width: 60%">Name</td>
+                                <td style="width: 20%">Last updated</td>
+                                <td style="width: 20%"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="game in gameList">
+                                <td style="vertical-align: middle">{{game.Name}}</td>
+                                <td style="vertical-align: middle">{{game.LastUpdate}}</td>
+                                <td>
+                                    <div class="btn-group pull-right">
+                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                            Actions <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu pull-right" role="menu">
+                                            <li><a href="update.aspx?gameid={{game.GameID}}&sessionid=0">Update</a></li>
+                                            <li><a href="delete.aspx?gameid={{game.GameID}}&sessionid=0">Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <br />
-                <h4>Your games</h4>
-                <table style="width: 100%" class="table table-hover" ng-controller="gameListController">
-                    <thead>
-                        <tr>
-                            <td style="width: 60%">Name</td>
-                            <td style="width: 20%">Last updated</td>
-                            <td style="width: 20%"></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="game in gameList">
-                            <td style="vertical-align: middle">{{game.Name}}</td>
-                            <td style="vertical-align: middle">{{game.LastUpdate}}</td>
-                            <td>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                        Actions <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a>Statistics</a></li>
-                                        <li><a href="{{game.UpdateURL}}">Update</a></li>
-                                        <li><a>Delete</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <h4>Stats</h4>
-                <div id="gameStatList" class="row">
+                <h2>Stats</h2>
+                <div id="gameStatList">
                     <h3 id="noGamesHeader" style="display:none">No stats being tracked</h3>
-                    <div id="gameStatCol" class="col-sm-12">
-
+                    <div id="gameStatCol">
                     </div>
                 </div>
             </div>
@@ -103,9 +107,10 @@
 
         var devId = "";
 
-        window.fbAsyncInit = function () {
+        window.fbAsyncInit = function ()
+        {
             FB.init({
-                appId: '672221882789824', // App ID 
+                appId: '672221882789824', // App ID
                 channelUrl: '//' + gameForestIP + ':46069/channel.html',
                 status: true, // check login status
                 cookie: true, // enable cookies to allow the server to access the session
@@ -114,15 +119,18 @@
 
             // Initialize when a user has authenticated with FB and this app
             // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response) {
+            FB.Event.subscribe('auth.authResponseChange', function (response)
+            {
 
-                if (response.status === 'connected') {
+                if (response.status === 'connected')
+                {
                     // user is logged in to FB
                     // has authorized app
 
                     console.log('Welcome, fetching information');
 
-                    FB.api('/me', function (response) {
+                    FB.api('/me', function (response)
+                    {
 
                         var fbid = response.id;
                         var fbuser = response.username;
@@ -135,13 +143,16 @@
                             type: "POST"
                         });
 
-                        request.done(function (msg) {
-                            if (msg.ResponseType != 0) {
+                        request.done(function (msg)
+                        {
+                            if (msg.ResponseType != 0)
+                            {
                                 // show error (maybe in an error div?)
                                 $("#alertDialog").show();
                                 $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
                             }
-                            else {
+                            else
+                            {
                                 // store session ID to local storage
                                 localStorage.setItem("user-session", msg.AdditionalData);
                                 console.log("sessionid: " + localStorage.getItem("user-session"));
@@ -152,7 +163,8 @@
                             $("#linkLogout").hide();
                         });
 
-                        request.fail(function (nothing, textStatus, something) {
+                        request.fail(function (nothing, textStatus, something)
+                        {
                             $("#alertDialog").show();
 
                             $("#alertDialog").css("class", "alert alert-danger");
@@ -167,19 +179,24 @@
                         document.getElementById('fb-log-well').style.display = 'none';
                     })
 
-                    document.getElementById('fbLogout').addEventListener('click', function () {
+                    document.getElementById('fbLogout').addEventListener('click', function ()
+                    {
                         var request = $.ajax({
                             url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                             async: true,
                             type: "DELETE"
                         });
 
-                        request.success(function (data) {
-                            if (data.ResponseType != 0) {
+                        request.success(function (data)
+                        {
+                            if (data.ResponseType != 0)
+                            {
                                 // hehe, this is imposible...
                             }
-                            else {
-                                FB.logout(function () {
+                            else
+                            {
+                                FB.logout(function ()
+                                {
                                     // wipe user
                                     window.location.reload(true);
                                 });
@@ -187,12 +204,14 @@
                         });
                     });
 
-                } else if (response.status === 'not_authorized') {
+                } else if (response.status === 'not_authorized')
+                {
                     // user is logged in to FB
                     // has not authorized app
 
                     document.getElementById('fb-log-well').style.display = 'block';
-                } else {
+                } else
+                {
                     // user is not logged in to FB
                     // has not authorized app
 
@@ -208,9 +227,9 @@
             // do a heartbeat to confirm user's session is still valid
             var showLogin = true;
             var heartBeatResponse = $.ajax({
-                url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type:   "PUT",
-                async:  true,
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true,
             });
 
             heartBeatResponse.success(function (data)
@@ -258,15 +277,17 @@
                     async: true
                 });
 
-                gameResponse.success(function (gData) 
+                gameResponse.success(function (gData)
                 {
-                    if (gData.ResponseType == 0) {
+                    if (gData.ResponseType == 0)
+                    {
                         console.log("Step 1: set game list");
                         var rawGameList = JSON.parse(gData.AdditionalData);
                         var devGameList = [];
                         var i;
 
-                        if (rawGameList.length > 0) {
+                        if (rawGameList.length > 0)
+                        {
                             for (i = 0; i < rawGameList.length; i++)
                                 if (rawGameList[i].Creator == devId)
                                     devGameList.push(rawGameList[i]);
@@ -274,9 +295,11 @@
 
                         console.log("Game List Set");
 
-                        if (devGameList.length > 0) {
+                        if (devGameList.length > 0)
+                        {
                             console.log("");
-                            for (i = 0; i < devGameList.length; i++) {
+                            for (i = 0; i < devGameList.length; i++)
+                            {
                                 var gameInfo = devGameList[i];
 
                                 console.log("Game : " + i);
@@ -301,15 +324,19 @@
 
                                 var close = gameInfo;
 
-                                statResponse.success(function (sData) {
-                                    if (sData.ResponseType == 0) {
+                                statResponse.success(function (sData)
+                                {
+                                    if (sData.ResponseType == 0)
+                                    {
                                         console.log("Step 3: Get stats");
                                         var statList = JSON.parse(sData.AdditionalData);
                                         console.log("Stat list set");
 
-                                        if (statList.length > 0) {
+                                        if (statList.length > 0)
+                                        {
                                             console.log("Step 4: Populate list of stats");
-                                            for (var x = 0; x < statList.length; x++) {
+                                            for (var x = 0; x < statList.length; x++)
+                                            {
                                                 var statistic = statList[x];
 
                                                 var appendStat = null;
@@ -321,7 +348,8 @@
                                                     statistic.stat_name + ": " + statistic.stat_value + "<br>"
                                                     );
                                             }
-                                        } else {
+                                        } else
+                                        {
                                             var appendMsg = null;
 
                                             appendMsg = $("#gameStatCol");
@@ -330,7 +358,8 @@
                                                 "No stats available <br>"
                                                 );
                                         }
-                                    } else {
+                                    } else
+                                    {
                                         console.log("Error in statResponse");
                                         var appendMsg = null;
 
@@ -342,20 +371,24 @@
                                     }
                                 });
 
-                                statResponse.fail(function (sData) {
+                                statResponse.fail(function (sData)
+                                {
                                     console.log("statResponse failed");
 
                                 });
                             }
-                        } else {
+                        } else
+                        {
                             $("#noGamesHeader").show();
                         }
-                    } else {
+                    } else
+                    {
                         console.log("Error in gameResponse");
                     }
                 });
 
-                gameResponse.fail(function (gData) {
+                gameResponse.fail(function (gData)
+                {
                     console.log("gameResponse failed");
                 });
             });
@@ -367,31 +400,32 @@
             });
         });
 
-        function gameListController($scope)
+        function gameListController($scope, $http)
         {
-            $scope.gameList = [
+            delete $http.defaults.headers.common['X-Requested-With'];
 
+            $http.get("http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
+            {
+                var userInfo = JSON.parse(data.AdditionalData);
+
+                $http.get("http://" + gameForestIP + ":1193/service/game/gamelist/" + userInfo.UserId).success(function (data, status)
                 {
-                    "Name":         "Sample game 1",
-                    "LastUpdate":   "10/10/2013",
-                    "UpdateURL" :   "update?gameid=samplegame1"
-                },
-                {
-                    "Name":         "Sample game 2",
-                    "LastUpdate":   "10/10/2013",
-                    "UpdateURL":    "update?gameid=samplegame1"
-                },
-                {
-                    "Name":         "Sample game 3",
-                    "LastUpdate":   "10/10/2013",
-                    "UpdateURL":    "update?gameid=samplegame1"
-                },
-                {
-                    "Name":         "Sample game 4",
-                    "LastUpdate":   "10/10/2013",
-                    "UpdateURL":    "update?gameid=samplegame1"
-                }
-            ];
+                    var gamedata = JSON.parse(data.AdditionalData);
+
+                    if (gamedata.length > 0)
+                    {
+                        $scope.gameList = gamedata;
+
+                        $("#noGameDiv").hide();
+                        $("#theGameList").show();
+                    }
+                    else
+                    {
+                        $("#noGameDiv").show();
+                        $("#theGameList").hide();
+                    }
+                });
+            });
         }
 
     </script>

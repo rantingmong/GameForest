@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="upload" Codebehind="upload.aspx.cs" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="GameForestFE.upload" CodeBehind="upload.aspx.cs" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -65,9 +65,10 @@
                         <label for="inputSessionId">Session ID:</label>
                         <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
+                    <label for="fileUpload">Game .zip</label>
                     <asp:FileUpload ID="fileUpload" runat="server" />
                     <br />
-                    <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click"/>
+                    <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click" />
                 </form>
             </div>
         </div>
@@ -77,16 +78,16 @@
     <script src="js/gameforestip.js"></script>
     <script type="text/javascript">
 
-        $(document).ready(function () {
-
+        $(document).ready(function ()
+        {
             // do a heartbeat to confirm user's session is still valid
             var showLogin = true;
 
             var response = $.ajax({
 
-                url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type:   "PUT",
-                async:  true,
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true,
             });
 
             response.success(function (data)

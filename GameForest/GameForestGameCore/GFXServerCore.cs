@@ -65,7 +65,6 @@ namespace GameForestCoreWebSocket
             get { return lobbySessionList; }
         }
 
-<<<<<<< HEAD
         public GFXDatabaseTable<GFXUserRow>             UserList
         {
             get { return userList; }
@@ -76,8 +75,6 @@ namespace GameForestCoreWebSocket
             get { return sessionList; }
         }
 
-=======
->>>>>>> origin/analytics
         public  GFXServerCore                           (string ipAddress = "localhost")
         {
             listenerList.Add(new GFXConfirmTurn());

@@ -97,6 +97,52 @@ namespace GameForestCore.Services
             }
         }
 
+        public GFXRestResponse                  GetUserGameList     (string userId)
+        {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserGameList", "Fetching game list for user...");
+
+            try
+            {
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(gameTable.Select(string.Format("Creator = '{0}'", userId))));
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse                  DeleteGame          (string usersessionid, string gameid)
+        {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "DeleteGame", "Deleting game...");
+
+            if (!sessionExists(usersessionid))
+            {
+                return constructResponse(GFXResponseType.NotFound, "User session not found!");
+            }
+
+            try
+            {
+                // get user from usersessionid
+                var userInfo = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)))[0];
+                var gameInfo = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameid)))[0];
+
+                if (gameInfo.Creator != userInfo.UserId)
+                    return constructResponse(GFXResponseType.InvalidInput, "You cannot delete this game!");
+
+                gameTable.Remove(string.Format("Creator = '{0}'", userInfo.UserId));
+
+                return constructResponse(GFXResponseType.Normal, "");
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "CreateGame", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
         // ----------------------------------------------------------------------------------------------------------------
 
         private GFXRestResponse                 constructResponse   (GFXResponseType responseType, string payload)
