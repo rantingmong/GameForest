@@ -1,16 +1,16 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="upload" Codebehind="upload.aspx.cs" %>
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>GameForest | Developer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameForest | Developer - Upload game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen" />
+    <link href="css/style.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
-        <br>
+        <br />
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -65,11 +65,7 @@
                         <label for="inputSessionId">Session ID:</label>
                         <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
                     </div>
-<<<<<<< HEAD
                     <asp:FileUpload ID="fileUpload" runat="server" />
-=======
-                    <asp:FileUpload ID="FileUpload" runat="server" />
->>>>>>> origin/analytics
                     <br />
                     <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click"/>
                 </form>
@@ -87,15 +83,10 @@
             var showLogin = true;
 
             var response = $.ajax({
-<<<<<<< HEAD
+
                 url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
                 type:   "PUT",
                 async:  true,
-=======
-                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: false,
->>>>>>> origin/analytics
             });
 
             response.success(function (data)
