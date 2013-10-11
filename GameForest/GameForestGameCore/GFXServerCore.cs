@@ -65,6 +65,16 @@ namespace GameForestCoreWebSocket
             get { return lobbySessionList; }
         }
 
+        public GFXDatabaseTable<GFXUserRow>             UserList
+        {
+            get { return userList; }
+        }
+
+        public GFXDatabaseTable<GFXLoginRow>            LoginList
+        {
+            get { return sessionList; }
+        }
+
         public  GFXServerCore                           (string ipAddress = "localhost")
         {
             listenerList.Add(new GFXConfirmTurn());

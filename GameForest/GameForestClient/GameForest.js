@@ -126,7 +126,8 @@ var GameForest                              = function (gameId, lobbyId, session
         GFX_TURN_CHANGED        = "GFX_TURN_CHANGED",           // message to inform the client the player's turn has changed
         GFX_TURN_RESOLVE        = "GFX_TURN_RESOLVE",           // message to inform the client the player's orders are updated
         GFX_DATA_CHANGED        = "GFX_DATA_CHANGED",           // message to inform the client the game's data is changed
-        
+        GFX_USER_DATA_CHANGED   = "GFX_USER_DATA_CHANGED",      // message to inform the client someone changed their user's data
+
     // messages for client disconnect and reconnect
         
         GFX_PLAYER_DISCONNECTED = "GFX_PLAYER_DISCONNECTED",    // message to inform the client someone was disconnected by the server
@@ -390,8 +391,14 @@ var GameForest                              = function (gameId, lobbyId, session
                 console.log("Server is informing players the game's data has changed.");
 
                 var packagedData = JSON.parse(parse.Message);
-
                 GameForest.prototype.onUpdateData(packagedData.Key, JSON.parse(packagedData.Data));
+                break;
+            case GFX_USER_DATA_CHANGED:
+
+                console.log("Server is informing players someone's data has changed.");
+
+                var packagedData = JSON.parse(parse.Message);
+                GameForest.prototype.onUpdateUserData(JSON.parse(packagedData.User), JSON.parse(packagedData.Data));
                 break;
         }
     };
@@ -784,6 +791,12 @@ GameForest.prototype.onTurnChange           = function ()
 
 // method to override when the game's data has changed
 GameForest.prototype.onUpdateData           = function (key, data)
+{
+
+};
+
+// method to override when someone's user data has changed
+GameForest.prototype.onUpdateUserData       = function (user, data)
 {
 
 };
