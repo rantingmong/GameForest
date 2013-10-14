@@ -11,6 +11,7 @@ namespace GameForestConsole
     public class GFXWebsocketCore
     {
         private GFXServerCore serverCore;
+        private GFXChatCore chatCore;
 
         private bool isRunning = false;
         private Thread wsThread;
@@ -25,6 +26,7 @@ namespace GameForestConsole
             wsThread = new Thread(new ThreadStart(() =>
                 {
                     serverCore = new GFXServerCore();
+                    chatCore = new GFXChatCore("localhost", "8085");
 
                     while (isRunning)
                     {
