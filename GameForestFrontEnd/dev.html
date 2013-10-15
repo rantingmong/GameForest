@@ -3,29 +3,16 @@
 <head>
     <title>GameForest | Developer</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
-    <link href="css/style.css" rel="stylesheet">
-
-    <script src="js/gameforestip.js" type="text/javascript"></script>
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen" />
+    <link href="css/style.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="fb-root"></div>
-    <script type="text/javascript">
-        (function (d)
-        {
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-    </script>
     <div class="container">
         <br>
-        <nav class="navbar navbar-default" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -41,14 +28,13 @@
                     <li><a href="games.html">Games</a></li>
                     <li><a href="dev.html">Developer</a></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display:none">Logout (FB User)</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
+                <ul class="nav navbar-nav navbar-right" ng-controller="loadUserInfoController">
+                    <li><a id="linkPro" href="profile.html" style="display: none">{{userInfo.Username}}</a></li>
+                    <li><a id="linkOut" href="index.html" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
-        <div class="row">
+        <div class="row" style="margin-top: 40px">
             <div class="col-sm-12">
                 <div class="page-header">
                     <h1>Developer</h1>
@@ -57,350 +43,175 @@
                 <a class="btn btn-primary" href="/dev/GameForest.zip">Download template and samples</a>
                 <a class="btn btn-default pull-right" href="/docu">GameForest documentation</a>
                 <br />
-                <h2>Your games</h2>
-                <div id="noGameDiv">
-                    <h3>You don't have any games hosted on GameForest yet.</h3>
-                </div>
-                <div id="theGameList">
-                    <table style="width: 100%" class="table table-hover" ng-controller="gameListController">
-                        <thead>
-                            <tr>
-                                <td style="width: 60%">Name</td>
-                                <td style="width: 20%">Last updated</td>
-                                <td style="width: 20%"></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="game in gameList">
-                                <td style="vertical-align: middle">{{game.Name}}</td>
-                                <td style="vertical-align: middle">{{game.LastUpdate}}</td>
-                                <td>
-                                    <div class="btn-group pull-right">
-                                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                            Actions <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu pull-right" role="menu">
-                                            <li><a href="update.aspx?gameid={{game.GameID}}&sessionid=0">Update</a></li>
-                                            <li><a href="delete.aspx?gameid={{game.GameID}}&sessionid=0">Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <br />
-                <h2>Stats</h2>
-                <div id="gameStatList">
-                    <h3 id="noGamesHeader" style="display:none">No stats being tracked</h3>
-                    <div id="gameStatCol">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3>Your games</h3>
+                        <div id="noGameDiv">
+                            <p>You don't have any games hosted on GameForest yet.</p>
+                        </div>
+                        <div id="theGameList">
+                            <table style="width: 100%" class="table table-hover" ng-controller="gameListController">
+                                <thead>
+                                    <tr>
+                                        <td style="width: 60%">Name</td>
+                                        <td style="width: 40%"></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="game in gameList">
+                                        <td style="vertical-align: middle">{{game.Name}}</td>
+                                        <td>
+                                            <div class="btn-group pull-right">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                                    Actions <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu pull-right" role="menu">
+                                                    <li><a href="update.aspx?gameid={{game.GameID}}&sessionid={{game.SessionID}}">Update</a></li>
+                                                    <li><a href="delete.aspx?gameid={{game.GameID}}&sessionid={{game.SessionID}}">Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h3>Stats</h3>
+                        <div id="gameStatList">
+                            <p id="noGamesHeader" style="display: none">No stats being tracked</p>
+                            <div id="gameStatCol">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/angular.js"></script>
+    <script src="js/gameforestip.js"></script>
 
+    <script src="js/jquery.js"></script>
+    <script src="js/angular.js"></script>
+    
+    <script src="js/bootstrap.min.js"></script>
+    
     <script type="text/javascript">
 
         var devId = "";
 
-        window.fbAsyncInit = function ()
+        // i dunno how to ng this...
+        function loadStatList           ()
         {
-            FB.init({
-                appId: '672221882789824', // App ID
-                channelUrl: '//' + gameForestIP + ':46069/channel.html',
-                status: true, // check login status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
+            var gameResponse    = $.ajax(
+                {
+                    url:    "http://" + gameForestIP + ":1193/service/game?maxcount=100",
+                    type:   "GET",
+                    async:  true
+                });
 
-            // Initialize when a user has authenticated with FB and this app
-            // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response)
+            gameResponse.success(function (gData)
             {
-
-                if (response.status === 'connected')
+                if (gData.ResponseType == 0)
                 {
-                    // user is logged in to FB
-                    // has authorized app
+                    console.log("Step 1: set game list");
 
-                    console.log('Welcome, fetching information');
+                    var rawGameList = JSON.parse(gData.AdditionalData);
+                    var devGameList = [];
+                    var i;
 
-                    FB.api('/me', function (response)
+                    if (rawGameList.length > 0)
                     {
-
-                        var fbid = response.id;
-                        var fbuser = response.username;
-                        var fname = response.first_name;
-                        var lname = response.last_name;
-
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/fb?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                            async: true,
-                            type: "POST"
-                        });
-
-                        request.done(function (msg)
+                        for (i = 0; i < rawGameList.length; i++)
                         {
-                            if (msg.ResponseType != 0)
-                            {
-                                // show error (maybe in an error div?)
-                                $("#alertDialog").show();
-                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                            }
-                            else
-                            {
-                                // store session ID to local storage
-                                localStorage.setItem("user-session", msg.AdditionalData);
-                                console.log("sessionid: " + localStorage.getItem("user-session"));
-                            }
+                            if (rawGameList[i].Creator == devId)
+                                devGameList.push(rawGameList[i]);
+                        }
+                    }
 
-                            $("buttonSignIn").button('reset');
-                            $("#fbLogout").show();
-                            $("#linkLogout").hide();
-                        });
+                    console.log("Game List Set");
 
-                        request.fail(function (nothing, textStatus, something)
-                        {
-                            $("#alertDialog").show();
-
-                            $("#alertDialog").css("class", "alert alert-danger");
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        $("#login-well").hide();
-                        $("#userinfo-well").show();
-
-                        document.getElementById('fb-log-well').style.display = 'none';
-                    })
-
-                    document.getElementById('fbLogout').addEventListener('click', function ()
+                    if (devGameList.length > 0)
                     {
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                            async: true,
-                            type: "DELETE"
-                        });
-
-                        request.success(function (data)
+                        for (i = 0; i < devGameList.length; i++)
                         {
-                            if (data.ResponseType != 0)
-                            {
-                                // hehe, this is imposible...
-                            }
-                            else
-                            {
-                                FB.logout(function ()
+                            var gameInfo = devGameList[i];
+
+                            console.log("Game : " + JSON.stringify(gameInfo));
+
+                            var appendElm = $("#gameStatCol");
+
+                            if (appendElm == null)
+                                continue;
+
+                            appendElm.append('<div id="' + gameInfo.GameID + '" class="panel-title"><b>' + gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '<br/></div>');
+
+                            var statResponse = $.ajax(
                                 {
-                                    // wipe user
-                                    window.location.reload(true);
+                                    url:    "http://" + gameForestIP + ":1193/service/stats/?getstat=all&gameid=" + gameInfo.GameID + "&all=true",
+                                    type:   "GET",
+                                    async:  false
                                 });
-                            }
-                        });
-                    });
 
-                } else if (response.status === 'not_authorized')
+                            var close = gameInfo;
+
+                            statResponse.success(function (sData)
+                            {
+                                if (sData.ResponseType == 0)
+                                {
+                                    console.log("Step 3: Get stats");
+
+                                    var statList = JSON.parse(sData.AdditionalData);
+
+                                    console.log("Stat list set");
+
+                                    if (statList.length > 0)
+                                    {
+                                        console.log("Step 4: Populate list of stats");
+
+                                        for (var x = 0; x < statList.length; x++)
+                                        {
+                                            var statistic = statList[x];
+
+                                            console.log("Stat " + (x + 1) + ": " + statistic.stat_name);
+                                            $("#" + close.GameID).append("" + statistic.stat_name + ": " + statistic.stat_value + "<br>");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        $("#gameStatCol").append("No stats available <br>");
+                                    }
+                                }
+                                else
+                                {
+                                    console.log("Error in statResponse");
+                                    $("#gameStatCol").append("No stats available <br>");
+                                }
+                            });
+
+                            statResponse.fail(function (sData)
+                            {
+                                console.log("statResponse failed");
+                            });
+                        }
+                    }
+                    else
+                    {
+                        $("#noGamesHeader").show();
+                    }
+                }
+                else
                 {
-                    // user is logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                } else
-                {
-                    // user is not logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
+                    console.log("Error in gameResponse");
                 }
             });
 
-
+            gameResponse.fail(function (gData)
+            {
+                console.log("gameResponse failed");
+            });
         }
 
-        $(document).ready(function ()
-        {
-            // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-            var heartBeatResponse = $.ajax({
-                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
-            });
-
-            heartBeatResponse.success(function (data)
-            {
-                if (data.ResponseType != 0)
-                {
-                    showLogin = true;
-                    localStorage.setItem('user-session', null);
-                }
-                else
-                {
-                    showLogin = false;
-                }
-
-                if (showLogin == false)
-                {
-                    // then async get user's information
-                    var userResponse = $.ajax({
-                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
-                    });
-
-                    userResponse.success(function (data)
-                    {
-                        // set user name to linkProfile
-                        var adata = JSON.parse(data.AdditionalData);
-
-                        $("#linkLogout").show();
-                        $("#linkProfile").show();
-
-                        $("#linkProfile").html(adata.Username);
-                        devId = adata.UserId;
-                    });
-                }
-                else
-                {
-                    localStorage.setItem('user-session', null);
-                    window.location.href = "index.html";
-                }
-
-                var gameResponse = $.ajax({
-                    url: "http://" + gameForestIP + ":1193/service/game?maxcount=100",
-                    type: "GET",
-                    async: true
-                });
-
-                gameResponse.success(function (gData)
-                {
-                    if (gData.ResponseType == 0)
-                    {
-                        console.log("Step 1: set game list");
-                        var rawGameList = JSON.parse(gData.AdditionalData);
-                        var devGameList = [];
-                        var i;
-
-                        if (rawGameList.length > 0)
-                        {
-                            for (i = 0; i < rawGameList.length; i++)
-                                if (rawGameList[i].Creator == devId)
-                                    devGameList.push(rawGameList[i]);
-                        }
-
-                        console.log("Game List Set");
-
-                        if (devGameList.length > 0)
-                        {
-                            console.log("");
-                            for (i = 0; i < devGameList.length; i++)
-                            {
-                                var gameInfo = devGameList[i];
-
-                                console.log("Game : " + i);
-
-                                var appendElm = null;
-
-                                appendElm = $("#gameStatCol");
-
-                                if (appendElm == null)
-                                    continue;
-
-                                appendElm.append(
-                                    '<div id="' + gameInfo.GameID + '" class="panel-title"><b>' +
-                                    gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '<br/></div>'
-                                    );
-
-                                var statResponse = $.ajax({
-                                    url: "http://" + gameForestIP + ":1193/service/stats/?getstat=all&gameid=" + gameInfo.GameID + "&all=true",
-                                    type: "GET",
-                                    async: false
-                                });
-
-                                var close = gameInfo;
-
-                                statResponse.success(function (sData)
-                                {
-                                    if (sData.ResponseType == 0)
-                                    {
-                                        console.log("Step 3: Get stats");
-                                        var statList = JSON.parse(sData.AdditionalData);
-                                        console.log("Stat list set");
-
-                                        if (statList.length > 0)
-                                        {
-                                            console.log("Step 4: Populate list of stats");
-                                            for (var x = 0; x < statList.length; x++)
-                                            {
-                                                var statistic = statList[x];
-
-                                                var appendStat = null;
-
-                                                appendStat = $("#" + close.GameID);
-
-                                                console.log("Stat " + (x + 1) + ": " + statistic.stat_name);
-                                                appendStat.append("" +
-                                                    statistic.stat_name + ": " + statistic.stat_value + "<br>"
-                                                    );
-                                            }
-                                        } else
-                                        {
-                                            var appendMsg = null;
-
-                                            appendMsg = $("#gameStatCol");
-
-                                            appendMsg.append(
-                                                "No stats available <br>"
-                                                );
-                                        }
-                                    } else
-                                    {
-                                        console.log("Error in statResponse");
-                                        var appendMsg = null;
-
-                                        appendMsg = $("#gameStatCol");
-
-                                        appendMsg.append(
-                                            "No stats available <br>"
-                                            );
-                                    }
-                                });
-
-                                statResponse.fail(function (sData)
-                                {
-                                    console.log("statResponse failed");
-
-                                });
-                            }
-                        } else
-                        {
-                            $("#noGamesHeader").show();
-                        }
-                    } else
-                    {
-                        console.log("Error in gameResponse");
-                    }
-                });
-
-                gameResponse.fail(function (gData)
-                {
-                    console.log("gameResponse failed");
-                });
-            });
-
-            heartBeatResponse.fail(function (data)
-            {
-                localStorage.setItem('user-session', null);
-                window.location.href = "index.html";
-            });
-        });
-
-        function gameListController($scope, $http)
+        function gameListController     ($scope, $http)
         {
             delete $http.defaults.headers.common['X-Requested-With'];
 
@@ -414,6 +225,11 @@
 
                     if (gamedata.length > 0)
                     {
+                        for (var i = 0; i < gamedata.length; i++)
+                        {
+                            gamedata[i].SessionID = localStorage.getItem("user-session");
+                        }
+
                         $scope.gameList = gamedata;
 
                         $("#noGameDiv").hide();
@@ -427,6 +243,63 @@
                 });
             });
         }
+
+        function loadUserInfoController ($scope, $http)
+        {
+            delete $http.defaults.headers.common['X-Requested-With'];
+
+            // heartbeat first
+            $http.put("http://" + "localhost" + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
+            {
+                if (data.ResponseType == 0)
+                {
+                    $("#linkOut").show();
+                    $("#linkPro").show();
+
+                    // userinfo get
+                    $http.get("http://" + "localhost" + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
+                    {
+                        var userInfo = JSON.parse(data.AdditionalData);
+
+                        $scope.userInfo = userInfo;
+                        devId           = userInfo.UserId;
+                    });
+                }
+                else
+                {
+                    $("#linkOut").hide();
+                    $("#linkPro").hide();
+
+                    window.location.href = "login.html";
+                }
+            });
+        }
+
+        function logOut                 (e)
+        {
+            console.log("Logging you out...");
+
+            var request = $.ajax(
+                {
+                    url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type: "DELETE",
+                    async: false
+                });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
+
+        $(document).ready(function ()
+        {
+            loadStatList();
+        });
 
     </script>
 </body>

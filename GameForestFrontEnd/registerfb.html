@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>GameForest | Profile</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen" />
+    <link href="css/style.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="fb-root"></div>
+    <script type="text/javascript">
+        (function (d)
+        {
+            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement('script'); js.id = id; js.async = true;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            ref.parentNode.insertBefore(js, ref);
+        }(document));
+    </script>
+    <div class="container">
+        <br>
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">GameForest</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row" style="margin-top: 40px">
+            <div class="col-sm-12">
+                <div id="alertDialog" class="alert alert-danger"></div>
+                <div class="page-header">
+                    <h1>Register Facebook User</h1>
+                </div>
+                <div class="row" id="fb-login-button">
+                    <div class="col-sm-12">
+                        <p>To register using your Facebook credentials, you must authorize GameForest with Facebook.</p>
+                        <a class="btn btn-primary" onclick="authFacebook()">Authorize GameForest</a>
+                    </div>
+                </div>
+                <div class="row" id="fb-main-panel" style="display: none">
+                    <div class="col-sm-12">
+                        <h4>Hello <strong id="fb-username"></strong>! To finish registering with GameForest, enter your desired password.</h4>
+                        <br/>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="password1">Password</label>
+                                    <input type="password" class="form-control" id="password1" placeholder="Password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password2">Verify password</label>
+                                    <input type="password" class="form-control" id="password2" placeholder="Type password again">
+                                </div>
+                                <button class="btn btn-success" onclick="registerUser()">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gameforestip.js"></script>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        $("#alertDialog").hide();
+
+        window.fbAsyncInit  = function ()
+        {
+            FB.init(
+                {
+                    appId:      '672221882789824',
+                    channelUrl: '//' + gameForestIP + ':46069/channel.html',
+                    status:     true,
+                    cookie:     true,
+                    xfbml:      true
+                });
+
+            FB.Event.subscribe('auth.authResponseChange', function (response)
+            {
+                if (response.status === 'connected')
+                {
+                    FB.api("/me", function (response)
+                    {
+                        $("#fb-login-button").hide();
+                        $("#fb-main-panel").show();
+
+                        var fbUn = response.username;
+                        var fbId = response.id;
+                        var fbFn = response.first_name;
+                        var fbLn = response.last_name;
+
+                        $("#fb-username").html(fbUn);
+                    });
+                }
+            });
+        };
+
+        window.authFacebook = function ()
+        {
+            FB.login();
+        };
+
+        window.registerUser = function ()
+        {
+            $("#fb-main-panel").hide();
+
+            FB.api("/me", function (response)
+            {
+                var error       = false;
+
+                var fbUn        = response.username;
+                var fbId        = response.id;
+                var fbFn        = response.first_name;
+                var fbLn        = response.last_name;
+
+                var varPword1   = $("#password1").val();
+                var varPword2   = $("#password2").val();
+
+                if (varPword1.length == 0 || varPword1 == null)
+                    error = true;
+
+                if (varPword2.length == 0 || varPword2 == null)
+                    error = true;
+
+                if (varPword1 != varPword2)
+                    error = true;
+
+                if (error)
+                {
+                    $("#alertDialog").show();
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+                }
+                else
+                {
+                    var request = $.ajax(
+                        {
+                            url:    "http://" + gameForestIP + ":1193/service/user/fbregister?username=" + fbUn + "&password=" + varPword1 + "&fbid=" + fbId + "&firstname=" + fbFn + "&lastname=" + fbLn,
+                            type:   "POST",
+                            async:  true
+                        });
+
+                    request.done(function (msg)
+                    {
+                        if (msg.ResponseType != 0)
+                        {
+                            $("#alertDialog").css("class", "alert alert-danger");
+                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                        }
+                        else
+                        {
+                            $("#alertDialog").css("class", "alert alert-success");
+                            $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered! Returning to main page...");
+
+                            setTimeout(function ()
+                            {
+                                window.location.href = "index.html";
+
+                            }, 5000);
+                        }
+
+                        $("#alertDialog").show();
+                    });
+
+                    request.fail(function (nothing, textStatus, something)
+                    {
+                        $("#alertDialog").css("class", "alert alert-danger");
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+                    });
+                }
+            });
+        };
+
+    </script>
+</body>
+</html>

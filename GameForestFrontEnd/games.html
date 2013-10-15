@@ -13,28 +13,18 @@
 
     <style type="text/css">
         #overlayWindow {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            width: 100%;
-            height: 100%;
-            z-index: 10000;
+            position:   absolute;
+            left:       0px;
+            top:        0px;
+            width:      100%;
+            height:     100%;
+            z-index:    10000;
             background: rgba(1, 1, 1, 0.5);
-            display: none;
+            display:    none;
         }
     </style>
 </head>
 <body>
-        <div class="fb-root"></div>
-        <script type="text/javascript">
-            (function (d) {
-                var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-                if (d.getElementById(id)) { return; }
-                js = d.createElement('script'); js.id = id; js.async = true;
-                js.src = "//connect.facebook.net/en_US/all.js";
-                ref.parentNode.insertBefore(js, ref);
-            }(document));
-        </script>
     <div id="overlayWindow">
         <div id="createDialogWindow" class="modal-dialog">
             <div class="modal-content">
@@ -85,7 +75,7 @@
     </div>
     <div class="container">
         <br>
-        <nav class="navbar navbar-default" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -101,14 +91,13 @@
                     <li><a href="games.html">Games</a></li>
                     <li><a href="dev.html">Developer</a></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display: none">Logout (FB user)</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
+                <ul class="nav navbar-nav navbar-right" ng-controller="loadUserInfoController">
+                    <li><a id="linkPro" href="profile.html" style="display: none">{{userInfo.Username}}</a></li>
+                    <li><a id="linkOut" href="index.html" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
-        <div class="row">
+        <div class="row" style="margin-top: 40px">
             <div class="col-sm-12" ng-controller="loadGameListController">
                 <div class="page-header">
                     <h1>Games</h1>
@@ -119,10 +108,10 @@
                 <div id="theGameList" style="display: none">
                     <div ng-repeat="game in gameList" style="border-bottom: solid 1px lightgray; padding: 10px 5px 5px 5px">
                         <div class="row">
-                            <div class="col-xs-8">
+                            <div class="col-xs-6">
                                 <h4>{{game.Name}}</h4>
                             </div>
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <div class="pull-right">
                                     <a href="#clossh?{{game.GameID}}" id="clossh_{{game.GameID}}" class="btn btn-danger" style="display: none">Close</a>
                                     <a href="#infosh?{{game.GameID}}" id="showsh_{{game.GameID}}" class="btn btn-info">Info</a>
@@ -147,116 +136,20 @@
             </div>
         </div>
     </div>
+    
     <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.js"></script>
+
+    <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
 
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '672221882789824', // App ID 
-                channelUrl: '//' + gameForestIP + ':46069/channel.html',
-                status: true, // check login status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
+        $("#alertDialog").hide();
 
-            // Initialize when a user has authenticated with FB and this app
-            // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response) {
-
-                if (response.status === 'connected') {
-                    // user is logged in to FB
-                    // has authorized app
-
-                    console.log('Welcome, fetching information');
-
-                    FB.api('/me', function (response) {
-
-                        var fbid = response.id;
-                        var fbuser = response.username;
-                        var fname = response.first_name;
-                        var lname = response.last_name;
-
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/fb?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                            async: true,
-                            type: "POST"
-                        });
-
-                        request.done(function (msg) {
-                            if (msg.ResponseType != 0) {
-                                // show error (maybe in an error div?)
-                                $("#alertDialog").show();
-                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                            }
-                            else {
-                                // store session ID to local storage
-                                localStorage.setItem("user-session", msg.AdditionalData);
-                                console.log("sessionid: " + localStorage.getItem("user-session"));
-                            }
-
-                            $("buttonSignIn").button('reset');
-                            $("#fbLogout").show();
-                            $("#linkLogout").hide();
-                        });
-
-                        request.fail(function (nothing, textStatus, something) {
-                            $("#alertDialog").show();
-
-                            $("#alertDialog").css("class", "alert alert-danger");
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        $("#login-well").hide();
-                        $("#userinfo-well").show();
-
-                        document.getElementById('fb-log-well').style.display = 'none';
-                    })
-
-                    document.getElementById('fbLogout').addEventListener('click', function () {
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                            async: true,
-                            type: "DELETE"
-                        });
-
-                        request.success(function (data) {
-                            if (data.ResponseType != 0) {
-                                // hehe, this is imposible...
-                            }
-                            else {
-                                FB.logout(function () {
-                                    // wipe user
-                                    window.location.reload(true);
-                                });
-                            }
-                        });
-                    });
-
-                } else if (response.status === 'not_authorized') {
-                    // user is logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                } else {
-                    // user is not logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                }
-            });
-
-
-        }
-
-        window.onhashchange = function ()
+        window.onhashchange           = function ()
         {
             console.log(location.hash);
 
-            var list    = location.hash.split('?');
+            var list = location.hash.split('?');
             var handled = false;
 
             if (list[0].indexOf("create") > -1)
@@ -294,70 +187,12 @@
             }
         };
 
-        $(document).ready(function ()
-        {
-            $("#alertDialog").hide();
-
-            // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-            var heartBeatResponse = $.ajax({
-                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
-            });
-
-            heartBeatResponse.success(function (data)
-            {
-                if (data.ResponseType != 0)
-                {
-                    showLogin = true;
-                    localStorage.setItem('user-session', null);
-                }
-                else
-                {
-                    showLogin = false;
-                }
-
-                if (showLogin == false)
-                {
-                    // then async get user's information
-                    var userResponse = $.ajax({
-                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
-                    });
-
-                    userResponse.success(function (data)
-                    {
-                        // set user name to linkProfile
-                        var adata = JSON.parse(data.AdditionalData);
-
-                        $("#linkLogout").show();
-                        $("#linkProfile").show();
-
-                        $("#linkProfile").html(adata.Username);
-                    });
-                }
-                else
-                {
-                    localStorage.setItem('user-session', null);
-                    window.location.href = "index.html";
-                }
-            });
-
-            heartBeatResponse.fail(function (data)
-            {
-                localStorage.setItem('user-session', null);
-                window.location.href = "index.html";
-            });
-        });
-
-        function hideOverlay()
+        function hideOverlay            ()
         {
             $("#overlayWindow").fadeOut("fast");
         }
 
-        function showCreateDialog(gameId)
+        function showCreateDialog       (gameId)
         {
             $("#overlayWindow").fadeIn("fast");
             $("#joinDialogWindow").hide();
@@ -366,14 +201,14 @@
             $("#inputGameId").val(gameId);
         }
 
-        function showJoinDialog(gameId)
+        function showJoinDialog         (gameId)
         {
             $("#lobbyList").html("");
 
             var lobbyResponse = $.ajax({
                 url:    "http://" + gameForestIP + ":1193/service/lobby?maxcount=1000",
                 type:   "GET",
-                async:  true,
+                async:  true
             });
 
             lobbyResponse.success(function (data)
@@ -392,14 +227,14 @@
                         var gameInfoResponse = $.ajax({
                             url:    "http://" + gameForestIP + ":1193/service/game/" + lobby.GameID,
                             type:   "GET",
-                            async:  false
+                            async:  true
                         });
 
                         gameInfoResponse.success(function (theData)
                         {
                             if (theData.ResponseType == 0)
                             {
-                                var gameInfo = JSON.parse(theData.AdditionalData);
+                                var gameInfo    = JSON.parse(theData.AdditionalData);
 
                                 var gameName    = gameInfo.Name;
                                 var gameId      = gameInfo.GameID;
@@ -411,9 +246,9 @@
                                 var maxUsers    = gameInfo.MaxPlayers;
 
                                 var userCountResponse = $.ajax({
-                                    url: "http://" + gameForestIP + ":1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID,
-                                    type: "GET",
-                                    async: false
+                                    url:    "http://" + gameForestIP + ":1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID,
+                                    type:   "GET",
+                                    async:  true
                                 });
 
                                 userCountResponse.success(function (userCountData)
@@ -437,7 +272,7 @@
             });
         }
 
-        function createLobby()
+        function createLobby            ()
         {
             var name        = $("#inputName").val(),
                 gameId      = $("#inputGameId").val(),
@@ -449,9 +284,9 @@
                 name = "Untitled lobby";
 
             var createLobbyResponse = $.ajax({
-                url:    "http://" + gameForestIP + ":1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate,
-                type:   "POST",
-                async:  true,
+                url: "http://" + gameForestIP + ":1193/service/lobby?name=" + name + "&gameid=" + gameId + "&password=" + password + "&usersessionid=" + sessionId + "&private=" + isprivate,
+                type: "POST",
+                async: true,
             });
 
             createLobbyResponse.success(function (data)
@@ -464,9 +299,9 @@
                     localStorage.setItem("lobby-session", data.AdditionalData);
 
                     var gameResponse = $.ajax({
-                        url:    "http://" + gameForestIP + ":1193/service/game/" + gameId,
-                        type:   "GET",
-                        async:  true
+                        url: "http://" + gameForestIP + ":1193/service/game/" + gameId,
+                        type: "GET",
+                        async: true
                     });
 
                     gameResponse.success(function (gameData)
@@ -494,26 +329,25 @@
             });
         }
 
-        function joinGame(lobbyId, gameId)
+        function joinGame               (lobbyId, gameId)
         {
             var joinGameResponse = $.ajax({
-                url: "http://" + gameForestIP + ":1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
-                type: "POST",
-                async: true
+                url:    "http://" + gameForestIP + ":1193/service/lobby/join?lobbyid=" + lobbyId + "&usersessionid=" + localStorage.getItem("user-session"),
+                type:   "POST",
+                async:  false
             });
 
             joinGameResponse.success(function (data)
             {
-
                 if (data.ResponseType == 0)
                 {
                     localStorage.setItem("lobby-owner", false);
                     localStorage.setItem("lobby-session", data.AdditionalData);
 
                     var gameResponse = $.ajax({
-                        url: "http://" + gameForestIP + ":1193/service/game/" + gameId,
-                        type: "GET",
-                        async: true
+                        url:    "http://" + gameForestIP + ":1193/service/game/" + gameId,
+                        type:   "GET",
+                        async:  false
                     });
 
                     gameResponse.success(function (gameData)
@@ -528,15 +362,15 @@
                             window.location.href = gameInfo.RelativeLink + "/index.html";
                         }
                     });
-                } else
+                }
+                else
                 {
-
                     alert("Cannot join you to the lobby. " + data.AdditionalData);
                 }
             });
         }
 
-        function loadGameListController($scope, $http)
+        function loadGameListController ($scope, $http)
         {
             delete $http.defaults.headers.common['X-Requested-With'];
 
@@ -544,7 +378,7 @@
             {
                 var gamedata = JSON.parse(data.AdditionalData);
 
-                if (gamedata.length >0)
+                if (gamedata.length > 0)
                 {
                     $scope.gameList = gamedata;
 
@@ -558,6 +392,58 @@
                 }
             });
         }
+
+        function loadUserInfoController ($scope, $http)
+        {
+            delete $http.defaults.headers.common['X-Requested-With'];
+
+            // heartbeat first
+            $http.put("http://" + "localhost" + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
+            {
+                if (data.ResponseType == 0)
+                {
+                    $("#linkReg").hide();
+                    $("#linkLog").hide();
+                    $("#linkOut").show();
+                    $("#linkPro").show();
+
+                    // userinfo get
+                    $http.get("http://" + "localhost" + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
+                    {
+                        $scope.userInfo = JSON.parse(data.AdditionalData);
+                    });
+                }
+                else
+                {
+                    $("#linkReg").show();
+                    $("#linkLog").show();
+                    $("#linkOut").hide();
+                    $("#linkPro").hide();
+                }
+            });
+        }
+
+        function logOut                 (e)
+        {
+            console.log("Logging you out...");
+
+            var request = $.ajax(
+                {
+                    url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type: "DELETE",
+                    async: false
+                });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

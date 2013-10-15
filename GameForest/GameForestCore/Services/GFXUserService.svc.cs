@@ -132,11 +132,12 @@ namespace GameForestCore.Services
                 userTable.Insert(new GFXUserRow
                 {
                     Description = "",
-                    FirstName = "GameForest",
-                    LastName = "User",
-                    Username = username,
-                    Password = password,
-                    UserId = Guid.NewGuid()
+                    FirstName   = "GameForest",
+                    LastName    = "User",
+                    Username    = username,
+                    Password    = password,
+                    UserId      = Guid.NewGuid(),
+                    fb_id       = ""
                 });
 
                 return constructResponse(GFXResponseType.Normal, "Success!");
@@ -174,6 +175,40 @@ namespace GameForestCore.Services
             }
         }
 
+        public GFXRestResponse      RegisterFB              (string username, string password, string fbid, string firstname, string lastname)
+        {
+            if (userExists(username))
+                return constructResponse(GFXResponseType.DuplicateEntry, "Username already exists!");
+
+            if (password.Length < 5 || password.Length > 20)
+                return constructResponse(GFXResponseType.InvalidInput, "Invalid password length!");
+
+            if (username.Length < 5 || username.Length > 40)
+                return constructResponse(GFXResponseType.InvalidInput, "Invalid username length!");
+
+            try
+            {
+                userTable.Insert(new GFXUserRow
+                {
+                    Description = "",
+                    FirstName   = firstname,
+                    LastName    = lastname,
+                    Username    = username,
+                    Password    = password,
+                    UserId      = Guid.NewGuid(),
+                    fb_id       = fbid
+                });
+
+                return constructResponse(GFXResponseType.Normal, "Success!");
+            }
+            catch (Exception exp)
+            {
+                Console.Error.WriteLine("[User|Register] " + exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
         public  GFXRestResponse     Login                   (string username, string password)
         {
             if (!userExists(username))
@@ -186,6 +221,44 @@ namespace GameForestCore.Services
             {
                 var sessionId = Guid.NewGuid();
                 var userId = getUserId(username);
+
+                if (userId == Guid.Empty)
+                    return constructResponse(GFXResponseType.RuntimeError, "Error in finding user id.");
+
+                loginTable.Insert(new GFXLoginRow
+                {
+                    LastHeartbeat   = DateTime.Now,
+                    UserId          = userId,
+                    SessionId       = sessionId,
+                    UserStatus      = GFXLoginStatus.MENU,
+                });
+
+                return constructResponse(GFXResponseType.Normal, sessionId.ToString());
+            }
+            catch (Exception exp)
+            {
+                Console.Error.WriteLine("[User|Login] " + exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse      LoginFB                 (string username, string fbid)
+        {
+            if (!userExists(username))
+                return constructResponse(GFXResponseType.NotFound, "Username or user id not found!");
+
+            var userList = new List<GFXUserRow>(userTable.Select(string.Format("Username = '{0}'", username)))[0];
+
+            if (userList.fb_id != fbid)
+            {
+                return constructResponse(GFXResponseType.InvalidInput, "Invalid Facebook ID!");
+            }
+
+            try
+            {
+                var sessionId   = Guid.NewGuid();
+                var userId      = getUserId(username);
 
                 if (userId == Guid.Empty)
                     return constructResponse(GFXResponseType.RuntimeError, "Error in finding user id.");
@@ -284,83 +357,6 @@ namespace GameForestCore.Services
                 Console.Error.WriteLine("[User|ChangePassword] " + exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-            }
-        }
-
-        public GFXRestResponse      FBConnect               (string fbid, string username, string fname, string lname)
-        {
-            if (!userExists(username))
-            {
-                try
-                {
-                    var sessionId = Guid.NewGuid();
-
-                    userTable.Insert(new GFXUserRow
-                    {
-                        Description = "",
-                        FirstName   = fname,
-                        LastName    = lname,
-                        Username    = username,
-                        Password    = "debugger",
-                        UserId      = Guid.NewGuid(),
-                        fb_id       = fbid
-                    });
-
-                    return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                }
-                catch (Exception exp)
-                {
-                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
-
-                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-                }
-            }
-            else
-            {
-                try
-                {
-                    var sessionId   = Guid.NewGuid();
-                    var userId      = getUserId(username);
-
-                    if (userId == Guid.Empty)
-                        return constructResponse(GFXResponseType.RuntimeError, "Error in finding user id");
-
-                    if (loginTable.Count(string.Format("UserId = '{0}'", userId)) == 0)
-                    {
-                        loginTable.Insert(new GFXLoginRow
-                        {
-                            LastHeartbeat   = DateTime.Now,
-                            UserId          = userId,
-                            SessionId       = sessionId,
-                            UserStatus      = GFXLoginStatus.MENU
-                        });
-
-                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                    }
-                    else
-                    {
-                        var result = new List<GFXLoginRow>(loginTable.Select(string.Format("UserId = '{0}'", userId)));
-
-                        if (result.Count <= 0)
-                            return constructResponse(GFXResponseType.NotFound, "Session expired");
-
-                        var user = result[0];
-
-                        user.LastHeartbeat = DateTime.Now;
-
-                        loginTable.Update(string.Format("UserId = '{0}'", userId), user);
-
-                        sessionId = user.SessionId;
-
-                        return constructResponse(GFXResponseType.Normal, sessionId.ToString());
-                    }
-                }
-                catch (Exception exp)
-                {
-                    Console.Error.WriteLine("[User|FBConn] " + exp.Message);
-
-                    return constructResponse(GFXResponseType.RuntimeError, exp.Message);
-                }
             }
         }
 

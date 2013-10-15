@@ -8,33 +8,36 @@ namespace GameForestCore.Services
     public interface IGFXUserService
     {
         [OperationContract, WebInvoke(UriTemplate = "/{username}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
-        GFXRestResponse GetUserInfo(string username);
+        GFXRestResponse GetUserInfo             (string username);
         
         [OperationContract, WebInvoke(UriTemplate = "/session/{usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
-        GFXRestResponse GetUserInfoFromSession(string usersessionid);
+        GFXRestResponse GetUserInfoFromSession  (string usersessionid);
 
         [OperationContract, WebInvoke(UriTemplate = "/{username}?firstname={firstname}&lastname={lastname}&description={description}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "PUT")]
-        GFXRestResponse SetUserInfo(string username, string firstname, string lastname, string description, string usersessionid);
+        GFXRestResponse SetUserInfo             (string username, string firstname, string lastname, string description, string usersessionid);
 
         [OperationContract, WebInvoke(UriTemplate = "/login?username={username}&password={password}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse Login(string username, string password);
+        GFXRestResponse Login                   (string username, string password);
+        
+        [OperationContract, WebInvoke(UriTemplate = "/loginfb?username={username}&fbid={fbid}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
+        GFXRestResponse LoginFB                 (string username, string fbid);
 
         [OperationContract, WebInvoke(UriTemplate = "/login?usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "DELETE")]
-        GFXRestResponse Logout(string usersessionid);
+        GFXRestResponse Logout                  (string usersessionid);
 
         [OperationContract, WebInvoke(UriTemplate = "/changepassword?usersessionid={usersessionid}&oldpassword={oldpassword}&newpassword={newpassword}", ResponseFormat = WebMessageFormat.Json, Method = "PUT")]
-        GFXRestResponse ChangePassword(string usersessionid, string oldpassword, string newpassword);
+        GFXRestResponse ChangePassword          (string usersessionid, string oldpassword, string newpassword);
 
         [OperationContract, WebInvoke(UriTemplate = "/login?usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "PUT")]
-        GFXRestResponse Heartbeat(string usersessionid);
+        GFXRestResponse Heartbeat               (string usersessionid);
 
         [OperationContract, WebInvoke(UriTemplate = "/register?username={username}&password={password}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse Register(string username, string password);
+        GFXRestResponse Register                (string username, string password);
 
         [OperationContract, WebInvoke(UriTemplate = "/register?username={username}&password={password}", ResponseFormat = WebMessageFormat.Json, Method = "DELETE")]
-        GFXRestResponse Unregister(string username, string password);
+        GFXRestResponse Unregister              (string username, string password);
 
-        [OperationContract, WebInvoke(UriTemplate = "/fb?fbid={fbid}&username={email}&firstname={fname}&lastname={lname}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse FBConnect(string fbid, string email, string fname, string lname);
+        [OperationContract, WebInvoke(UriTemplate = "/fbregister?username={username}&password={password}&fbid={fbid}&firstname={firstname}&lastname={lastname}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
+        GFXRestResponse RegisterFB              (string username, string password, string fbid, string firstname, string lastname);
     }
 }

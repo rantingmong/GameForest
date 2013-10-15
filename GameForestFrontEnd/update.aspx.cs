@@ -62,9 +62,20 @@ namespace GameForestFE
             var reader      = new StreamReader(response.GetResponseStream());
 
             var data        = JsonConvert.DeserializeObject<GFXRestResponse>(reader.ReadToEnd());
+
+            if (data.ResponseType != GFXResponseType.Normal)
+            {
+                error = true;
+
+                alertDialog.Style["display"] = "normal";
+                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>There was something wrong with the server.";
+
+                return;
+            }
+
             var userInfo    = JsonConvert.DeserializeObject<Dictionary<string, object>>((string)data.AdditionalData);
 
-            userId          = (string)userInfo["UserID"];
+            userId          = (string)userInfo["UserId"];
 
             if (fileUpload.HasFile)
             {
@@ -150,15 +161,16 @@ namespace GameForestFE
                 // replace this to update
 
                 // send REST request to server
-                HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
+                HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}&gameid={5}",
                                                                                                 inputGameName.Text,
                                                                                                 inputGameDescription.Text,
                                                                                                 inputMinPlayers.Text,
                                                                                                 inputMaxPlayers.Text,
-                                                                                                Guid.Parse(sessId)));
+                                                                                                Guid.Parse(sessId),
+                                                                                                Guid.Parse(gameId)));
 
-                newGameRequest.Method = "POST";
-                newGameRequest.ContentLength = 0;
+                newGameRequest.Method           = "PUT";
+                newGameRequest.ContentLength    = 0;
 
                 response    = (HttpWebResponse)newGameRequest.GetResponse();
                 reader      = new StreamReader(response.GetResponseStream());

@@ -3,18 +3,16 @@
 <head>
     <title>GameForest | Profile</title>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
-    <link href="css/style.css" rel="stylesheet">
-
-    <script src="js/gameforestip.js" type="text/javascript"></script>
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen" />
+    <link href="css/style.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
         <br>
-        <nav class="navbar navbar-default" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -30,46 +28,54 @@
                 </ul>
             </div>
         </nav>
-        <div class="row">
-            <div id="alertDialog" class="alert alert-danger"></div>
-            <div class="col-sm-8">
+        <div class="row" id="registerForm" style="margin-top: 40px">
+            <div class="col-sm-12">
+                <div id="alertDialog" class="alert alert-danger"></div>
                 <div class="page-header">
                     <h1>Register User</h1>
                 </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="email" class="form-control" id="username" placeholder="foobar">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="email" class="form-control" id="username" placeholder="foobar">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" id="email" placeholder="foobar@baz.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="password1">Password</label>
+                            <input type="password" class="form-control" id="password1" placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="password2">Verify password</label>
+                            <input type="password" class="form-control" id="password2" placeholder="Type password again">
+                        </div>
+                        <button class="btn btn-success" onclick="onRegisterClick()">Register</button>
+                    </div>
+                    <div class="col-sm-6">
+                        <h4>To Facebook users</h4>
+                        <a class="btn btn-primary" href="registerfb.html">Register with your Facebook account</a>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email address</label>
-                    <input type="email" class="form-control" id="email" placeholder="foobar@baz.com">
-                </div>
-                <div class="form-group">
-                    <label for="password1">Password</label>
-                    <input type="password" class="form-control" id="password1" placeholder="Password">
-                </div>
-                <div class="form-group">
-                    <label for="password2">Verify password</label>
-                    <input type="password" class="form-control" id="password2" placeholder="Type password again">
-                </div>
-                <button class="btn btn-success" onclick="onRegisterClick();">Register</button>
             </div>
         </div>
     </div>
+
+    <script src="js/gameforestip.js"></script>
+
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    
     <script type="text/javascript">
 
-        var gameForestIp = gameForestIP;
-
-        $(document).ready(function ()
-        {
-            $("#alertDialog").hide();
-        })
+        $("#alertDialog").hide();
 
         function onRegisterClick()
         {
             $("#alertDialog").hide();
+            $("#registerForm").hide();
 
             var error = false;
 
@@ -96,35 +102,44 @@
             }
             else
             {
-                var request = $.ajax({
-                    url: "http://" + gameForestIp + ":1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
-                    async: true,
-                    type: "POST"
-                });
+                var request = $.ajax(
+                    {
+                        url:    "http://" + gameForestIP + ":1193/service/user/register?username=" + varUrname + "&password=" + varPword1,
+                        type:   "POST",
+                        async:  true
+                    });
 
                 request.done(function (msg)
                 {
-                    $("#alertDialog").show();
-
                     if (msg.ResponseType != 0)
                     {
-
                         $("#alertDialog").css("class", "alert alert-danger");
                         $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+
+                        $("#registerForm").show();
                     }
                     else
                     {
                         $("#alertDialog").css("class", "alert alert-success");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered!");
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered! Returning to main page...");
+
+                        setTimeout(function ()
+                        {
+                            window.location.href = "index.html";
+
+                        }, 5000);
                     }
+
+                    $("#alertDialog").show();
                 });
 
                 request.fail(function (nothing, textStatus, something)
                 {
-                    $("#alertDialog").show();
-
                     $("#alertDialog").css("class", "alert alert-danger");
                     $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+
+                    $("#alertDialog").show();
+                    $("#registerForm").show();
                 });
             }
         }

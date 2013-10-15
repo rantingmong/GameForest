@@ -30,7 +30,26 @@ namespace GameForestCore.Services
             {
                 List<GFXGameRow> gameList = new List<GFXGameRow>(gameTable.Select("", maxCount));
 
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(gameList));
+                List<Dictionary<string, object>> returnGameList = new List<Dictionary<string, object>>();
+
+                foreach (var game in gameList)
+                {
+                    var user = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", game.Creator)));
+
+                    var item = new Dictionary<string, object>();
+
+                    item["Name"]        = game.Name;
+                    item["GameID"]      = game.GameID;
+                    item["MinPlayers"]  = game.MinPlayers;
+                    item["MaxPlayers"]  = game.MaxPlayers;
+                    item["Description"] = game.Description;
+                    item["Creator"]     = user[0].Username;
+                    item["CreatorName"] = user[0].FirstName + " " + user[0].LastName;
+
+                    returnGameList.Add(item);
+                }
+
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(returnGameList));
             }
             catch (Exception exp)
             {
@@ -58,6 +77,22 @@ namespace GameForestCore.Services
             catch (Exception exp)
             {
                 GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameInfo", exp.Message);
+
+                return constructResponse(GFXResponseType.RuntimeError, exp.Message);
+            }
+        }
+
+        public GFXRestResponse                  GetUserGameList     (string userId)
+        {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserGameList", "Fetching game list for user...");
+
+            try
+            {
+                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(gameTable.Select(string.Format("Creator = '{0}'", userId))));
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -97,17 +132,40 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse                  GetUserGameList     (string userId)
+        public GFXRestResponse                  UpdateGame          (string name, string description, int minPlayers, int maxPlayers, string usersessionid, string gameid)
         {
-            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "GetUserGameList", "Fetching game list for user...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "UpdateGame", "Updating game...");
+
+            if (!sessionExists(usersessionid))
+            {
+                return constructResponse(GFXResponseType.NotFound, "User session not found!");
+            }
 
             try
             {
-                return constructResponse(GFXResponseType.Normal, JsonConvert.SerializeObject(gameTable.Select(string.Format("Creator = '{0}'", userId))));
+                // get user from usersessionid
+                var userInfo = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", usersessionid)))[0];
+                var gameInfo = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameid)))[0];
+
+                if (gameInfo.Creator != userInfo.UserId)
+                    return constructResponse(GFXResponseType.InvalidInput, "You cannot update this game! Its not yours. >:(");
+
+                gameTable.Update(string.Format("Creator = '{0}' AND GameId = '{1}'", userInfo.UserId, gameid), new GFXGameRow
+                {
+                    Creator         = getUserId(usersessionid),
+                    Description     = description,
+                    GameID          = Guid.Parse(gameid),
+                    MaxPlayers      = maxPlayers,
+                    MinPlayers      = minPlayers,
+                    Name            = name,
+                    RelativeLink    = gameInfo.RelativeLink
+                });
+                
+                return constructResponse(GFXResponseType.Normal, "");
             }
             catch (Exception exp)
             {
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "GetGameList", exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "CreateGame", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -129,9 +187,9 @@ namespace GameForestCore.Services
                 var gameInfo = new List<GFXGameRow>(gameTable.Select(string.Format("GameId = '{0}'", gameid)))[0];
 
                 if (gameInfo.Creator != userInfo.UserId)
-                    return constructResponse(GFXResponseType.InvalidInput, "You cannot delete this game!");
+                    return constructResponse(GFXResponseType.InvalidInput, "You cannot delete this game! Its not yours. >:(");
 
-                gameTable.Remove(string.Format("Creator = '{0}'", userInfo.UserId));
+                gameTable.Remove(string.Format("Creator = '{0}' AND GameId = '{1}'", userInfo.UserId, gameid));
 
                 return constructResponse(GFXResponseType.Normal, "");
             }

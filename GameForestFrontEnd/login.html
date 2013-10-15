@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>GameForest | Log in</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="fb-root"></div>
+    <script type="text/javascript">
+        (function (d)
+        {
+            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement('script'); js.id = id; js.async = true;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            ref.parentNode.insertBefore(js, ref);
+        }(document));
+    </script>
+    <div class="container">
+        <br>
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">GameForest</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row" style="margin-top: 40px">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>Login to GameForest</h1>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div id="alertDialog" class="alert alert-danger"></div>
+                        <div class="form-group" id="fb-login-button" style="display: normal">
+                            <button id="buttonSignIn" class="btn btn-primary" onclick="fbLogin(event)">Login in with Facebook</button>
+                            <br />
+                        </div>
+                        <h3>Or login the usual way...</h3>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="inputUsername" placeholder="Email" />
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" />
+                        </div>
+                        <div class="form-group">
+                            <button id="buttonSignIn" class="btn btn-primary" onclick="normLogin(event)">Login</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3>Don't have a GameForest account?</h3>
+                                <a class="btn btn-default" href="register.html">Register</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gameforestip.js"></script>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        var facebookConnected = false;
+
+        $("#alertDialog").hide();
+
+        window.fbAsyncInit  = function ()
+        {
+            FB.init(
+                {
+                    appId:      '672221882789824',
+                    channelUrl: '//' + gameForestIP + ':46069/channel.html',
+                    status:     true,
+                    cookie:     true,
+                    xfbml:      true
+                });
+
+            FB.Event.subscribe('auth.authResponseChange', function (response)
+            {
+                if (response.status === 'connected')
+                {
+                    facebookConnected = true;
+                }
+            });
+        };
+
+        window.fbLogin      = function (e)
+        {
+            if (facebookConnected)
+            {
+                loginToFB();
+            }
+            else
+            {
+                FB.login(function (response)
+                {
+                    if (response.authResponse)
+                    {
+                        loginToFB();
+                    }
+                });
+            }
+        };
+
+        window.normLogin    = function (e)
+        {
+            $("#alertDialog").hide();
+
+            var error = false;
+
+            var varEmail = $("#inputUsername").val();
+            var varPword = $("#inputPassword").val();
+
+            if (varEmail.length == 0 || varEmail == null)
+                error = true;
+
+            if (varPword.length == 0 || varPword == null)
+                error = true;
+
+            if (error)
+            {
+                $("#alertDialog").show();
+                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+            }
+            else
+            {
+                var request = $.ajax(
+                    {
+                        url:    "http://" + gameForestIP + ":1193/service/user/login?username=" + varEmail + "&password=" + varPword,
+                        type:   "POST",
+                        async:  false
+                    });
+
+                console.log("loggin in...");
+
+                request.done(function (msg)
+                {
+                    if (msg.ResponseType != 0)
+                    {
+                        // show error (maybe in an error div?)
+                        $("#alertDialog").show();
+                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                    }
+                    else
+                    {
+                        // store session ID to local storage
+                        localStorage.setItem("user-session", msg.AdditionalData);
+                        window.location.href = "index.html";
+                    }
+                });
+
+                request.fail(function (nothing, textStatus, something)
+                {
+                    $("#alertDialog").show();
+
+                    $("#alertDialog").css("class", "alert alert-danger");
+                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+                });
+            }
+        };
+
+        function loginToFB  ()
+        {
+            console.log("Im going to use this to log you in to GameForest!");
+
+            $("#fb-login-button").hide();
+
+            FB.api("/me", function (response)
+            {
+                // do gameforest rest api call for fblogin
+                var response = $.ajax(
+                    {
+                        url:    "http://" + gameForestIP + ":1193/service/user/loginfb?username=" + response.username + "&fbid=" + response.id,
+                        type:   "POST",
+                        async:  true,
+                    });
+
+                response.success(function (result)
+                {
+                    if (result.ResponseType == 0)
+                    {
+                        localStorage.setItem("user-session", result.AdditionalData);
+                        window.location.href = "index.html";
+                    }
+                    else
+                    {
+                        alert("Cannot log you in to GameForest!");
+                    }
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>

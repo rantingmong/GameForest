@@ -87,15 +87,15 @@ namespace GameForestCoreWebSocket
             listenerList.Add(new GFXGameStart());
             listenerList.Add(new GFXGameStartConfirm());
             
-            // TODO: create a timer that checks users if they are still online (interval: 30,000ms)
             loginCheckTimer     = new Timer(new TimerCallback((o) =>
                 {
                     CheckUsernameTick();
+
                 }));
 
             sessionCheckTimer   = new Timer(new TimerCallback((o) =>
                 {
-                    // CheckUserConnectedTick();
+                    CheckUserConnectedTick();
                 }));
 
             loginCheckTimer.Change  (TimeSpan.FromHours(1),     TimeSpan.FromHours(1));
@@ -231,6 +231,27 @@ namespace GameForestCoreWebSocket
         // This method checks if the user is online and connected to a game
         private void                                    CheckUserConnectedTick  ()
         {
+            var removeList = new List<Guid>();
+
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "WebSocket", "Removing invalid websocket connections...");
+
+            foreach (var socket in webSocketList)
+            {
+                if (socket.Value.IsAvailable == false)
+                {
+                    removeList.Add(socket.Key);
+                }
+            }
+
+            foreach (var item in removeList)
+            {
+                webSocketList.Remove(item);
+                connectionList.Remove(item);
+            }
+
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "WebSocket", "Removed " + removeList.Count + " connections.");
+
+            /*
             var sessionList         = new List<GFXLoginRow>(this.sessionList.Select(""));
             var lobbySessionList    = new List<GFXLobbySessionRow>(this.lobbySessionList.Select(""));
 
@@ -311,6 +332,7 @@ namespace GameForestCoreWebSocket
                     Console.Write(exp + "\r\n");
                 }
             }
+            */
         }
     }
 }

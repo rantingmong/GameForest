@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="GameForestFE.upload" CodeBehind="upload.aspx.cs" %>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -11,7 +12,7 @@
 <body>
     <div class="container">
         <br />
-        <nav class="navbar navbar-default" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -26,7 +27,6 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="games.html">Games</a></li>
                     <li><a href="dev.html">Developer</a></li>
-                    <li><a href="stats.html">Stats</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
@@ -35,40 +35,46 @@
             </div>
         </nav>
         <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
-        <div class="row">
+        <div class="row" style="margin-top: 40px">
             <div class="col-sm-12">
                 <div class="page-header">
                     <h1>Upload game</h1>
                 </div>
                 <form runat="server">
-                    <div class="form-group">
-                        <label for="inputGameName">Game name:</label>
-                        <asp:TextBox ID="inputGameName" runat="server" CssClass="form-control"></asp:TextBox>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inputGameName">Game name:</label>
+                                <asp:TextBox ID="inputGameName" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputMaxPlayers">Maximum allowable players:</label>
+                                <asp:TextBox ID="inputMaxPlayers" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputMinPlayers">Minimum allowable players:</label>
+                                <asp:TextBox ID="inputMinPlayers" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputDescription">Description of the game:</label>
+                                <asp:TextBox ID="inputDescription" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group" style="display: none">
+                                <label for="inputUserId">User ID:</label>
+                                <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                            <div class="form-group" style="display: none">
+                                <label for="inputSessionId">Session ID:</label>
+                                <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
+                            </div>
+                            <label for="fileUpload">Game .zip</label>
+                            <asp:FileUpload ID="fileUpload" runat="server" />
+                            <br />
+                            <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="inputMaxPlayers">Maximum allowable players:</label>
-                        <asp:TextBox ID="inputMaxPlayers" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputMinPlayers">Minimum allowable players:</label>
-                        <asp:TextBox ID="inputMinPlayers" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputDescription">Description of the game:</label>
-                        <asp:TextBox ID="inputDescription" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group" style="display: none">
-                        <label for="inputUserId">User ID:</label>
-                        <asp:TextBox ID="inputUserId" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <div class="form-group" style="display: none">
-                        <label for="inputSessionId">Session ID:</label>
-                        <asp:TextBox ID="inputSessionId" runat="server" CssClass="form-control"></asp:TextBox>
-                    </div>
-                    <label for="fileUpload">Game .zip</label>
-                    <asp:FileUpload ID="fileUpload" runat="server" />
-                    <br />
-                    <asp:Button ID="ButtonSubmit" runat="server" Text="Submit game" CssClass="btn btn-primary" OnClick="ButtonSubmit_Click" />
                 </form>
             </div>
         </div>

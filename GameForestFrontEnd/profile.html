@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app>
 <head>
     <title>GameForest | Profile</title>
 
@@ -8,24 +8,11 @@
 
     <link href="css/bootstrap.min-plum.css" rel="stylesheet" media="screen">
     <link href="css/style.css" rel="stylesheet">
-
-    <script src="js/gameforestip.js" type="text/javascript"></script>
 </head>
 <body>
-    <div class="fb-root"></div>
-    <script type="text/javascript">
-        (function (d)
-        {
-            var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement('script'); js.id = id; js.async = true;
-            js.src = "//connect.facebook.net/en_US/all.js";
-            ref.parentNode.insertBefore(js, ref);
-        }(document));
-    </script>
     <div class="container">
         <br>
-        <nav class="navbar navbar-default" role="navigation">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -41,14 +28,13 @@
                     <li><a href="games.html">Games</a></li>
                     <li><a href="dev.html">Developer</a></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display:none">Logout (FB User)</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
+                <ul class="nav navbar-nav navbar-right" ng-controller="loadUserInfoController">
+                    <li><a id="linkPro" href="profile.html" style="display: none">{{userInfo.Username}}</a></li>
+                    <li><a id="linkOut" href="index.html" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
-        <div class="row">
+        <div class="row" style="margin-top: 40px">
             <div id="alertDialog" class="alert alert-info"></div>
             <div class="modal fade" id="modalPassword" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
                 <div class="modal-dialog">
@@ -78,36 +64,30 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="well">
-                    <h1 id="profileName">Profile</h1>
-                </div>
-
-                <img class="img-responsive" src="http://placehold.it/250x250&text=DP" />
-                <br>
-
-                <div class="well">
-                </div>
-            </div>
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <div class="page-header">
                     <h1 id="profileNameEdit">Edit your profile</h1>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="firstName">First name</label>
+                            <input type="text" class="form-control" id="firstName" />
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last name</label>
+                            <input type="text" class="form-control" id="lastName" />
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="description">User description</label>
+                            <textarea class="form-control" id="description" style="height: 300px"></textarea>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="firstName">First name</label>
-                        <input type="text" class="form-control" id="firstName" />
+                        <a data-toggle="modal" class="btn btn-warning" href="#modalPassword">Change password</a>
+                        <button class="btn btn-primary" onclick="onChangeUserInfo()">Save changes</button>
                     </div>
-                    <div class="form-group">
-                        <label for="lastName">Last name</label>
-                        <input type="text" class="form-control" id="lastName" />
-                    </div>
-                    <div class="form-group">
-                        <label for="description">User description</label>
-                        <textarea class="form-control" id="description" style="height: 300px"></textarea>
-                    </div>
-
-                    <a data-toggle="modal" class="btn btn-warning" href="#modalPassword">Change password</a>
-                    <button class="btn btn-primary" onclick="onChangeUserInfo();">Save changes</button>
                 </div>
             </div>
         </div>
@@ -124,318 +104,185 @@
             </div>
         </div>
     </div>
+    <script src="js/gameforestip.js"></script>
+
     <script src="js/jquery.js"></script>
+    <script src="js/angular.js"></script>
+    
     <script src="js/bootstrap.min.js"></script>
+    
     <script type="text/javascript">
 
         var originalUsername = "";
-        var gameForestIp = gameForestIP;
 
-        window.fbAsyncInit = function ()
+        $("#alertDialog").hide();
+
+        function loadUserInfoController ($scope, $http)
         {
-            FB.init({
-                appId: '672221882789824', // App ID
-                channelUrl: '//' + gameForestIP + ':46069/channel.html',
-                status: true, // check login status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
+            delete $http.defaults.headers.common['X-Requested-With'];
 
-            // Initialize when a user has authenticated with FB and this app
-            // Handle events accordingly
-            FB.Event.subscribe('auth.authResponseChange', function (response)
+            // heartbeat first
+            $http.put("http://" + "localhost" + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
             {
-                if (response.status === 'connected')
+                if (data.ResponseType == 0)
                 {
-                    // user is logged in to FB
-                    // has authorized app
+                    $("#linkOut").show();
+                    $("#linkPro").show();
 
-                    console.log('Welcome, fetching information');
-
-                    FB.api('/me', function (response)
+                    // userinfo get
+                    $http.get("http://" + "localhost" + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
                     {
-                        var fbid = response.id;
-                        var fbuser = response.username;
-                        var fname = response.first_name;
-                        var lname = response.last_name;
+                        var userInfo = JSON.parse(data.AdditionalData);
 
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/fb?fbid=" + fbid + "&username=" + fbuser + "&firstname=" + fname + "&lastname=" + lname,
-                            async: true,
-                            type: "POST"
-                        });
+                        $scope.userInfo     = userInfo;
+                        originalUsername    = userInfo.Username;
 
-                        request.done(function (msg)
-                        {
-                            if (msg.ResponseType != 0)
-                            {
-                                // show error (maybe in an error div?)
-                                $("#alertDialog").show();
-                                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
-                            }
-                            else
-                            {
-                                // store session ID to local storage
-                                localStorage.setItem("user-session", msg.AdditionalData);
-                                console.log("sessionid: " + localStorage.getItem("user-session"));
-                            }
-
-                            $("buttonSignIn").button('reset');
-                            $("#fbLogout").show();
-                            $("#linkLogout").hide();
-                        });
-
-                        request.fail(function (nothing, textStatus, something)
-                        {
-                            $("#alertDialog").show();
-
-                            $("#alertDialog").css("class", "alert alert-danger");
-                            $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
-
-                            $("buttonSignIn").button('reset');
-                        });
-
-                        $("#login-well").hide();
-                        $("#userinfo-well").show();
-
-                        document.getElementById('fb-log-well').style.display = 'none';
-                    })
-
-                    document.getElementById('fbLogout').addEventListener('click', function ()
-                    {
-                        var request = $.ajax({
-                            url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                            async: true,
-                            type: "DELETE"
-                        });
-
-                        request.success(function (data)
-                        {
-                            if (data.ResponseType == 0)
-                            {
-                                FB.logout(function ()
-                                {
-                                    // wipe user
-                                    window.location.reload(true);
-                                });
-                            }
-                        });
+                        $("#firstName")     .val(userInfo.NameFirst);
+                        $("#lastName")      .val(userInfo.NameLast);
+                        $("#description")   .val(userInfo.Description);
                     });
-
-                } else if (response.status === 'not_authorized')
+                }
+                else
                 {
-                    // user is logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
-                } else
-                {
-                    // user is not logged in to FB
-                    // has not authorized app
-
-                    document.getElementById('fb-log-well').style.display = 'block';
+                    $("#linkOut").hide();
+                    $("#linkPro").hide();
                 }
             });
         }
 
-        $(document).ready(function ()
+        function logOut                 (e)
         {
-            $("#alertDialog").hide();
+            console.log("Logging you out...");
 
-            // do a heartbeat to confirm user's session is still valid
-            var showLogin = true;
-
-            var response = $.ajax({
-                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
-            });
-
-            response.success(function (data)
-            {
-                if (data.ResponseType != 0)
+            var request = $.ajax(
                 {
-                    showLogin = true;
-                    localStorage.setItem('user-session', null);
-                }
-                else
-                {
-                    showLogin = false;
-                }
-
-                if (showLogin == false)
-                {
-                    $("#login-well").hide();
-                    $("#userinfo-well").show();
-
-                    // then async get user's information
-
-                    var userResponse = $.ajax({
-                        url: "http://" + gameForestIp + ":1193/service/user/session/" + localStorage.getItem("user-session"),
-                        type: "GET",
-                        async: true,
-                    });
-
-                    userResponse.success(function (data)
-                    {
-                        // set user name to linkProfile
-                        var adata = JSON.parse(data.AdditionalData);
-
-                        $("#linkLogout").show();
-                        $("#linkProfile").show();
-
-                        $("#linkProfile").html(adata.Username);
-
-                        // set profile data here!
-                        $("#profileName").html(adata.Username);
-
-                        $("#firstName").val(adata.NameFirst);
-                        $("#lastName").val(adata.NameLast);
-                        $("#description").val(adata.Description);
-
-                        originalUsername = adata.Username;
-                    });
-                }
-                else
-                {
-                    window.location.href = "index.html";
-                }
-
-                var gameResponse = $.ajax({
-                    url:    "http://" + gameForestIP + ":1193/service/game?maxcount=100",
-                    type:   "GET",
-                    async:  true
+                    url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type:   "DELETE",
+                    async:  false
                 });
 
-                gameResponse.success(function (gData)
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
                 {
-                    if (gData.ResponseType == 0)
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
+
+        // ng ng ng!!
+        function loadUserStat           ()
+        {
+            var gameResponse = $.ajax({
+                url: "http://" + gameForestIP + ":1193/service/game?maxcount=100",
+                type: "GET",
+                async: true
+            });
+
+            gameResponse.success(function (gData)
+            {
+                if (gData.ResponseType == 0)
+                {
+                    console.log("game data list");
+                    var gameList = JSON.parse(gData.AdditionalData);
+                    console.log("GameList set");
+
+                    if (gameList.length > 0)
                     {
-                        console.log("game data list");
-                        var gameList = JSON.parse(gData.AdditionalData);
-                        console.log("GameList set");
+                        var i;
 
-                        if (gameList.length > 0)
+                        console.log("Step 2: Extract games tracking stats");
+                        for (i = 0; i < gameList.length; i++)
                         {
-                            var i;
+                            var gameInfo = gameList[i];
 
-                            console.log("Step 2: Extract games tracking stats");
-                            for (i = 0; i < gameList.length; i++)
+                            console.log("Game : " + i);
+
+                            var appendElm = null;
+
+                            appendElm = $("#gameStatCol");
+
+                            if (appendElm == null)
+                                continue;
+
+                            appendElm.append('<div id="' + gameInfo.GameID + '" class="panel-title"><b>' + gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '<br/></div>');
+
+                            var statResponse = $.ajax({
+                                url: "http://" + gameForestIP + ":1193/service/stats/user?getstat=all&gameid=" + gameInfo.GameID + "&session=" + localStorage.getItem("user-session") + "&all=true",
+                                type: "GET",
+                                async: false
+                            });
+
+                            var close = gameInfo;
+
+                            statResponse.success(function (sData)
                             {
-                                var gameInfo = gameList[i];
-
-                                console.log("Game : " + i);
-
-                                var appendElm = null;
-
-                                appendElm = $("#gameStatCol");
-
-                                if (appendElm == null)
-                                    continue;
-
-                                appendElm.append('<div id="' + gameInfo.GameID + '" class="panel-title"><b>' + gameInfo.Name + "</b> (id: " + gameInfo.GameID + ")" + '<br/></div>');
-
-                                var statResponse = $.ajax({
-                                    url: "http://" + gameForestIP + ":1193/service/stats/user?getstat=all&gameid=" + gameInfo.GameID + "&session=" + localStorage.getItem("user-session") + "&all=true",
-                                    type: "GET",
-                                    async: false
-                                });
-
-                                var close = gameInfo;
-
-                                statResponse.success(function (sData)
+                                if (sData.ResponseType == 0)
                                 {
-                                    if (sData.ResponseType == 0)
+                                    console.log("Step 3: Get stats");
+                                    var statList = JSON.parse(sData.AdditionalData);
+                                    console.log("Stat list set");
+
+                                    if (statList.length > 0)
                                     {
-                                        console.log("Step 3: Get stats");
-                                        var statList = JSON.parse(sData.AdditionalData);
-                                        console.log("Stat list set");
-
-                                        if (statList.length > 0)
+                                        console.log("Step 4: Populate list of stats");
+                                        for (var x = 0; x < statList.length; x++)
                                         {
-                                            console.log("Step 4: Populate list of stats");
-                                            for (var x = 0; x < statList.length; x++)
-                                            {
-                                                var statistic = statList[x];
+                                            var statistic = statList[x];
 
-                                                var appendStat = null;
+                                            var appendStat = null;
 
-                                                appendStat = $("#" + close.GameID);
+                                            appendStat = $("#" + close.GameID);
 
-                                                console.log("Stat " + (x + 1) + ": " + statistic.stat_name);
-                                                appendStat.append("" + statistic.stat_name + ": " + statistic.stat_value + "<br/>");
-                                            }
-                                        } else
-                                        {
-                                            var appendMsg = null;
-
-                                            appendMsg = $("#gameStatCol");
-
-                                            appendMsg.append("No stats available <br/>");
+                                            console.log("Stat " + (x + 1) + ": " + statistic.stat_name);
+                                            appendStat.append("" + statistic.stat_name + ": " + statistic.stat_value + "<br/>");
                                         }
                                     } else
                                     {
-                                        console.log("Error in statResponse");
                                         var appendMsg = null;
 
                                         appendMsg = $("#gameStatCol");
 
                                         appendMsg.append("No stats available <br/>");
                                     }
-                                });
-
-                                statResponse.fail(function (sData)
+                                } else
                                 {
-                                    console.log("statResponse failed");
+                                    console.log("Error in statResponse");
+                                    var appendMsg = null;
 
-                                });
-                            }
+                                    appendMsg = $("#gameStatCol");
 
-                        } else
-                        {
-                            $("#noGamesHeader").show();
+                                    appendMsg.append("No stats available <br/>");
+                                }
+                            });
+
+                            statResponse.fail(function (sData)
+                            {
+                                console.log("statResponse failed");
+
+                            });
                         }
 
                     } else
                     {
-                        console.log("Error in gameResponse");
+                        $("#noGamesHeader").show();
                     }
 
-                });
-
-                gameResponse.fail(function (gData)
+                } else
                 {
-                    console.log("gameResponse failed");
-                });
-
-            });
-
-            response.fail(function (data)
-            {
-                localStorage.setItem('user-session', null);
-
-                window.location.href = "index.html";
-            });
-        });
-
-        function onLogout()
-        {
-            var request = $.ajax({
-                url: "http://" + gameForestIp + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                async: true,
-                type: "DELETE"
-            });
-
-            request.success(function (data)
-            {
-                if (data.ResponseType == 0)
-                {
-                    window.location.reload(true);
+                    console.log("Error in gameResponse");
                 }
+
+            });
+
+            gameResponse.fail(function (gData)
+            {
+                console.log("gameResponse failed");
             });
         }
 
-        function onChangeUserInfo()
+        function onChangeUserInfo       ()
         {
             var error = false;
 
@@ -450,31 +297,29 @@
 
             if (error)
             {
-                // show a dialog...
                 $("#alertDialog").show();
                 $("#alertDialog").html("There is an error in some of your entries. Please fix it.");
             }
             else
             {
-                var oorl = "http://" + gameForestIp + ":1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session");
-
-                var request = $.ajax({
-                    url: oorl,
-                    type: "PUT",
-                    async: true,
-                });
+                var request = $.ajax(
+                    {
+                        url:    "http://" + gameForestIP + ":1193/service/user/" + originalUsername + "?firstname=" + fn + "&lastname=" + ln + "&description=" + dx + "&usersessionid=" + localStorage.getItem("user-session"),
+                        type:   "PUT",
+                        async:  true,
+                    });
 
                 request.success(function (data)
                 {
                     if (data.ResponseType == 0)
                     {
-                        // show a dialog...
                         $("#alertDialog").show();
                         $("#alertDialog").html("User information updated! Will refresh in a short while...");
 
                         setTimeout(function ()
                         {
                             window.location.reload(true);
+
                         }, 5000);
                     }
                     else
@@ -490,10 +335,9 @@
                     $("#alertDialog").html("Something went wrong. :(");
                 });
             }
-
         }
 
-        function onChangeUserPassword()
+        function onChangeUserPassword   ()
         {
             var pc = $("#passwordCurrent").val();
             var p1 = $("#passwordNew1").val();
@@ -504,15 +348,14 @@
                 alert("Passwords must match!");
             }
 
-            var oorl = "http://" + gameForestIp + ":1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1;
+            var request = $.ajax(
+                {
+                    url:    "http://" + gameForestIP + ":1193/service/user/changepassword?usersessionid=" + localStorage.getItem("user-session") + "&oldpassword=" + pc + "&newpassword=" + p1,
+                    type:   "PUT",
+                    async:  true,
+                });
 
-            var request = $.ajax({
-                url: oorl,
-                type: "PUT",
-                async: true,
-            });
-
-            request.success(function (data)
+            request.done(function (data)
             {
                 if (data.ResponseType == 0)
                 {
@@ -533,6 +376,11 @@
                 alert("There was a problem in processing your request.")
             });
         }
+
+        $(document).ready(function ()
+        {
+            loadUserStat();
+        });
 
     </script>
 </body>
