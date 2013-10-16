@@ -704,7 +704,10 @@ var GameForest                              = function (gameId, lobbyId, session
     };
 
     // function to inform the server the user is active
-    this.heartbeat              = function () {
+    this.heartbeat              = function ()
+    {
+        var thus = this;
+
         sendRequest("/user/login?usersessionid=" + this.sessionId, "PUT",
             function(result) {
 
@@ -712,7 +715,7 @@ var GameForest                              = function (gameId, lobbyId, session
             function (status, why)
             {
                 // if the user is playing and this suddenly went up. we know the user is disconnected from the internet.
-                if (this.lobbyStatus == GFX_STATUS_PLAYING)
+                if (thus.lobbyStatus == GFX_STATUS_PLAYING)
                 {
                     // call
                     GameForest.prototype.onGameDisconnected();

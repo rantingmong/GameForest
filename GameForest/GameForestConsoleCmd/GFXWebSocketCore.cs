@@ -1,23 +1,27 @@
-﻿using GameForestCoreWebSocket;
+﻿
+using GameForestCoreWebSocket;
+using System;
 using System.Threading;
 
 namespace GameForest
 {
     public class GFXWebsocketCore
     {
-        private GFXServerCore   serverCore;
+        private GFXServerCore serverCore;
+        private GFXChatCore chatCore;
 
-        private bool            isRunning           = false;
-        private Thread          wsThread;
+        private bool isRunning = false;
+        private Thread wsThreadCore;
+        private Thread wsThreadChat;
 
-        public bool             IsRunning
+        public bool IsRunning
         {
             get { return isRunning; }
         }
 
-        public                  GFXWebsocketCore    (string address = "localhost")
+        public GFXWebsocketCore(string address = "localhost")
         {
-            wsThread = new Thread(new ThreadStart(() =>
+            wsThreadCore = new Thread(new ThreadStart(() =>
             {
                 serverCore = new GFXServerCore(address);
 
@@ -26,15 +30,30 @@ namespace GameForest
                     Thread.Sleep(100);
                 }
             }));
+
+            wsThreadChat = new Thread(new ThreadStart(() =>
+            {
+                chatCore = new GFXChatCore(address, "8085");
+                chatCore.start();
+
+                Console.WriteLine("Chat started");
+
+                while (isRunning)
+                {
+                    Thread.Sleep(100);
+                }
+            }));
         }
 
-        public void             Start               ()
+        public void Start()
         {
             isRunning = true;
-            wsThread.Start();
+
+            wsThreadCore.Start();
+            wsThreadChat.Start();
         }
 
-        public void             Stop                ()
+        public void Stop()
         {
             isRunning = false;
         }

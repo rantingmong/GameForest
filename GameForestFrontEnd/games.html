@@ -398,7 +398,7 @@
             delete $http.defaults.headers.common['X-Requested-With'];
 
             // heartbeat first
-            $http.put("http://" + "localhost" + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
+            $http.put("http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
             {
                 if (data.ResponseType == 0)
                 {
@@ -408,7 +408,7 @@
                     $("#linkPro").show();
 
                     // userinfo get
-                    $http.get("http://" + "localhost" + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
+                    $http.get("http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
                     {
                         $scope.userInfo = JSON.parse(data.AdditionalData);
                     });

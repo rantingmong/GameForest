@@ -38,7 +38,7 @@
         <div class="row" style="margin-top: 80px">
             <div class="col-sm-12">
                 <div class="jumbotron">
-                    <h1>Game Forest</h1>
+                    <h1>GameForest</h1>
                     <p>An online HTML5 multiplayer game lobby.</p>
                 </div>
             </div>
@@ -59,7 +59,7 @@
             delete $http.defaults.headers.common['X-Requested-With'];
 
             // heartbeat first
-            $http.put("http://" + "localhost" + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
+            $http.put("http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session")).success(function (data, status)
             {
                 if (data.ResponseType == 0)
                 {
@@ -69,7 +69,7 @@
                     $("#linkPro").show();
 
                     // userinfo get
-                    $http.get("http://" + "localhost" + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
+                    $http.get("http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session")).success(function (data, status)
                     {
                         $scope.userInfo = JSON.parse(data.AdditionalData);
                     });
