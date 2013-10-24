@@ -23,7 +23,7 @@ namespace GameForestCoreWebSocket
             }
         }
 
-        Dictionary<IWebSocketConnection, String> connections;
+        Dictionary<IWebSocketConnection, String> connectionMessages;
         List<GFXChatLobby> lobbies;
         Boolean lobbyConnection = false;
 
@@ -32,7 +32,7 @@ namespace GameForestCoreWebSocket
 
         public GFXChatCore(String address, String portnumber)
         {
-            connections = new Dictionary<IWebSocketConnection, String>();
+            connectionMessages = new Dictionary<IWebSocketConnection, String>();
             lobbies = new List<GFXChatLobby>();
             websocketServer = new WebSocketServer("ws://" + address + ":" + portnumber);
         }
@@ -51,8 +51,18 @@ namespace GameForestCoreWebSocket
                 {
                     messageQueue.Enqueue(new MessageSocket(socket, message));
 
-                    // put processMessage in another thread
-                    // processMessage(socket, message);
+                    //foreach (IWebSocketConnection connectionKey in connectionMessages.Keys)
+                    //{
+                    //    if (connectionKey == socket)
+                    //    {
+                    //        messageQueue.Enqueue(new MessageSocket(socket, message));
+                    //    }
+                    //    else
+                    //    {
+                    //        connectionMessages.Add(socket, message);
+                    //        messageQueue.Enqueue(new MessageSocket(socket, message));
+                    //    }
+                    //}
                 };
 
                 socket.OnClose = () =>
@@ -128,12 +138,6 @@ namespace GameForestCoreWebSocket
 
                 if (index != -1)
                 {
-                    if (lobbies[index].ConnectionExists() == false)
-                    {
-                        lobbies[index].Connection(socket, name);
-                        lobbyConnection = true;
-                    }
-
                     lobbies[index].SendToAll(mess, socket);
                 }
                 else
@@ -141,14 +145,27 @@ namespace GameForestCoreWebSocket
                     lobbies.Add(new GFXChatLobby(lobbyName));
                     index = getLobbyIndex(lobbyName, lobbies);
 
-                    if (lobbies[index].ConnectionExists() == false)
-                    {
-                        lobbies[index].Connection(socket, name);
-                        lobbyConnection = true;
-                    }
+                    lobbies[index].Connection(socket, name);
 
                     lobbies[index].SendToAll(mess, socket);
                 }
+
+                //foreach (IWebSocketConnection connectionKey in connectionMessages.Keys)
+                //{
+                //    if (connectionKey == socket)
+                //    {
+                //        lobbies[index].SendToAll(mess, socket);
+                //    }
+                //    else
+                //    {
+                //        lobbies.Add(new GFXChatLobby(lobbyName));
+                //        index = getLobbyIndex(lobbyName, lobbies);
+
+                //        lobbies[index].Connection(socket, name);
+
+                //        lobbies[index].SendToAll(mess, socket);
+                //    }
+                //}
             }
             else
             {
