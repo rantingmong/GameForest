@@ -208,7 +208,8 @@
             var lobbyResponse = $.ajax({
                 url:    "http://" + gameForestIP + ":1193/service/lobby?maxcount=1000",
                 type:   "GET",
-                async:  true
+                async:  true,
+                cache:  false
             });
 
             lobbyResponse.success(function (data)
@@ -219,50 +220,58 @@
 
                     for (var i = 0; i < lobbies.length; i++)
                     {
-                        var lobby = lobbies[i];
-
-                        if (lobby.GameID != gameId)
-                            continue;
-
-                        var gameInfoResponse = $.ajax({
-                            url:    "http://" + gameForestIP + ":1193/service/game/" + lobby.GameID,
-                            type:   "GET",
-                            async:  true
-                        });
-
-                        gameInfoResponse.success(function (theData)
+                        if (lobbies[i].GameID != gameId)
                         {
-                            if (theData.ResponseType == 0)
+                            continue;
+                        }
+                        else
+                        {
+                            var lobby = lobbies[i];
+
+                            var gameInfoResponse = $.ajax({
+                                url:    "http://" + gameForestIP + ":1193/service/game/" + lobby.GameID,
+                                type:   "GET",
+                                async:  false
+                            });
+
+                            console.log(i + " lobby before call: " + JSON.stringify(lobby));
+
+                            gameInfoResponse.success(function (theData)
                             {
-                                var gameInfo    = JSON.parse(theData.AdditionalData);
+                                console.log(i + " lobby after call: " + JSON.stringify(lobby));
 
-                                var gameName    = gameInfo.Name;
-                                var gameId      = gameInfo.GameID;
-
-                                var lobiName    = lobby.Name;
-                                var lobbyId     = lobby.LobbyID;
-
-                                var userCount   = 0;
-                                var maxUsers    = gameInfo.MaxPlayers;
-
-                                var userCountResponse = $.ajax({
-                                    url:    "http://" + gameForestIP + ":1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID,
-                                    type:   "GET",
-                                    async:  true
-                                });
-
-                                userCountResponse.success(function (userCountData)
+                                if (theData.ResponseType == 0)
                                 {
-                                    if (userCountData.ResponseType == 0)
-                                    {
-                                        userCount = parseInt(userCountData.AdditionalData);
+                                    var gameInfo    = JSON.parse(theData.AdditionalData);
 
-                                        //prepare for table insertion
-                                        $("#lobbyList").append("<tr><td style='vertical-align: middle'>" + gameName + "</td><td style='vertical-align: middle'>" + lobiName + "</td><td style='vertical-align: middle'>" + userCount + "/" + maxUsers + '</td><td style="vertical-align: middle">None</td><td style="vertical-align: middle"><a class="btn btn-primary" onclick="joinGame(\'' + lobbyId + '\', \'' + gameId + '\')">Join</a></td></tr>');
-                                    }
-                                });
-                            }
-                        });
+                                    var gameName    = gameInfo.Name;
+                                    var gameId      = gameInfo.GameID;
+
+                                    var lobiName    = lobby.Name;
+                                    var lobbyId     = lobby.LobbyID;
+
+                                    var userCount   = 0;
+                                    var maxUsers    = gameInfo.MaxPlayers;
+
+                                    var userCountResponse = $.ajax({
+                                        url: "http://" + gameForestIP + ":1193/service/lobby/usercount?lobbyid=" + lobby.LobbyID,
+                                        type: "GET",
+                                        async: true
+                                    });
+
+                                    userCountResponse.success(function (userCountData)
+                                    {
+                                        if (userCountData.ResponseType == 0)
+                                        {
+                                            userCount = parseInt(userCountData.AdditionalData);
+
+                                            //prepare for table insertion
+                                            $("#lobbyList").append("<tr><td style='vertical-align: middle'>" + gameName + "</td><td style='vertical-align: middle'>" + lobiName + "</td><td style='vertical-align: middle'>" + userCount + "/" + maxUsers + '</td><td style="vertical-align: middle">None</td><td style="vertical-align: middle"><a class="btn btn-primary" onclick="joinGame(\'' + lobbyId + '\', \'' + gameId + '\')">Join</a></td></tr>');
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
 
                     $("#overlayWindow").fadeIn("fast");

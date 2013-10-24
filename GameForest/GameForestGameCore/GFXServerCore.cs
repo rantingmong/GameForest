@@ -16,7 +16,7 @@ namespace GameForestCoreWebSocket
         public static readonly string                   STOP_CONNECTION     = "GFX_STOP_CONNECTION";
 
         private double                                  disconnectThreshold = 30D;  // 30 seconds
-        private double                                  logoutThreshold     = 1.5D; // 1 hour and 30 minutes
+        private double                                  logoutThreshold     = 300D; // 300 seconds
 
         private Timer                                   loginCheckTimer     = null;
         private Timer                                   sessionCheckTimer   = null;
@@ -98,8 +98,8 @@ namespace GameForestCoreWebSocket
                     CheckUserConnectedTick();
                 }));
 
-            loginCheckTimer.Change  (TimeSpan.FromHours(1),     TimeSpan.FromHours(1));
-            sessionCheckTimer.Change(TimeSpan.FromSeconds(30),  TimeSpan.FromSeconds(30));
+            loginCheckTimer.Change(TimeSpan.FromSeconds(logoutThreshold), TimeSpan.FromSeconds(logoutThreshold));
+            sessionCheckTimer.Change(TimeSpan.FromSeconds(disconnectThreshold), TimeSpan.FromSeconds(disconnectThreshold));
 
             server = new WebSocketServer("ws://" + ipAddress + ":8084");
 
@@ -218,12 +218,16 @@ namespace GameForestCoreWebSocket
 
             var dtNow       = DateTime.Now;
 
+            Console.WriteLine("Removing inactive users...");
+
             foreach (var item in sessionList)
             {
-                if ((dtNow - item.LastHeartbeat).TotalHours > logoutThreshold)
+                if ((dtNow - item.LastHeartbeat).TotalSeconds > logoutThreshold)
                 {
                     // remove this user from the login list
                     this.sessionList.Remove(string.Format("SessionId = '{0}'", item.SessionId));
+
+                    Console.WriteLine("Logged out user with session " + item.SessionId);
                 }
             }
         }
@@ -251,11 +255,12 @@ namespace GameForestCoreWebSocket
 
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "WebSocket", "Removed " + removeList.Count + " connections.");
 
-            /*
             var sessionList         = new List<GFXLoginRow>(this.sessionList.Select(""));
             var lobbySessionList    = new List<GFXLobbySessionRow>(this.lobbySessionList.Select(""));
 
             var dtNow               = DateTime.Now;
+
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Lobby Session", "Removing rouge lobby sessions...");
 
             foreach (var item in lobbySessionList)
             {
@@ -274,8 +279,12 @@ namespace GameForestCoreWebSocket
                         return false;
                     }));
 
-                    if ((dtNow - result.LastHeartbeat).TotalSeconds > disconnectThreshold)
+                    if ((dtNow - result.LastHeartbeat).TotalSeconds > disconnectThreshold &&
+                        result.UserStatus == GFXLoginStatus.GAME &&
+                        item.Status == 2)
                     {
+                        Console.WriteLine(item.SessionID + " is becoming a rouge session ID!");
+
                         // get the lobby the player is in
                         var getLobbySessionResult = new List<GFXLobbySessionRow>(this.lobbySessionList.Select(string.Format("SessionId = '{0}'", result.SessionId)));
 
@@ -322,7 +331,6 @@ namespace GameForestCoreWebSocket
                                             LobbyId     = sessionRow.LobbyID
                                         });
                                 }), new object[] { getLobbySessionResult, disconnectedPlayerInfo[0] }, 90000, Timeout.Infinite);
-
                         }
                     }
                 }
@@ -332,7 +340,6 @@ namespace GameForestCoreWebSocket
                     Console.Write(exp + "\r\n");
                 }
             }
-            */
         }
     }
 }

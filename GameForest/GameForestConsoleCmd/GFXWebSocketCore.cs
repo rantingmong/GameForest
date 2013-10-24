@@ -36,8 +36,6 @@ namespace GameForest
                 chatCore = new GFXChatCore(address, "8085");
                 chatCore.start();
 
-                Console.WriteLine("Chat started");
-
                 while (isRunning)
                 {
                     Thread.Sleep(100);

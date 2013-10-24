@@ -215,6 +215,8 @@ namespace GameForestCore.Services
 
         public  GFXRestResponse             LeaveLobby                  (string usersessionid)
         {
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Lobby", "LeaveLobby...");
+
             try
             {
                 List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionTable.Select(string.Format("SessionId = '{0}'", usersessionid)));

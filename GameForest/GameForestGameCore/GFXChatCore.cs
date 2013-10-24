@@ -39,8 +39,6 @@ namespace GameForestCoreWebSocket
 
         public void start()
         {
-            Console.WriteLine("Jallo!");
-
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () =>

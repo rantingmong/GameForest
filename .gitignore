@@ -108,3 +108,4 @@ Backup*/
 UpgradeLog*.XML
 /GameForestFrontEnd/dev
 /GameForestFrontEnd/game/
+/GameForestFrontEnd/temp

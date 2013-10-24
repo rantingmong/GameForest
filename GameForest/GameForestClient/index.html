@@ -92,18 +92,15 @@
 
     <script type="text/javascript">
 
-        var userUpdateInterval = null;
-
-        var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
-                                new Guid(localStorage.getItem("lobby-session")),
-                                new Guid(localStorage.getItem("user-session")));
+        var userUpdateInterval  = null;
+        var gf                  = new GameForest(new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("lobby-session")), new Guid(localStorage.getItem("user-session")));
 
         $(document).ready(function ()
         {
             var getLobbyRequest = $.ajax({
-                url: "http://" + GameForestCloudUrl + ":1193/service/lobby/" + localStorage.getItem("lobby-session"),
-                type: "GET",
-                async: true
+                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/" + localStorage.getItem("lobby-session"),
+                type:   "GET",
+                async:  true
             });
 
             getLobbyRequest.success(function (result)
