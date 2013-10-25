@@ -34,12 +34,12 @@
                 </ul>
             </div>
         </nav>
-        <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
         <div class="row" style="margin-top: 40px">
             <div class="col-sm-12">
                 <div class="page-header">
                     <h1>Upload game</h1>
                 </div>
+                <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
                 <form runat="server">
                     <div class="row">
                         <div class="col-sm-6">

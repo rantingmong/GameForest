@@ -13,15 +13,6 @@ namespace GameForestFE {
     public partial class update {
         
         /// <summary>
-        /// alertDialog control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDialog;
-        
-        /// <summary>
         /// gameName control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,15 @@ namespace GameForestFE {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl gameName;
+        
+        /// <summary>
+        /// alertDialog control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDialog;
         
         /// <summary>
         /// inputGameName control.

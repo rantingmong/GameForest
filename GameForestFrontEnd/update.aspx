@@ -35,13 +35,13 @@
                 </ul>
             </div>
         </nav>
-        <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
         <div class="row" style="margin-top: 40px">
             <div class="col-sm-12">
                 <div class="page-header">
                     <h1>Update game <small id="gameName" runat="server">the game</small></h1>
                 </div>
             </div>
+            <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
         </div>
         <div class="row">
             <div class="col-sm-12">
