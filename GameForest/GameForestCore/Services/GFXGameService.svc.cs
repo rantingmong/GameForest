@@ -189,7 +189,7 @@ namespace GameForestCore.Services
                 if (gameInfo.Creator != userInfo.UserId)
                     return constructResponse(GFXResponseType.InvalidInput, "You cannot delete this game! Its not yours. >:(");
 
-                gameTable.Remove(string.Format("Creator = '{0}' AND GameId = '{1}'", userInfo.UserId, gameid));
+                gameTable.Remove(string.Format("GameId = '{1}'", userInfo.UserId, gameid));
 
                 return constructResponse(GFXResponseType.Normal, "");
             }

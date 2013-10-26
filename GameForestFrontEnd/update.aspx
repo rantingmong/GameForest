@@ -79,7 +79,7 @@
             </div>
         </div>
     </div>
-    <!--TODO: update this not to make sira sira-->
+    <script src="js/gameforestip.js"></script>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.js"></script>

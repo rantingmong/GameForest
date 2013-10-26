@@ -22,6 +22,15 @@ namespace GameForestFE {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl gameName;
         
         /// <summary>
+        /// rowDelete control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl rowDelete;
+        
+        /// <summary>
         /// buttonDelete control.
         /// </summary>
         /// <remarks>
@@ -29,5 +38,23 @@ namespace GameForestFE {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button buttonDelete;
+        
+        /// <summary>
+        /// rowError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl rowError;
+        
+        /// <summary>
+        /// errorHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl errorHeader;
     }
 }

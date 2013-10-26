@@ -10,7 +10,8 @@
     <link href="css/style.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="container">s
+    <div class="container">
+        s
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -29,7 +30,7 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout()">Logout</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
@@ -40,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="rowDelete" runat="server">
             <div class="col-sm-6">
                 <h3>Are you sure you want to delete this game? You will not be able to recover your game once you pressed &quot;Delete game&quot;.</h3>
                 <div class="row">
@@ -54,10 +55,103 @@
                 </div>
             </div>
         </div>
+        <div class="row" id="rowError" runat="server" style="display: none">
+            <div class="col-sm-6">
+                <h3 id="errorHeader" runat="server"></h3>
+                <br />
+                <a class="btn btn-primary" href="dev.html">Go back</a>
+            </div>
+        </div>
     </div>
     <!--TODO: update this not to make sira sira-->
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+
+                        $("#inputUserId").val(adata.UserId);
+                        $("#inputSessionId").val(localStorage.getItem("user-session"));
+                    });
+                }
+                else
+                {
+                    window.location.href = "index.html";
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                window.location.href = "index.html";
+            });
+        });
+
+        function logOut(e)
+        {
+            console.log("Logging you out...");
+
+            var request = $.ajax(
+                {
+                    url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type: "DELETE",
+                    async: false
+                });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

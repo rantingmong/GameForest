@@ -17,6 +17,14 @@ namespace GameForestFE
         {
             var theQuery    = Request.Url.Query.Split('&');
 
+            if (theQuery.Length < 2)
+            {
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "Invalid game and session id.";
+
+                return;
+            }
+
             var gameIdQ     = theQuery[0].Split('=');
             var gameId      = gameIdQ[1];
 
@@ -117,9 +125,10 @@ namespace GameForestFE
                 try
                 {
                     FastZip zipFile = new FastZip();
-                    zipFile.ExtractZip(Path.Combine(basePath, "temp", userId, fileUpload.FileName),
-                                       Path.Combine(basePath, "game", userId, inputGameName.Text),
-                                       null);
+
+                            zipFile.ExtractZip(Path.Combine(basePath, "temp", userId, fileUpload.FileName),
+                                               Path.Combine(basePath, "game", userId, inputGameName.Text),
+                                               null);
 
                     bool gfjsok = false;
                     bool gfmain = false;
