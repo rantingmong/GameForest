@@ -13,13 +13,40 @@ namespace GameForestFE {
     public partial class upload {
         
         /// <summary>
-        /// alertDialog control.
+        /// alertDialogError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDialog;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDialogError;
+        
+        /// <summary>
+        /// alertDangerText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDangerText;
+        
+        /// <summary>
+        /// alertDialogAllOk control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertDialogAllOk;
+        
+        /// <summary>
+        /// alertAllOkText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl alertAllOkText;
         
         /// <summary>
         /// inputGameName control.

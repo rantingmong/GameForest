@@ -11,7 +11,6 @@
 </head>
 <body>
     <div class="container">
-        <br />
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -30,7 +29,7 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
@@ -39,7 +38,12 @@
                 <div class="page-header">
                     <h1>Upload game</h1>
                 </div>
-                <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
+                <div id="alertDialogError" class="alert alert-danger" runat="server" style="display: none">
+                    <span class="glyphicon glyphicon-remove"></span><span id="alertDangerText" runat="server"> Hello there!</span>
+                </div>
+                <div id="alertDialogAllOk" class="alert alert-success" runat="server" style="display: none">
+                    <span class="glyphicon glyphicon-ok"></span><span id="alertAllOkText" runat="server"> Hello there!</span>
+                </div>
                 <form runat="server">
                     <div class="row">
                         <div class="col-sm-6">
@@ -91,9 +95,9 @@
 
             var response = $.ajax({
 
-                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
-                type: "PUT",
-                async: true,
+                url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type:   "PUT",
+                async:  true,
             });
 
             response.success(function (data)
@@ -145,6 +149,27 @@
                 window.location.href = "index.html";
             });
         });
+
+        function logOut(e)
+        {
+            console.log("Logging you out...");
+
+            var request = $.ajax(
+                {
+                    url:    "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type:   "DELETE",
+                    async:  false
+                });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
 
     </script>
 </body>

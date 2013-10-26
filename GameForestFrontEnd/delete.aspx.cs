@@ -13,5 +13,10 @@ namespace GameForestFE
         {
 
         }
+
+        protected void buttonDelete_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

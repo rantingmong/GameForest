@@ -11,7 +11,6 @@
 </head>
 <body>
     <div class="container">
-        <br />
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -30,8 +29,7 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="profile.html" id="linkProfile" style="display: none">user's name goes here</a></li>
-                    <li><a href="#" id="fbLogout" style="display: none">Logout (FB User)</a></li>
-                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="onLogout();">Logout</a></li>
+                    <li><a href="index.html" id="linkLogout" style="display: none" onclick="logOut(event)">Logout</a></li>
                 </ul>
             </div>
         </nav>
@@ -41,7 +39,12 @@
                     <h1>Update game <small id="gameName" runat="server">the game</small></h1>
                 </div>
             </div>
-            <div class="alert alert-danger" id="alertDialog" runat="server" style="display: none"></div>
+            <div id="alertDialogError" class="alert alert-danger" runat="server" style="display: none">
+                <span class="glyphicon glyphicon-remove"></span><span id="alertDangerText" runat="server">Hello there!</span>
+            </div>
+            <div id="alertDialogAllOk" class="alert alert-success" runat="server" style="display: none">
+                <span class="glyphicon glyphicon-ok"></span><span id="alertAllOkText" runat="server">Hello there!</span>
+            </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
@@ -76,8 +79,95 @@
             </div>
         </div>
     </div>
+    <!--TODO: update this not to make sira sira-->
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function ()
+        {
+            // do a heartbeat to confirm user's session is still valid
+            var showLogin = true;
+
+            var response = $.ajax({
+
+                url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                type: "PUT",
+                async: true,
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType != 0)
+                {
+                    showLogin = true;
+                    localStorage.setItem('user-session', null);
+                }
+                else
+                {
+                    showLogin = false;
+                }
+
+                if (showLogin == false)
+                {
+                    // then async get user's information
+
+                    var userResponse = $.ajax({
+                        url: "http://" + gameForestIP + ":1193/service/user/session/" + localStorage.getItem("user-session"),
+                        type: "GET",
+                        async: true,
+                    });
+
+                    userResponse.success(function (data)
+                    {
+                        // set user name to linkProfile
+                        var adata = JSON.parse(data.AdditionalData);
+
+                        $("#linkLogout").show();
+                        $("#linkProfile").show();
+
+                        $("#linkProfile").html(adata.Username);
+
+                        $("#inputUserId").val(adata.UserId);
+                        $("#inputSessionId").val(localStorage.getItem("user-session"));
+                    });
+                }
+                else
+                {
+                    window.location.href = "index.html";
+                }
+            });
+
+            response.fail(function (data)
+            {
+                localStorage.setItem('user-session', null);
+
+                window.location.href = "index.html";
+            });
+        });
+
+        function logOut(e)
+        {
+            console.log("Logging you out...");
+
+            var request = $.ajax(
+                {
+                    url: "http://" + gameForestIP + ":1193/service/user/login?usersessionid=" + localStorage.getItem("user-session"),
+                    type: "DELETE",
+                    async: false
+                });
+
+            request.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    localStorage.setItem("user-session", null);
+                    window.location.reload(true);
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

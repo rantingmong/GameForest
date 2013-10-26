@@ -87,6 +87,7 @@
     <Compile Include="delete.aspx.designer.cs">
       <DependentUpon>delete.aspx</DependentUpon>
     </Compile>
+    <Compile Include="gameforestip.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="update.aspx.cs">
       <DependentUpon>update.aspx</DependentUpon>

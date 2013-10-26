@@ -28,13 +28,18 @@
                 </ul>
             </div>
         </nav>
-        <div class="row" id="registerForm" style="margin-top: 40px">
+        <div class="row" style="margin-top: 40px">
             <div class="col-sm-12">
-                <div id="alertDialog" class="alert alert-danger"></div>
                 <div class="page-header">
                     <h1>Register User</h1>
                 </div>
-                <div class="row">
+                <div id="alertDialogError" class="alert alert-danger">
+                    <span class="glyphicon glyphicon-remove"></span><span id="alertDangerText"> Hello there!</span>
+                </div>
+                <div id="alertDialogAllOk" class="alert alert-success">
+                    <span class="glyphicon glyphicon-ok"></span><span id="alertAllOkText"> Hello there!</span>
+                </div>
+                <div id="registerForm" class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="username">Username</label>
@@ -59,6 +64,11 @@
                         <a class="btn btn-primary" href="registerfb.html">Register with your Facebook account</a>
                     </div>
                 </div>
+                <div id="registeringForm" class="row" style="display: none">
+                    <div class="col-sm-12">
+                        <h3>Registering... Please wait...</h3>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -70,35 +80,75 @@
     
     <script type="text/javascript">
 
-        $("#alertDialog").hide();
+        $("#alertDialogError").hide();
+        $("#alertDialogAllOk").hide();
 
         function onRegisterClick()
         {
-            $("#alertDialog").hide();
             $("#registerForm").hide();
+            $("#registeringForm").show();
 
             var error = false;
+            var etype = 0;
 
             var varUrname = $("#username").val();
             var varPword1 = $("#password1").val();
             var varPword2 = $("#password2").val();
 
-            if (varUrname.length == 0 || varUrname == null)
-                error = true;
+            if (varUrname.length < 5 || varUrname == null)
+            {
+                error  = true;
+                etype += 1;
+            }
 
-            if (varPword1.length == 0 || varPword1 == null)
-                error = true;
+            if (varPword1.length < 5 || varPword1 == null)
+            {
+                error  = true;
+                etype += 2;
+            }
 
-            if (varPword2.length == 0 || varPword2 == null)
-                error = true;
+            if (varPword2.length < 5 || varPword2 == null)
+            {
+                error  = true;
+                etype += 2;
+            }
 
             if (varPword1 != varPword2)
-                error = true;
+            {
+                error  = true;
+                etype += 4;
+            }
 
             if (error)
             {
-                $("#alertDialog").show();
-                $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>Invalid username or password");
+                switch (etype) {
+                    case 1:
+                        $("#alertDangerText").html(" Invalid username length!");
+                        break;
+                    case 2:
+                        $("#alertDangerText").html(" Invalid password length!");
+                        break;
+                    case 3:
+                        $("#alertDangerText").html(" Invalid username and password length!");
+                        break;
+                    case 4:
+                        $("#alertDangerText").html(" Passwords does not match!");
+                        break;
+                    case 5:
+                        $("#alertDangerText").html(" Passwords does not match and invalid username length!");
+                        break;
+                    case 6:
+                        $("#alertDangerText").html(" Invalid password length and they don't match!");
+                        break;
+                    case 7:
+                        $("#alertDangerText").html(" Everything's wrong!!! >:(");
+                        break;
+                }
+
+                $("#alertDialogError").show();
+
+                $("#registerForm").show();
+                $("#registeringForm").hide();
             }
             else
             {
@@ -113,33 +163,34 @@
                 {
                     if (msg.ResponseType != 0)
                     {
-                        $("#alertDialog").css("class", "alert alert-danger");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + msg.AdditionalData);
+                        $("#alertDialogError").show();
+                        $("#alertDangerText").html(msg.AdditionalData);
 
                         $("#registerForm").show();
                     }
                     else
                     {
-                        $("#alertDialog").css("class", "alert alert-success");
-                        $("#alertDialog").html("<p class='glyphicon glyphicon-ok' style='margin-right:10px'/>" + "You are successfully registered! Returning to main page...");
+                        $("#alertDialogAllOk").show();
+                        $("#alertAllOkText").html(" Registration successful! Will now go back to the main page...");
 
                         setTimeout(function ()
                         {
                             window.location.href = "index.html";
 
-                        }, 5000);
+                        }, 3000);
                     }
 
                     $("#alertDialog").show();
+                    $("#registeringForm").hide();
                 });
 
                 request.fail(function (nothing, textStatus, something)
                 {
-                    $("#alertDialog").css("class", "alert alert-danger");
-                    $("#alertDialog").html("<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'/>" + "Something went wrong! :(");
+                    $("#alertDialogError").show();
+                    $("#alertDangerText").html("Something went wrong...");
 
-                    $("#alertDialog").show();
                     $("#registerForm").show();
+                    $("#registeringForm").hide();
                 });
             }
         }

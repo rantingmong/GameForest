@@ -43,16 +43,16 @@ namespace GameForestFE
                     {
                         error = true;
 
-                        alertDialog.Style["display"] = "normal";
-                        alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>File specified is not a zip file.";
+                        alertDialogError.Style["display"]   = "normal";
+                        alertDangerText.InnerHtml           = "File specified is not a zip file.";
                     }
                 }
                 else
                 {
                     error = true;
 
-                    alertDialog.Style["display"] = "normal";
-                    alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Please specify your file (in zip format) for upload.";
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "Please specify your file (in zip format) for upload.";
                 }
 
                 if (error == false)
@@ -61,6 +61,7 @@ namespace GameForestFE
                     try
                     {
                         FastZip zipFile = new FastZip();
+
                         zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName),
                                            Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text),
                                            null);
@@ -81,9 +82,8 @@ namespace GameForestFE
                         // if something is missing or broken, delete the directory and inform the user
                         if (!gfjsok || !gfmain)
                         {
-                            alertDialog.Attributes["class"] = "alert alert-danger";
-                            alertDialog.Style["display"] = "normal";
-                            alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Your zip file does not contain the required gameforest files.";
+                            alertDialogError.Style["display"]   = "normal";
+                            alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
 
                             Directory.Delete(Path.Combine("games", inputUserId.Text, inputGameName.Text));
                             File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
@@ -93,8 +93,8 @@ namespace GameForestFE
                     }
                     catch (ZipException)
                     {
-                        alertDialog.Style["display"] = "normal";
-                        alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Zip file decompression failed. Please check if your the file is a valid zip file.";
+                        alertDialogError.Style["display"]   = "normal";
+                        alertDangerText.InnerHtml           = "Zip file decompression failed. Please check if your the file is a valid zip file.";
 
                         if (File.Exists(Path.Combine(basePath, "temp", fileUpload.FileName)))
                             File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
@@ -103,44 +103,41 @@ namespace GameForestFE
                     }
 
                     // send REST request to server
-                    HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
+                    HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}",
                                                                                                     inputGameName.Text,
                                                                                                     inputDescription.Text,
                                                                                                     inputMinPlayers.Text,
                                                                                                     inputMaxPlayers.Text,
                                                                                                     Guid.Parse(inputSessionId.Text)));
 
-                    newGameRequest.Method = "POST";
-                    newGameRequest.ContentLength = 0;
+                    newGameRequest.Method           = "POST";
+                    newGameRequest.ContentLength    = 0;
 
-                    var response = (HttpWebResponse)newGameRequest.GetResponse();
-                    var reader = new StreamReader(response.GetResponseStream());
+                    var response    = (HttpWebResponse)newGameRequest.GetResponse();
+                    var reader      = new StreamReader(response.GetResponseStream());
 
-                    var respose = JsonConvert.DeserializeObject<GFXRestResponse>(reader.ReadToEnd());
+                    var respose     = JsonConvert.DeserializeObject<GFXRestResponse>(reader.ReadToEnd());
 
                     if (respose.ResponseType == GFXResponseType.Normal)
                     {
                         // inform user we are done processing
-                        alertDialog.Attributes["class"] = "alert alert-success";
-                        alertDialog.Style["display"] = "normal";
-                        alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation succesful! The page will now go back to the games page.";
+                        alertDialogAllOk.Style["display"]   = "normal";
+                        alertDialogAllOk.InnerHtml          = "Game creation succesful! The page will now go back to the games page.";
                     }
                     else
                     {
                         // read response, if it fails, inform the user and don't continue and delete the uploaded file.
-                        alertDialog.Attributes["class"] = "alert alert-danger";
-                        alertDialog.Style["display"] = "normal";
-                        alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation was not successful.";
+                        
+                        alertDialogError.Style["display"]   = "normal";
+                        alertDangerText.InnerHtml           = "Game creation was not successful.";
                     }
                 }
             }
             catch (Exception exp)
             {
-                alertDialog.Attributes["class"] = "alert alert-danger";
-                alertDialog.Style["display"] = "normal";
-                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>FATAL ERROR! " + exp.Message;
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "FATAL ERROR! " + exp.Message;
             }
-            
         }
     }
 }

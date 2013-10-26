@@ -24,8 +24,8 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="index.html">Home</a></li>
-                    <li><a href="games.html">Games</a></li>
-                    <li><a href="dev.html">Developer</a></li>
+                    <li><a id="mainLinkGame" href="games.html" style="display: none">Games</a></li>
+                    <li><a id="mainLinkDevt" href="dev.html" style="display: none">Developer</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right" ng-controller="loadUserInfoController">
                     <li><a id="linkPro" href="profile.html" style="display: none">{{userInfo.Username}}</a></li>
@@ -63,6 +63,9 @@
             {
                 if (data.ResponseType == 0)
                 {
+                    $("#mainLinkGame").show();
+                    $("#mainLinkDevt").show();
+
                     $("#linkReg").hide();
                     $("#linkLog").hide();
                     $("#linkOut").show();
@@ -76,6 +79,9 @@
                 }
                 else
                 {
+                    $("#mainLinkGame").hide();
+                    $("#mainLinkDevt").hide();
+
                     $("#linkReg").show();
                     $("#linkLog").show();
                     $("#linkOut").hide();

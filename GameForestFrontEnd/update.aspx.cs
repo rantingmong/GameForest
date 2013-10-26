@@ -26,7 +26,7 @@ namespace GameForestFE
             this.gameId     = gameId;
             this.sessionId  = sessId;
 
-            HttpWebRequest getGameInfo = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game/" + gameId));
+            HttpWebRequest getGameInfo = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/game/" + gameId));
 
             getGameInfo.Method          = "GET";
             getGameInfo.ContentLength   = 0;
@@ -53,7 +53,7 @@ namespace GameForestFE
             var error       = false;
             var basePath    = AppDomain.CurrentDomain.BaseDirectory;
 
-            HttpWebRequest userInfoFromSess = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/user/session/" + sessId));
+            HttpWebRequest userInfoFromSess = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/user/session/" + sessId));
 
             userInfoFromSess.Method         = "GET";
             userInfoFromSess.ContentLength  = 0;
@@ -67,8 +67,8 @@ namespace GameForestFE
             {
                 error = true;
 
-                alertDialog.Style["display"] = "normal";
-                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>There was something wrong with the server.";
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "There was something wrong with the server.";
 
                 return;
             }
@@ -98,17 +98,17 @@ namespace GameForestFE
                 else
                 {
                     error = true;
-
-                    alertDialog.Style["display"] = "normal";
-                    alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>File specified is not a zip file.";
+                    
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "File specified is not a zip file.";
                 }
             }
             else
             {
                 error = true;
-
-                alertDialog.Style["display"] = "normal";
-                alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Please specify your file (in zip format) for upload.";
+                
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "Please specify your file (in zip format) for upload.";
             }
 
             if (error == false)
@@ -137,9 +137,8 @@ namespace GameForestFE
                     // if something is missing or broken, delete the directory and inform the user
                     if (!gfjsok || !gfmain)
                     {
-                        alertDialog.Attributes["class"] = "alert alert-danger";
-                        alertDialog.Style["display"] = "normal";
-                        alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Your zip file does not contain the required gameforest files.";
+                        alertDialogError.Style["display"]   = "normal";
+                        alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
 
                         Directory.Delete(Path.Combine("games", userId, inputGameName.Text));
                         File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
@@ -149,8 +148,8 @@ namespace GameForestFE
                 }
                 catch (ZipException)
                 {
-                    alertDialog.Style["display"] = "normal";
-                    alertDialog.InnerHtml = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Zip file decompression failed. Please check if your the file is a valid zip file.";
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "Zip file decompression failed. Please check if your the file is a valid zip file.";
 
                     if (File.Exists(Path.Combine(basePath, "temp", fileUpload.FileName)))
                         File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
@@ -161,7 +160,7 @@ namespace GameForestFE
                 // replace this to update
 
                 // send REST request to server
-                HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://localhost:1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}&gameid={5}",
+                HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}&gameid={5}",
                                                                                                 inputGameName.Text,
                                                                                                 inputGameDescription.Text,
                                                                                                 inputMinPlayers.Text,
@@ -179,15 +178,13 @@ namespace GameForestFE
 
                 if (respose.ResponseType == GFXResponseType.Normal)
                 {
-                    alertDialog.Attributes["class"]     = "alert alert-success";
-                    alertDialog.Style["display"]        = "normal";
-                    alertDialog.InnerHtml               = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation succesful! The page will now go back to the games page.";
+                    alertDialogAllOk.Style["display"]   = "normal";
+                    alertAllOkText.InnerHtml            = "Game creation succesful! The page will now go back to the games page.";
                 }
                 else
                 {
-                    alertDialog.Attributes["class"]     = "alert alert-danger";
-                    alertDialog.Style["display"]        = "normal";
-                    alertDialog.InnerHtml               = "<p class='glyphicon glyphicon-warning-sign' style='margin-right:10px'></p>Game creation was not successful.";
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "Game creation was not successful.";
                 }
             }
         }
