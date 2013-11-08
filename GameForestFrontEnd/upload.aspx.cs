@@ -122,14 +122,14 @@ namespace GameForestFE
                     {
                         // inform user we are done processing
                         alertDialogAllOk.Style["display"]   = "normal";
-                        alertDialogAllOk.InnerHtml          = "Game creation succesful! The page will now go back to the games page.";
+                        alertDialogAllOk.InnerHtml          = " Game creation succesful! The page will now go back to the games page.";
                     }
                     else
                     {
                         // read response, if it fails, inform the user and don't continue and delete the uploaded file.
                         
                         alertDialogError.Style["display"]   = "normal";
-                        alertDangerText.InnerHtml           = "Game creation was not successful.";
+                        alertDangerText.InnerHtml           = " Game creation was not successful. " + respose.AdditionalData;
                     }
                 }
             }
