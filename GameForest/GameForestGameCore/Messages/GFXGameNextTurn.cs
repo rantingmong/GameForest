@@ -79,7 +79,7 @@ namespace GameForestCoreWebSocket.Messages
                 {
                     if (player.SessionID == nextPlayer.SessionID)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject         = "GFX_TURN_START",
                                 Message         = JsonConvert.SerializeObject(entries),
@@ -88,7 +88,7 @@ namespace GameForestCoreWebSocket.Messages
                     }
                     else
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject         = "GFX_TURN_CHANGED",
                                 Message         = JsonConvert.SerializeObject(entries),

@@ -49,7 +49,7 @@ namespace GameForestCoreWebSocket.Messages
                     // send a GFX_START_GAME to all clients
                     foreach (var player in checkPlayers)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                               Subject       = "GFX_START_GAME",
                               Message       = "",
@@ -70,7 +70,7 @@ namespace GameForestCoreWebSocket.Messages
 
                     server.LobbyList.Update(string.Format("LobbyId = '{0}'", lobby.LobbyID), lobby);
 
-                    server.WebSocketList[order[0].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                    server.WebSocketList[order[0].SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                         {
                             Subject         = "GFX_TURN_START",
                             Message         = "",
@@ -79,7 +79,7 @@ namespace GameForestCoreWebSocket.Messages
 
                     for (int i = 1; i < order.Count; i++)
                     {
-                        server.WebSocketList[order[i].SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[order[i].SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject         = "GFX_TURN_CHANGED",
                                 Message         = "",
@@ -102,7 +102,7 @@ namespace GameForestCoreWebSocket.Messages
 
                     server.GameDataList[nextPlayer.LobbyID].CurrentUserSession = nextPlayer.SessionID;
 
-                    server.WebSocketList[nextPlayer.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                    server.WebSocketList[nextPlayer.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                     {
                         Subject         = "GFX_TURN_RESOLVE",
                         Message         = nextPlayer.Order.ToString(),

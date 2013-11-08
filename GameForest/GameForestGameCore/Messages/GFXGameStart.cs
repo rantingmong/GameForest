@@ -34,7 +34,7 @@ namespace GameForestCoreWebSocket.Messages
                 {
                     if (player.SessionID != info.SessionId)
                     {
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject = "GFX_GAME_START",
                                 Message = "",

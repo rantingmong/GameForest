@@ -27,7 +27,7 @@ namespace GameForestCoreWebSocket.Messages
             foreach (var player in players)
             {
                 // send GFX_GAME_FINISHED
-                server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                     {
                         ResponseCode    = GFXResponseType.Normal,
                         Subject         = "GFX_GAME_FINISHED",

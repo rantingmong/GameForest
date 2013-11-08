@@ -80,7 +80,7 @@ namespace GameForestCoreWebSocket.Messages
                         server.LobbySessionList .Update(string.Format("SessionId = '{0}'", xcurrentPlayer.SessionID),   xcurrentPlayer);
 
                         // then we send the associated events to the clients
-                        server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                        server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {
                                 Subject             = "GFX_START_CHOICE",
                                 Message             = "",
@@ -92,7 +92,7 @@ namespace GameForestCoreWebSocket.Messages
                             server.GameDataList[currentPlayer.LobbyID].CurrentUserSession = player.SessionID;
 
                             // send a GFX_TURN_RESOLVE to the owner of the lobby
-                            server.WebSocketList[player.SessionID].Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                            server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                                 {
                                     Subject         = "GFX_TURN_RESOLVE",
                                     Message         = player.Order.ToString(),

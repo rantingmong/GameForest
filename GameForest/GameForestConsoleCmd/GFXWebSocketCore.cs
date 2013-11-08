@@ -54,6 +54,9 @@ namespace GameForest
         public void Stop()
         {
             isRunning = false;
+
+            wsThreadCore.Abort();
+            wsThreadChat.Abort();
         }
     }
 }
