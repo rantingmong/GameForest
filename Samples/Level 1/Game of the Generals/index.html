@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Game Forest game</title><!--Change this to your game's title.-->
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+
+    <style type="text/css">
+        #gameForestDisconnectWindow {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: rgba(1, 1, 1, 0.5);
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body onunload="unload();">
+
+    <!--This is where you will place your game-->
+    <div id="gameForestGameWindow" style="display: none" class="container">
+        <div class="row">
+            <h2 style="text-align: center">Game of the Generals</h2>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">
+                <h3 id="username1" style="text-align: center"><span id="username1pic" class="glyphicon glyphicon-play" style="display: none"></span> Name 1</h3>
+            </div>
+            <div class="col-xs-4">
+                <h3 style="text-align: center">versus</h3>
+            </div>
+            <div class="col-xs-4">
+                <h3 id="username2" style="text-align: center"><span id="username2pic" class="glyphicon glyphicon-play" style="display: none"></span>Name 2</h3>
+            </div>
+        </div>
+        <div id="pickPanel" class="row" style="display: none">
+            <div class="col-sm-12">
+                <h3>Choose where to place your pieces:</h3>
+                <table id="tablePickDes" class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="boardCell" id="pickcelldes_1_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_1_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="pickcelldes_2_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_2_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="pickcelldes_3_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                            <td class="boardCell" id="pickcelldes_3_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="tablePickSrc" class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="selectCell" id="pickcellsrc_1_1" draggable="true" data-info="1" ondragstart="pickDragStart(event)"><img src="img/general5star.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_2" draggable="true" data-info="2" ondragstart="pickDragStart(event)"><img src="img/general4star.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_3" draggable="true" data-info="3" ondragstart="pickDragStart(event)"><img src="img/general3star.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_4" draggable="true" data-info="4" ondragstart="pickDragStart(event)"><img src="img/general2star.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_5" draggable="true" data-info="5" ondragstart="pickDragStart(event)"><img src="img/general1star.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_6" draggable="true" data-info="6" ondragstart="pickDragStart(event)"><img src="img/colonel.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_1_7" draggable="true" data-info="7" ondragstart="pickDragStart(event)"><img src="img/ltcolonel.png" /></td>
+                        </tr>
+                        <tr>
+                            <td class="selectCell" id="pickcellsrc_2_1" draggable="true" data-info="8" ondragstart="pickDragStart(event)"><img src="img/major.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_2" draggable="true" data-info="9" ondragstart="pickDragStart(event)"><img src="img/captain.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_3" draggable="true" data-info="a" ondragstart="pickDragStart(event)"><img src="img/lieu1st.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_4" draggable="true" data-info="b" ondragstart="pickDragStart(event)"><img src="img/lieu2nd.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_5" draggable="true" data-info="c" ondragstart="pickDragStart(event)"><img src="img/sergeant.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_6" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_2_7" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                        </tr>
+                        <tr>
+                            <td class="selectCell" id="pickcellsrc_3_1" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_2" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_3" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_4" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_5" draggable="true" data-info="e" ondragstart="pickDragStart(event)"><img src="img/spy.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_6" draggable="true" data-info="e" ondragstart="pickDragStart(event)"><img src="img/spy.png" /></td>
+                            <td class="selectCell" id="pickcellsrc_3_7" draggable="true" data-info="f" ondragstart="pickDragStart(event)"><img src="img/flag.png" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a id="buttonPiecePlacementConfirm" class="btn btn-success btn-lg" onclick="buttonConfirmPlaceClick(event)">Accept placement!</a>
+            </div>
+        </div>
+        <div id="mainPanel" class="row" style="display: none">
+            <div class="col-sm-12">
+                <table id="tableMain" class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="boardCell" id="maincell_1_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_1_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_2_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_2_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_3_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_3_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_4_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_4_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_5_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_5_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_6_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_6_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_7_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_7_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                        <tr>
+                            <td class="boardCell" id="maincell_8_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                            <td class="boardCell" id="maincell_8_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="waitPanel" class="row" style="display: normal">
+            <div class="col-sm-12">
+                <h3 style="text-align: center">Waiting for <strong id="waitPanelUsername">&lt;username&gt;</strong></h3>
+            </div>
+        </div>
+    </div>
+    <!--Disconnection window. Do not customize unless you know what you're doing.-->
+    <div id="gameForestDisconnectWindow">
+        <div style="margin: auto; width: 400px; margin-top: 30px" class="well well-lg">
+            <div id="gameForestClientDisconnected" style="display: none">
+                <h3 id="gameForestDisconnectedPlayer">&lt;client&gt; was disconnected!</h3>
+                <p>Waiting for the client to reconnect...</p>
+            </div>
+            <div id="gameForestPlayerDisconnected" style="display: none">
+                <h3>You are disconnected from the game.</h3>
+                <p>You will be kicked out in<b id="gameForestCountdownKill">(n)</b> seconds.</p>
+            </div>
+            <div id="gameForestPlayerKilled" style="display: none">
+                <h3>You are disconnected from the game.</h3>
+                <p>We're sorry but we cannot reconnect you to the server.</p>
+                <a style="text-align: center" href="../../../games.html">Go back to GameForest</a>
+            </div>
+        </div>
+    </div>
+
+    <!--GameForest stuff. Do not customize unless you know what you're doing.-->
+    <div id="gameForestLobbyWindow" class="container" style="display: normal">
+        <div class="page-header">
+            <h1>Lobby <small id="gameForestLobbyName">Game 1</small></h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="gfxButtonStart" disabled>Start game</button>
+                    <button type="button" class="btn btn-warning" id="gfxButtonLeave">Leave lobby</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <div class="col-sm-6">
+                <h3>User list:</h3>
+                <div class="panel panel-default" id="gfxUserList">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="well">
+                    <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chattext" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit" id="buttonSendChat">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="guid.js"></script>
+    <script src="jquery.js"></script>
+    <script src="promise.js"></script>
+
+    <script src="Bootstrap/js/bootstrap.min.js"></script>
+    <script src="GameForest.js"></script>
+    <script src="GameLogic.js"></script>
+
+    <script type="text/javascript">
+
+        var userUpdateInterval = null;
+
+        var gf = new GameForest(
+            new Guid(localStorage.getItem("lobby-game")),
+            new Guid(localStorage.getItem("lobby-session")),
+            new Guid(localStorage.getItem("user-session"))
+            );
+
+        $(document).ready(function ()
+        {
+            var getLobbyRequest = $.ajax({
+                url: "http://" + GameForestCloudUrl + ":1193/service/lobby/" + localStorage.getItem("lobby-session"),
+                type: "GET",
+                async: true
+            });
+
+            getLobbyRequest.success(function (result)
+            {
+                if (result.ResponseType == 0)
+                {
+                    var lobbyData = JSON.parse(result.AdditionalData);
+                    $("#gameForestLobbyName").html(lobbyData.Name);
+                }
+            });
+
+            $("#gfxButtonLeave").click(function ()
+            {
+                // navigate to main page
+                window.location.href = "../../../games.html";
+            });
+
+            // setup timer for user list
+            userUpdateInterval = setInterval(updateUserList, 5000);
+
+            gf.start();
+
+            // check if user is owner or not
+            var isowner = localStorage.getItem("lobby-owner");
+
+            if (isowner == "true")
+            {
+                $("#gfxButtonStart").removeAttr("disabled");
+                $("#gfxButtonStart").html("Start game");
+
+                $("#gfxButtonStart").click(function ()
+                {
+                    $("#gfxButtonStart").prop("disabled", true);
+                    $("#gfxButtonStart").html("Waiting for other players...");
+
+                    gf.startGame();
+                });
+            }
+            else
+            {
+                $("#gfxButtonStart").html("Ready");
+
+                $("#gfxButtonStart").click(function ()
+                {
+                    gf.readyGame();
+                });
+            }
+
+            onDocumentReady();
+        });
+
+        function unload()
+        {
+            $.ajax({
+                url: "http://" + GameForestCloudUrl + ":1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+                type: "DELETE",
+                async: false
+            });
+
+            gf.stop();
+        }
+
+        function updateUserList()
+        {
+            var response = $.ajax({
+                url: "http://" + GameForestCloudUrl + ":1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
+                type: "GET",
+                async: true
+            });
+
+            response.success(function (data)
+            {
+                if (data.ResponseType == 0)
+                {
+                    $("#gfxUserList").html("");
+
+                    var userList = JSON.parse(data.AdditionalData);
+
+                    for (var i = 0; i < userList.length; i++)
+                    {
+                        $("#gfxUserList").append("<div class='panel-body'><span class='glyphicon glyphicon-user' style='margin-right: 10px'></span>" + userList[i].Username + "</div>");
+                    }
+                }
+            });
+        }
+
+        function connect()
+        {
+            var textarea = document.getElementById("chattext");
+            textarea.onkeydown = keydownHandler;
+
+            if (sessionStorage.username == null)
+                var name = prompt("Input name", "Name");
+            else
+                var name = sessionStorage.username;
+
+            mess.Name = name;
+            mess.Lobby = lobbyid
+
+            socket = new WebSocket('ws://localhost:8085/');
+
+            socket.onopen = function ()
+            {
+                $("#chatbox").append("Connected\n");
+                socket.send(JSON.stringify(mess));
+            }
+
+            socket.onmessage = function (evt)
+            {
+                var message = JSON.parse(evt.data);
+
+                if (message.Message == "Chat")
+                {
+                    $("#chatbox").append(message.Chat + "\n");
+                    var psconsole = $('#chatbox');
+                    psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+                } else if (message.Message == "Names")
+                {
+                    var list = message.names;
+                    var code = "";
+
+                    for (var i = 0; i < list.length; i++)
+                    {
+                        console.log(list[i]);
+                        code += list[i] + "\n";
+                    }
+
+                    // we don't have a list yet of where to place the names
+                    //$("#namesofconnected").val(code);
+                }
+            }
+
+            socket.onclose = function ()
+            {
+                $("#chatbox").append("Connection Lost\n");
+            }
+
+            $('#submit').on('click', function (e)
+            {
+                var mes = new Object();
+                mes.Lobby = lobbyid;
+                mes.Message = "Mess";
+                mes.Mess = $("#chattext").val();
+                socket.send(JSON.stringify(mes));
+                $("#chattext").val("");
+            });
+        }
+
+        function keydownHandler(evt)
+        {
+            if (evt.keyCode == 13)
+            {
+                var mes = new Object();
+                mes.Lobby = lobbyid;
+                mes.Message = "Mess";
+                mes.Mess = $("#chattext").val();
+                socket.send(JSON.stringify(mes));
+                $("#chattext").val("");
+            }
+        }
+
+    </script>
+</body>
+</html>
