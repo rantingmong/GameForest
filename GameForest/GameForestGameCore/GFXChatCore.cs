@@ -110,7 +110,7 @@ namespace GameForestCoreWebSocket
         {
             Console.Write(msg);
 
-            var     packet  = JsonConvert.DeserializeObject(msg) as Dictionary<string, object>;
+            var     packet  = JsonConvert.DeserializeObject<Dictionary<string, object>>(msg);
 
             Guid    lobby   = Guid.Parse(packet["Lobby"] as string);
             string  message = packet["Message"] as string;
@@ -130,7 +130,7 @@ namespace GameForestCoreWebSocket
 
                         Dictionary<string, object> sendMessage = new Dictionary<string, object>();
 
-                        sendMessage["Messsage"] = "open";
+                        sendMessage["Message"]  = "open";
                         sendMessage["Value"]    = "okay";
 
                         // we inform the client the server accepted the connection
@@ -158,7 +158,7 @@ namespace GameForestCoreWebSocket
 
                             Dictionary<string, object> sendMessage = new Dictionary<string, object>();
 
-                            sendMessage["Messsage"] = "chat";
+                            sendMessage["Message"]  = "chat";
                             sendMessage["Value"]    = value;
 
                             // fly fly away!
