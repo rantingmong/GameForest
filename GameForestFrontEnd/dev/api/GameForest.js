@@ -263,7 +263,7 @@ var GameForest                              = function (gameId, lobbyId, session
 
         console.log(message.data);
 
-        if (message.data == GFX_CONNECTION_PING)
+        if (parse == GFX_CONNECTION_PING)
         {
             console.log("Sending ping reply!");
 
