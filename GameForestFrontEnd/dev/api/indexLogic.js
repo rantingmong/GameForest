@@ -20,6 +20,7 @@ $('#buttonSendChat').on('click', function (e)
 
     mes.Lobby   = localStorage.getItem("lobby-session");
     mes.Message = "chat";
+    mes.Name    = localStorage.getItem("user-session");
     mes.Value   = $("#chattext").val();
 
     chatWebSocket.send(JSON.stringify(mes));
@@ -129,7 +130,8 @@ function connect            ()
 
         mes.Lobby   = localStorage.getItem("lobby-session");
         mes.Message = "open";
-        mes.Value   = Guid.create();    // we use this to differentiate users in the server.
+        mes.Name    = localStorage.getItem("user-session");
+        mes.Value   = "";
 
         chatWebSocket.send(JSON.stringify(mes));
     };
@@ -146,7 +148,7 @@ function connect            ()
         else if (message.Message == "chat")
         {
             // add chat entry to the list
-            $("#chatbox").append(message.Value + "\n");
+            $("#chatbox").append(message.Name + ": " + message.Value + "\n");
 
             var psconsole = $('#chatbox');
                 psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
@@ -172,6 +174,7 @@ function keydownHandler     (evt)
         mes.Lobby   = localStorage.getItem("lobby-session");
         mes.Message = "chat";
         mes.Value   = $("#chattext").val();
+        mes.Name    = localStorage.getItem("user-session");
 
         chatWebSocket.send(JSON.stringify(mes));
         $("#chattext").val("");

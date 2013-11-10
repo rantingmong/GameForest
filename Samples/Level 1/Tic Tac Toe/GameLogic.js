@@ -7,6 +7,8 @@
 /// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforest.js" />
 /// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforesttracking.js" />
 
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/indexLogic.js" />
+
 'use strict';
 
 // gameforest-specific data
@@ -238,23 +240,17 @@ GameForest.prototype.onGameStart    = function ()
 
     var playerOrder = gf.playerOrderIndex();
 
-    var thisPlayer  = gf.playerInfo();
-    var nextPlayer  = gf.nextPlayer(1);
-
     if      (playerOrder == 1)
     {
         myToken = 'O';
-
-        oPlayer = thisPlayer;
-        xPlayer = nextPlayer;
     }
     else if (playerOrder == 2)
     {
         myToken = 'X';
-
-        xPlayer = thisPlayer;
-        oPlayer = nextPlayer;
     }
+
+    oPlayer = gf.userList[0];
+    xPlayer = gf.userList[1];
 
     xPlayerName = xPlayer.Username;
     oPlayerName = oPlayer.Username;
