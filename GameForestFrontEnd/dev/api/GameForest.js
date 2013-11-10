@@ -267,7 +267,7 @@ var GameForest                              = function (gameId, lobbyId, session
         {
             console.log("Sending ping reply!");
 
-            constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_PING_RESPOND);
+            constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_PING_RESPOND, "");
             return;
         }
 
