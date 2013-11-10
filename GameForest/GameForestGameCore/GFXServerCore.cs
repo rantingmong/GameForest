@@ -38,7 +38,7 @@ namespace GameForestCoreWebSocket
         private int                                     modChecker          = 0;
 
         private double                                  pingThreshold       = 10D;
-        private double                                  disconnectThreshold = 30D;
+        private double                                  disconnectThreshold = 60D;
         private double                                  logoutThreshold     = 300D;
 
         private Timer                                   loginCheckTimer     = null; // timer for users logged in on game-forest
