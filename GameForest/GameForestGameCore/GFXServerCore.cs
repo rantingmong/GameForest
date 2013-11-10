@@ -41,9 +41,10 @@ namespace GameForestCoreWebSocket
         private double                                  disconnectThreshold = 30D;
         private double                                  logoutThreshold     = 300D;
 
-        private Timer                                   loginCheckTimer     = null;
-        private Timer                                   sessionCheckTimer   = null;
-        private Timer                                   pingTimer           = null;
+        private Timer                                   loginCheckTimer     = null; // timer for users logged in on game-forest
+        private Timer                                   sessionCheckTimer   = null; // timer for users playing
+        private Timer                                   pingTimer           = null; // timer for checking if the player is still alive
+        private Timer                                   lobbyCheckTimer     = null; // timer for checking for lobbies
 
         private WebSocketServer                         server;
 
@@ -129,9 +130,15 @@ namespace GameForestCoreWebSocket
                     CheckUserConnectedTick();
                 }));
 
+            lobbyCheckTimer = new Timer(new TimerCallback((o) =>
+                {
+
+                }));
+
             pingTimer           .Change(TimeSpan.FromSeconds(pingThreshold),        TimeSpan.FromSeconds(pingThreshold));
             loginCheckTimer     .Change(TimeSpan.FromSeconds(logoutThreshold),      TimeSpan.FromSeconds(logoutThreshold));
             sessionCheckTimer   .Change(TimeSpan.FromSeconds(disconnectThreshold),  TimeSpan.FromSeconds(disconnectThreshold));
+            lobbyCheckTimer     .Change(TimeSpan.FromSeconds(disconnectThreshold),  TimeSpan.FromSeconds(disconnectThreshold));
 
             server = new WebSocketServer("ws://" + ipAddress + ":8084");
 
@@ -360,14 +367,37 @@ namespace GameForestCoreWebSocket
                     }
                 }
             }
-
+            
             // remove dead connections
             foreach (var item in removeList)
             {
                 webSocketList.Remove(item);
+
+                // remove the user from the lobby
+                List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", item)));
+                lobbySessionList.Remove(string.Format("SessionId = '{0}'", item));
+
+                if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
+                {
+                    lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
+                }
+
+                GFXLoginRow loginRow = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", item), 1))[0];
+
+                loginRow.UserStatus = GFXLoginStatus.MENU;
+
+                sessionList.Update(string.Format("SessionId = '{0}'", item), loginRow);
             }
 
+            removeList.Clear();
+
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Remove users", "Invalid users removed!");
+        }
+
+        private void                                    LobbyCheckTick          ()
+        {
+            // to know if users are playing in that lobby, for each lobby we check for users. for those users we check if they have
+            // a websocket connection. if not we remove the player from the lobby
         }
     }
 }

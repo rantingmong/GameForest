@@ -1,14 +1,17 @@
-﻿/// <reference path="GameForest.js" />
-/// <reference path="guid.js" />
-/// <reference path="jquery.js" />
-/// <reference path="promise.js" />
-/// <reference path="index.html" />
+﻿/// <reference path="index.html" />
+
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/guid.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/jquery.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/promise.js" />
+
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforest.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforesttracking.js" />
 
 'use strict';
 
 // gameforest-specific data
 
-GameForestCloudUrl                  = "localhost";
+GameForestCloudUrl                  = "game-forest.cloudapp.net";
 GameForestVerboseMessaging          = false;
 
 // DOM elements

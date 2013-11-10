@@ -65,6 +65,7 @@
     <Content Include="dev\api\GameForest.js" />
     <Content Include="dev\api\GameForestTracking.js" />
     <Content Include="dev\api\guid.js" />
+    <Content Include="dev\api\indexLogic.js" />
     <Content Include="dev\api\jquery.js" />
     <Content Include="dev\api\promise.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

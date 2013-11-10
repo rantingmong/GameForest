@@ -1,17 +1,18 @@
 ﻿/// <reference path="index.html" />
 
-/// <reference path="guid.js" />
-/// <reference path="jquery.js" />
-/// <reference path="promise.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/guid.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/jquery.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/promise.js" />
 
-/// <reference path="GameForest.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforest.js" />
+/// <reference path="http://game-forest.cloudapp.net:46069/dev/api/gameforesttracking.js" />
 
 'use strict';
 
 // gameforest-specific data
 
 // Set this to localhost when debugging and to game-forest.cloudapp.net when submitting it to Game Forest.
-GameForestCloudUrl          = "10.2.180.26";
+GameForestCloudUrl          = "game-forest.cloudapp.net";
 
 // Set this to true when debugging to let Game Forest show alert messages when something went wrong.
 GameForestVerboseMessaging  = false;

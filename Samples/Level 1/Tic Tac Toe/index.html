@@ -21,8 +21,7 @@
         }
     </style>
 </head>
-<body onunload="unload();">
-
+<body onunload="unload()">
     <!--This is where you will place your game-->
     <div id="gameForestGameWindow" style="display: none" class="container">
         <div id="sampleGameChooseScreen" style="display: none" class="row">
@@ -38,6 +37,25 @@
         </div>
         <div id="sampleGameActualGame" style="display: none;text-align: center">
             <canvas id="sampleGameCanvas" width="800" height="480" style="margin: auto; margin-top: 30px"></canvas>
+        </div>
+    </div>
+    <!--Chat window-->
+    <div id="gameForestChatWindow" class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="well">
+                    <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chattext" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <a class="btn btn-default" id="buttonSendChat">Send</a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     <!--Disconnection window. Do not customize unless you know what you're doing.-->
@@ -74,114 +92,15 @@
         </div>
     </div>
 
-    <script src="guid.js"></script>
-    <script src="jquery.js"></script>
-    <script src="promise.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/guid.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/jquery.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/promise.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/gameforest.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/GameForestTracking.js"></script>
 
     <script src="Bootstrap/js/bootstrap.min.js"></script>
-    <script src="GameForest.js"></script>
     <script src="GameLogic.js"></script>
 
-    <script type="text/javascript">
-
-        var userUpdateInterval = null;
-
-        var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")),
-                                new Guid(localStorage.getItem("lobby-session")),
-                                new Guid(localStorage.getItem("user-session")));
-
-        $(document).ready(function ()
-        {
-            var getLobbyRequest = $.ajax({
-                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/" + localStorage.getItem("lobby-session"),
-                type:   "GET",
-                async:  true
-            });
-
-            getLobbyRequest.success(function (result)
-            {
-                if (result.ResponseType == 0)
-                {
-                    var lobbyData = JSON.parse(result.AdditionalData);
-                    $("#gameForestLobbyName").html(lobbyData.Name);
-                }
-            });
-
-            $("#gfxButtonLeave").click(function ()
-            {
-                // navigate to main page
-                window.location.href = "../../../games.html";
-            });
-
-            // setup timer for user list
-            userUpdateInterval = setInterval(updateUserList, 5000);
-
-            gf.start();
-
-            // check if user is owner or not
-            var isowner = localStorage.getItem("lobby-owner");
-
-            if (isowner == "true")
-            {
-                $("#gfxButtonStart").removeAttr("disabled");
-                $("#gfxButtonStart").html("Start game");
-
-                $("#gfxButtonStart").click(function ()
-                {
-                    $("#gfxButtonStart").prop("disabled", true);
-                    $("#gfxButtonStart").html("Waiting for other players...");
-
-                    gf.startGame();
-                });
-            }
-            else
-            {
-                $("#gfxButtonStart").html("Ready");
-
-                $("#gfxButtonStart").click(function ()
-                {
-                    gf.readyGame();
-                });
-            }
-
-            onDocumentReady();
-        });
-
-        function unload()
-        {
-            $.ajax({
-                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
-                type:   "DELETE",
-                async:  false
-            });
-
-            gf.stop();
-        }
-
-        function updateUserList()
-        {
-            var response = $.ajax({
-                url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/users?lobbyid=" + localStorage.getItem("lobby-session") + "&usersessionid=" + localStorage.getItem("user-session"),
-                type:   "GET",
-                async:  true
-            });
-
-            response.success(function (data)
-            {
-                if (data.ResponseType == 0)
-                {
-                    $("#gfxUserList").html("");
-
-                    var userList = JSON.parse(data.AdditionalData);
-
-                    for (var i = 0; i < userList.length; i++)
-                    {
-                        $("#gfxUserList").append("<div class='panel-body'><span class='glyphicon glyphicon-user' style='margin-right: 10px'></span>" + userList[i].Username + "</div>");
-                    }
-                }
-            });
-        }
-
-    </script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/indexLogic.js"></script>
 </body>
 </html>
