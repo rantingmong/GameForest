@@ -18,8 +18,8 @@ namespace GameForestFE
         {
             try
             {
-                var error = false;
-                var basePath = AppDomain.CurrentDomain.BaseDirectory;
+                var error       = false;
+                var basePath    = AppDomain.CurrentDomain.BaseDirectory;
 
                 if (fileUpload.HasFile)
                 {
@@ -132,7 +132,7 @@ namespace GameForestFE
             catch (Exception exp)
             {
                 alertDialogError.Style["display"]   = "normal";
-                alertDangerText.InnerHtml           = "FATAL ERROR! " + exp.Message;
+                alertDangerText.InnerHtml           = "FATAL ERROR! " + exp.Message + "<br/>" + exp.StackTrace;
             }
         }
     }
