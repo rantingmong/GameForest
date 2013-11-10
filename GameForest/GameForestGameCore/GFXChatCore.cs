@@ -1,4 +1,5 @@
 ﻿using Fleck;
+using GameForestDatabaseConnector.Logger;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,246 +10,163 @@ using System.Threading;
 
 namespace GameForestCoreWebSocket
 {
+    public struct MessageSocket
+    {
+        public IWebSocketConnection webSocket;
+        public string               message;
+
+        public MessageSocket        (IWebSocketConnection websocket, string message) : this()
+        {
+            this.message    = message;
+            this.webSocket  = websocket;
+        }
+    }
+
+    public struct ChatEntry
+    {
+        public IWebSocketConnection webSocket;
+        public Guid                 lobbyId;
+    }
+
     public class GFXChatCore
     {
-        public class MessageSocket
+        WebSocketServer             websocketServer = null;
+        Queue<MessageSocket>        messageQueue    = new Queue<MessageSocket>();
+
+        Dictionary<Guid, ChatEntry> clientList      = new Dictionary<Guid, ChatEntry>();
+
+        Thread                      messageThread   = null;
+
+        public                      GFXChatCore     (String address, String portnumber)
         {
-            public IWebSocketConnection    socketConnection;
-            public String                  message;
-
-            public MessageSocket(IWebSocketConnection _socket, String _message)
-            {
-                socketConnection = _socket;
-                message = _message;
-            }
-        }
-
-        Dictionary<IWebSocketConnection, String> connectionMessages;
-        List<GFXChatLobby> lobbies;
-        Boolean lobbyConnection = false;
-
-        WebSocketServer         websocketServer;
-        Queue<MessageSocket>    messageQueue = new Queue<MessageSocket>();
-
-        public GFXChatCore(String address, String portnumber)
-        {
-            connectionMessages = new Dictionary<IWebSocketConnection, String>();
-            lobbies = new List<GFXChatLobby>();
             websocketServer = new WebSocketServer("ws://" + address + ":" + portnumber);
         }
 
-        public void start()
+        public void                 start           ()
         {
             websocketServer.Start(socket =>
             {
                 socket.OnOpen = () =>
                 {
-                    Console.WriteLine(socket.ConnectionInfo.ClientIpAddress);
-                    Console.WriteLine("Opened socket!");
+
                 };
 
                 socket.OnMessage = message =>
                 {
                     messageQueue.Enqueue(new MessageSocket(socket, message));
-
-                    //foreach (IWebSocketConnection connectionKey in connectionMessages.Keys)
-                    //{
-                    //    if (connectionKey == socket)
-                    //    {
-                    //        messageQueue.Enqueue(new MessageSocket(socket, message));
-                    //    }
-                    //    else
-                    //    {
-                    //        connectionMessages.Add(socket, message);
-                    //        messageQueue.Enqueue(new MessageSocket(socket, message));
-                    //    }
-                    //}
                 };
 
                 socket.OnClose = () =>
                 {
-                    for (int i = 0; i < lobbies.Count; i++)
+                    // we remove the websocket entry from clientList
+                    Guid keyToRemove = Guid.Empty;
+
+                    foreach (var item in clientList)
                     {
-                        //lobbies[i].Remove(websocketServer);
+                        if (item.Value.webSocket == socket)
+                        {
+                            keyToRemove = item.Key;
+                            break;
+                        }
                     }
 
-                    List<GFXChatLobby> deadLobbies = killLobbies(lobbies);
-
-                    for (int i = 0; i < deadLobbies.Count; i++)
+                    if (keyToRemove != Guid.Empty)
                     {
-                        //lobbies[i].Remove(deadLobbies[i]);
+                        clientList.Remove(keyToRemove);
                     }
                 };
-
-
             });
 
-            var thread = new Thread(new ThreadStart(() =>
+            messageThread = new Thread(new ThreadStart(() =>
                 {
                     while (true)
                     {
                         // process commands here
-                        MessageSocket thingToDequeue = null;
+                        MessageSocket thingToDequeue;
 
                         lock (messageQueue)
                         {
-                            if (messageQueue.Count != 0)
+                            if (messageQueue.Count > 0)
                             {
                                 thingToDequeue = messageQueue.Dequeue();
-
-                                if (thingToDequeue != null)
-                                {
-                                    processMessage(thingToDequeue.socketConnection, thingToDequeue.message);
-                                }
+                                processMessage(thingToDequeue.webSocket, thingToDequeue.message);
                             }
-                                
                         }
 
-                        Thread.Sleep(100);
+                        Thread.Sleep(50);
                     }
                 }));
 
-            thread.Start();
+            messageThread.Start();
+        }
 
-            Console.Read();
+        public void                 stop            ()
+        {
             websocketServer.Dispose();
+            messageThread.Abort();
         }
 
-        public void processMessage(IWebSocketConnection socket, String message)
+        public void                 processMessage  (IWebSocketConnection socket, String msg)
         {
-            var jsonSerializer = new JsonSerializer();
+            Console.Write(msg);
 
-            Console.Write(message);
+            dynamic packet      = JsonConvert.DeserializeObject(msg);
 
-            dynamic packet = jsonSerializer.Deserialize(new JsonTextReader(new StringReader(message)));
+            Guid    lobby       = Guid.Parse(packet.Lobby as string);
+            string  message     = packet.Message    as string;
+            string  value       = packet.Value      as string;
 
-            String name = packet.Name + "";
-            String mess = packet.Mess + "";
-            String lobbyName = packet.Lobby + "";
-            int index = getLobbyIndex(lobbyName, lobbies);
-
-            if (packet.Message == "Name")
+            switch (message)
             {
-                
-                Console.WriteLine("Sent name!");
-
-            } else if (packet.Message == "Mess")
-            {
-                Console.WriteLine("Sent message!");
-
-                if (index != -1)
-                {
-                    lobbies[index].SendToAll(mess, socket);
-                }
-                else
-                {
-                    lobbies.Add(new GFXChatLobby(lobbyName));
-                    index = getLobbyIndex(lobbyName, lobbies);
-
-                    lobbies[index].Connection(socket, name);
-
-                    lobbies[index].SendToAll(mess, socket);
-                }
-
-                //foreach (IWebSocketConnection connectionKey in connectionMessages.Keys)
-                //{
-                //    if (connectionKey == socket)
-                //    {
-                //        lobbies[index].SendToAll(mess, socket);
-                //    }
-                //    else
-                //    {
-                //        lobbies.Add(new GFXChatLobby(lobbyName));
-                //        index = getLobbyIndex(lobbyName, lobbies);
-
-                //        lobbies[index].Connection(socket, name);
-
-                //        lobbies[index].SendToAll(mess, socket);
-                //    }
-                //}
-            }
-            else
-            {
-                Console.WriteLine("Unknown packet message!");
-            }
-        }
-
-        public void processMessage2(IWebSocketConnection socket, String message)
-        {
-            var jsonSerializer = new JsonSerializer();
-
-            Console.Write(message);
-            dynamic packet = jsonSerializer.Deserialize(new JsonTextReader(new StringReader(message)));
-
-            if (packet.Message == "Name")
-            {
-                String lobbyName = packet.Lobby + "";
-                String name = packet.Name + "";
-                int index = getLobbyIndex(lobbyName, lobbies);
-
-                if (index != -1)
-                {
-                    lobbies[index].Connection(socket, name);
-                }
-                else
-                {
-                    lobbies.Add(new GFXChatLobby(lobbyName));
-                    index = getLobbyIndex(lobbyName, lobbies);
-
-                    lobbies[index].Connection(socket, name);
-                    Console.Write("Lobby: " + index);
-                }
-            }
-            else
-            {
-                String lobbyName = packet.Lobby + "";
-                String mess = packet.Mess + "";
-                String name = packet.Name + "";
-
-                int index = getLobbyIndex(lobbyName, lobbies);
-
-                if (index != -1)
-                {
-                    if (lobbies[index].ConnectionExists() == false)
+                case "open":
                     {
-                        lobbies[index].Connection(socket, name);
-                        lobbyConnection = true;
-                    }
-                    
-                    lobbies[index].SendToAll(mess, socket);
-                }
-                else
-                {
-                    lobbies.Add(new GFXChatLobby(lobbyName));
-                    index = getLobbyIndex(lobbyName, lobbies);
+                        ChatEntry newEntry = new ChatEntry
+                        {
+                            lobbyId     = lobby,
+                            webSocket   = socket
+                        };
 
-                    if (lobbies[index].ConnectionExists() == false)
+                        clientList.Add(Guid.Parse(value), newEntry);
+
+                        Dictionary<string, object> sendMessage = new Dictionary<string, object>();
+
+                        sendMessage["Messsage"] = "open";
+                        sendMessage["Value"]    = "okay";
+
+                        // we inform the client the server accepted the connection
+                        socket.Send(JsonConvert.SerializeObject(sendMessage));
+                    }
+                    break;
+                case "chat":
                     {
-                        lobbies[index].Connection(socket, name);
-                        lobbyConnection = true;
+                        // we get other players in the lobby specified by this message
+                        List<ChatEntry> otherPlayers = new List<ChatEntry>();
+
+                        foreach (var item in clientList)
+                        {
+                            if (item.Value.lobbyId == lobby)
+                            {
+                                otherPlayers.Add(item.Value);
+                            }
+                        }
+
+                        // after that, we send the 'value' to other players
+                        foreach (var item in otherPlayers)
+                        {
+                            if (item.webSocket == socket)
+                                continue;
+
+                            Dictionary<string, object> sendMessage = new Dictionary<string, object>();
+
+                            sendMessage["Messsage"] = "chat";
+                            sendMessage["Value"]    = value;
+
+                            // fly fly away!
+                            item.webSocket.Send(JsonConvert.SerializeObject(sendMessage));
+                        }
                     }
-
-                    lobbies[index].SendToAll(mess, socket);
-                }
+                    break;
             }
-        }
-
-        public List<GFXChatLobby> killLobbies(List<GFXChatLobby> currentLobbies)
-        {
-            List<GFXChatLobby> list = new List<GFXChatLobby>();
-
-            for (int i = 0; i < currentLobbies.Count; i++)
-                if (currentLobbies[i].isToBeKilled() == true)
-                    list.Add(currentLobbies[i]);
-            
-            return list;
-        }
-
-        public int getLobbyIndex(String lobbyName, List<GFXChatLobby> list)
-        {
-            for (int i = 0; i < list.Count; i++)
-                if (list[i].getName() == lobbyName) return i;
-            return -1;
         }
     }
 }

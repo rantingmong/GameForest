@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GFXChatCore.cs" />
-    <Compile Include="GFXChatLobby.cs" />
     <Compile Include="GFXDisconnectInfo.cs" />
     <Compile Include="GFXGameData.cs" />
     <Compile Include="GFXSocketRequest.cs" />

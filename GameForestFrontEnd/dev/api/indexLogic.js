@@ -6,11 +6,26 @@
 
 var userUpdateInterval = null;
 
-var gf = new GameForest(new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("lobby-session")), new Guid(localStorage.getItem("user-session")));
+var gf              = new GameForest(new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("lobby-session")), new Guid(localStorage.getItem("user-session")));
+var chatWebSocket   = new WebSocket('ws://' + GameForestCloudUrl + ':8085/');
 
 $("#gfxButtonLeave").click(function ()
 {
-    window.location.href = "../../../games.html";
+    window.location.href = "http://game-forest.cloudapp.net:46069/games.html";
+});
+
+$('#buttonSendChat').on('click', function (e)
+{
+    var mes = new Object();
+
+    mes.Lobby   = localStorage.getItem("lobby-session");
+    mes.Message = "chat";
+    mes.Value   = $("#chattext").val();
+
+    chatWebSocket.send(JSON.stringify(mes));
+    $("#chattext").val("");
+
+    console.log("Sending chat message!");
 });
 
 $(document).ready(function ()
@@ -105,60 +120,47 @@ function connect            ()
 {
     document.getElementById("chattext").onkeydown = keydownHandler;
 
-    var socket = new WebSocket('ws://' + GameForestCloudUrl + ':8085/');
-
-    socket.onopen       = function ()
+    chatWebSocket.onopen = function ()
     {
-        $("#chatbox").append("Connected\n");
+        console.log("Connecting to chat...");
 
-        var mess = new Object();
-
-        mess.Lobby      = localStorage.getItem("lobby-session");
-        mess.Message    = "Mess";
-        mess.Mess       = $("#chattext").val();
-
-        // socket.send(JSON.stringify(mess));
-    };
-
-    socket.onmessage    = function (evt)
-    {
-        var message = JSON.parse(evt.data);
-
-        if (message.Message == "Chat")
-        {
-            $("#chatbox").append(message.Chat + "\n");
-            var psconsole = $('#chatbox');
-            psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
-        }
-        else if (message.Message == "Names")
-        {
-            var list = message.names;
-            var code = "";
-
-            for (var i = 0; i < list.length; i++)
-            {
-                console.log(list[i]);
-                code += list[i] + "\n";
-            }
-        }
-    };
-
-    socket.onclose      = function ()
-    {
-        $("#chatbox").append("Connection Lost\n");
-    };
-
-    $('#buttonSendChat').on('click', function (e)
-    {
+        // inform the server for chat connection
         var mes = new Object();
 
         mes.Lobby   = localStorage.getItem("lobby-session");
-        mes.Message = "Mess";
-        mes.Mess    = $("#chattext").val();
+        mes.Message = "open";
+        mes.Value   = Guid.create();    // we use this to differentiate users in the server.
 
-        socket.send(JSON.stringify(mes));
-        $("#chattext").val("");
-    });
+        chatWebSocket.send(JSON.stringify(mes));
+    };
+
+    chatWebSocket.onmessage = function (evt)
+    {
+        var message = JSON.parse(evt.data);
+
+        if      (message.Message == "open")
+        {
+            // server replied!
+            $("#chatbox").append("Connected\n");
+        }
+        else if (message.Message == "chat")
+        {
+            // add chat entry to the list
+            $("#chatbox").append(message.Value + "\n");
+
+            var psconsole = $('#chatbox');
+                psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+        }
+        else
+        {
+            console.warn("Invalid message!");
+        }
+    };
+
+    chatWebSocket.onclose      = function ()
+    {
+        console.error("Connection closed.");
+    };
 }
 
 function keydownHandler     (evt)
@@ -167,11 +169,11 @@ function keydownHandler     (evt)
     {
         var mes = new Object();
 
-        mes.Lobby       = localStorage.getItem("lobby-session");
-        mes.Message     = "Mess";
-        mes.Mess        = $("#chattext").val();
+        mes.Lobby   = localStorage.getItem("lobby-session");
+        mes.Message = "chat";
+        mes.Value   = $("#chattext").val();
 
-        socket.send(JSON.stringify(mes));
+        chatWebSocket.send(JSON.stringify(mes));
         $("#chattext").val("");
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using GameForestCoreWebSocket;
+﻿using GameForestCoreWebSocket;
 using System;
 using System.Threading;
 
@@ -7,19 +6,20 @@ namespace GameForest
 {
     public class GFXWebsocketCore
     {
-        private GFXServerCore serverCore;
-        private GFXChatCore chatCore;
+        private GFXServerCore   serverCore;
+        private GFXChatCore     chatCore;
 
-        private bool isRunning = false;
-        private Thread wsThreadCore;
-        private Thread wsThreadChat;
+        private bool            isRunning = false;
 
-        public bool IsRunning
+        private Thread          wsThreadCore;
+        private Thread          wsThreadChat;
+
+        public bool             IsRunning
         {
             get { return isRunning; }
         }
 
-        public GFXWebsocketCore(string address = "localhost")
+        public                  GFXWebsocketCore    (string address = "localhost")
         {
             wsThreadCore = new Thread(new ThreadStart(() =>
             {
@@ -43,7 +43,7 @@ namespace GameForest
             }));
         }
 
-        public void Start()
+        public void             Start               ()
         {
             isRunning = true;
 
@@ -51,9 +51,12 @@ namespace GameForest
             wsThreadChat.Start();
         }
 
-        public void Stop()
+        public void             Stop                ()
         {
             isRunning = false;
+
+            serverCore.Stop();
+            chatCore.stop();
 
             wsThreadCore.Abort();
             wsThreadChat.Abort();
