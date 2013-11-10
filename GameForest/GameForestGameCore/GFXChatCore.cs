@@ -110,11 +110,11 @@ namespace GameForestCoreWebSocket
         {
             Console.Write(msg);
 
-            dynamic packet      = JsonConvert.DeserializeObject(msg);
+            var     packet  = JsonConvert.DeserializeObject(msg) as Dictionary<string, object>;
 
-            Guid    lobby       = Guid.Parse(packet.Lobby as string);
-            string  message     = packet.Message    as string;
-            string  value       = packet.Value      as string;
+            Guid    lobby   = Guid.Parse(packet["Lobby"] as string);
+            string  message = packet["Message"] as string;
+            string  value   = packet["Value"]   as string;
 
             switch (message)
             {
