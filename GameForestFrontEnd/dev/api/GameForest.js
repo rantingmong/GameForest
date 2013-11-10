@@ -263,6 +263,14 @@ var GameForest                              = function (gameId, lobbyId, session
 
         console.log(message.data);
 
+        if (message.data == GFX_CONNECTION_PING)
+        {
+            console.log("Sending ping reply!");
+
+            constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_PING_RESPOND);
+            return;
+        }
+
         switch (parse.Subject)
         {
             case GFX_PLAYER_DISCONNECTED:
@@ -272,10 +280,6 @@ var GameForest                              = function (gameId, lobbyId, session
             case GFX_PLAYER_RECONNECTED:
 
                 GameForest.prototype.onPlayerReconnected();
-                break;
-            case GFX_CONNECTION_PING:
-
-                constructWSRequest(this.wsConnection, this.connectionId, this.sessionId, GFX_PING_RESPOND);
                 break;
             case GFX_INFORM_RECONNECT:
 

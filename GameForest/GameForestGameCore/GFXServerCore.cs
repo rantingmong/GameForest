@@ -38,7 +38,7 @@ namespace GameForestCoreWebSocket
         private int                                     modChecker          = 0;
 
         private double                                  pingThreshold       = 10D;
-        private double                                  disconnectThreshold = 120D;
+        private double                                  disconnectThreshold = 30D;
         private double                                  logoutThreshold     = 300D;
 
         private Timer                                   loginCheckTimer     = null; // timer for users logged in on game-forest
@@ -331,31 +331,35 @@ namespace GameForestCoreWebSocket
                         var lobbyList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
                         var usessList = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
 
-                        var userId = usessList[0].UserId;
-                        var lobbyId = lobbyList[0].LobbyID;
-
-                        // We get the users playing in this lobby
-                        var userList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbyId)));
-
-                        var disconnectedPlayerInfo = new List<GFXUserRow>(this.userList.Select(string.Format("UserId = '{0}'", userId)));
-                        var disconnectedPlayerData = new Dictionary<string, object>()
+                        var userId  = usessList[0].UserId;
+                        
+                        if (lobbyList.Count > 0)
                         {
-                            { "Name",       disconnectedPlayerInfo[0].FirstName + " " + disconnectedPlayerInfo[0].LastName },
-                            { "UserId",     disconnectedPlayerInfo[0].UserId },
-                            { "Username",   disconnectedPlayerInfo[0].Username }
-                        };
+                            var lobbyId = lobbyList[0].LobbyID;
 
-                        var serializedInfo = JsonConvert.SerializeObject(disconnectedPlayerData);
+                            // We get the users playing in this lobby
+                            var userList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbyId)));
 
-                        foreach (var player in userList)
-                        {
-                            if (player.SessionID != sessionId)
-                                webSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
-                                {
-                                    Subject = "GFX_PLAYER_DISCONNECTED",
-                                    Message = serializedInfo,
-                                    ResponseCode = GFXResponseType.Normal
-                                }));
+                            var disconnectedPlayerInfo = new List<GFXUserRow>(this.userList.Select(string.Format("UserId = '{0}'", userId)));
+                            var disconnectedPlayerData = new Dictionary<string, object>()
+                            {
+                                { "Name",       disconnectedPlayerInfo[0].FirstName + " " + disconnectedPlayerInfo[0].LastName },
+                                { "UserId",     disconnectedPlayerInfo[0].UserId },
+                                { "Username",   disconnectedPlayerInfo[0].Username }
+                            };
+
+                            var serializedInfo = JsonConvert.SerializeObject(disconnectedPlayerData);
+
+                            foreach (var player in userList)
+                            {
+                                if (player.SessionID != sessionId)
+                                    webSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                                    {
+                                        Subject = "GFX_PLAYER_DISCONNECTED",
+                                        Message = serializedInfo,
+                                        ResponseCode = GFXResponseType.Normal
+                                    }));
+                            }
                         }
                     }
                     else if (websocketEntry.disconnected)

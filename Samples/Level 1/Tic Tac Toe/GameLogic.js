@@ -240,6 +240,8 @@ GameForest.prototype.onGameStart    = function ()
 
     var playerOrder = gf.playerOrderIndex();
 
+    alert(playerOrder);
+
     if      (playerOrder == 1)
     {
         myToken = 'O';
@@ -249,8 +251,10 @@ GameForest.prototype.onGameStart    = function ()
         myToken = 'X';
     }
 
-    oPlayer = gf.userList[0];
-    xPlayer = gf.userList[1];
+    console.log(JSON.stringify(gf.userList()));
+
+    oPlayer = gf.userList()[0];
+    xPlayer = gf.userList()[1];
 
     xPlayerName = xPlayer.Username;
     oPlayerName = oPlayer.Username;
