@@ -300,98 +300,106 @@ namespace GameForestCoreWebSocket
         // This method checks if the user is online and connected to a game
         private void                                    CheckUserConnectedTick  ()
         {
-            GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "Remove users", "Removing invalid users...");
-
-            var removeList = new List<Guid>();
-
-            foreach (var item in webSocketList)
+            try
             {
-                var websocketEntry = item.Value;
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "Remove users", "Removing invalid users...");
 
-                // we check if the client replied by checking
-                var secondsSinceLastPing = (DateTime.Now - websocketEntry.lastPing).TotalSeconds;
+                var removeList = new List<Guid>();
 
-                GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "info", string.Format("{0} >= {1} of {2}",
-                    secondsSinceLastPing,
-                    disconnectThreshold,
-                    item.Key));
-
-                if (secondsSinceLastPing >= disconnectThreshold)
+                foreach (var item in webSocketList)
                 {
-                    websocketEntry.disconnected = true;
+                    var websocketEntry = item.Value;
 
-                    // The user is not responding! It could be the user has been disconnected or its not responding. Nonetheless we inform other players.
+                    // we check if the client replied by checking
+                    var secondsSinceLastPing = (DateTime.Now - websocketEntry.lastPing).TotalSeconds;
 
-                    // We can get the session ID of the user by
-                    var sessionId = item.Key;
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "info", string.Format("{0} >= {1} of {2}",
+                        secondsSinceLastPing,
+                        disconnectThreshold,
+                        item.Key));
 
-                    // We get the lobby the user is in
-                    var lobbyList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
-                    var usessList = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
+                    if (secondsSinceLastPing >= disconnectThreshold)
+                    {
+                        websocketEntry.disconnected = true;
 
-                    var userId  = usessList[0].UserId;
-                    var lobbyId = lobbyList[0].LobbyID;
+                        // The user is not responding! It could be the user has been disconnected or its not responding. Nonetheless we inform other players.
 
-                    // We get the users playing in this lobby
-                    var userList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbyId)));
+                        // We can get the session ID of the user by
+                        var sessionId = item.Key;
 
-                    var disconnectedPlayerInfo = new List<GFXUserRow>(this.userList.Select(string.Format("UserId = '{0}'", userId)));
-                    var disconnectedPlayerData = new Dictionary<string, object>()
+                        // We get the lobby the user is in
+                        var lobbyList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
+                        var usessList = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", sessionId)));
+
+                        var userId = usessList[0].UserId;
+                        var lobbyId = lobbyList[0].LobbyID;
+
+                        // We get the users playing in this lobby
+                        var userList = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("LobbyId = '{0}'", lobbyId)));
+
+                        var disconnectedPlayerInfo = new List<GFXUserRow>(this.userList.Select(string.Format("UserId = '{0}'", userId)));
+                        var disconnectedPlayerData = new Dictionary<string, object>()
                         {
                             { "Name",       disconnectedPlayerInfo[0].FirstName + " " + disconnectedPlayerInfo[0].LastName },
                             { "UserId",     disconnectedPlayerInfo[0].UserId },
                             { "Username",   disconnectedPlayerInfo[0].Username }
                         };
 
-                    var serializedInfo = JsonConvert.SerializeObject(disconnectedPlayerData);
+                        var serializedInfo = JsonConvert.SerializeObject(disconnectedPlayerData);
 
-                    foreach (var player in userList)
+                        foreach (var player in userList)
+                        {
+                            if (player.SessionID != sessionId)
+                                webSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
+                                {
+                                    Subject = "GFX_PLAYER_DISCONNECTED",
+                                    Message = serializedInfo,
+                                    ResponseCode = GFXResponseType.Normal
+                                }));
+                        }
+                    }
+                    else if (websocketEntry.disconnected)
                     {
-                        if (player.SessionID != sessionId)
-                            webSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
-                            {
-                                Subject = "GFX_PLAYER_DISCONNECTED",
-                                Message = serializedInfo,
-                                ResponseCode = GFXResponseType.Normal
-                            }));
+                        websocketEntry.checkCount += 1;
+
+                        if (websocketEntry.checkCount > 3)
+                        {
+                            // if after 60 seconds the user hasn't reconnected, we remove that user from the list and lobby session and inform other players this user is dead.
+                            removeList.Add(item.Key);
+                        }
                     }
                 }
-                else if (websocketEntry.disconnected)
+
+                // remove dead connections
+                foreach (var item in removeList)
                 {
-                    websocketEntry.checkCount += 1;
+                    webSocketList.Remove(item);
 
-                    if (websocketEntry.checkCount > 3)
+                    // remove the user from the lobby
+                    List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", item)));
+                    lobbySessionList.Remove(string.Format("SessionId = '{0}'", item));
+
+                    if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
                     {
-                        // if after 60 seconds the user hasn't reconnected, we remove that user from the list and lobby session and inform other players this user is dead.
-                        removeList.Add(item.Key);
+                        lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
                     }
+
+                    GFXLoginRow loginRow = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", item), 1))[0];
+
+                    loginRow.UserStatus = GFXLoginStatus.MENU;
+
+                    sessionList.Update(string.Format("SessionId = '{0}'", item), loginRow);
                 }
+
+                removeList.Clear();
+
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Remove users", "Invalid users removed!");
+            }
+            catch(Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "CheckUserConnectedTick", "Error! " + exp.Message + "\n" + exp.StackTrace);
             }
             
-            // remove dead connections
-            foreach (var item in removeList)
-            {
-                webSocketList.Remove(item);
-
-                // remove the user from the lobby
-                List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", item)));
-                lobbySessionList.Remove(string.Format("SessionId = '{0}'", item));
-
-                if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
-                {
-                    lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
-                }
-
-                GFXLoginRow loginRow = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", item), 1))[0];
-
-                loginRow.UserStatus = GFXLoginStatus.MENU;
-
-                sessionList.Update(string.Format("SessionId = '{0}'", item), loginRow);
-            }
-
-            removeList.Clear();
-
-            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Remove users", "Invalid users removed!");
         }
 
         private void                                    LobbyCheckTick          ()
