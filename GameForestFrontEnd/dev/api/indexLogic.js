@@ -6,7 +6,8 @@
 
 var userUpdateInterval = null;
 
-var gf              = new GameForest(new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("lobby-session")), new Guid(localStorage.getItem("user-session")));
+var gf              = new GameForest        (new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("lobby-session")), new Guid(localStorage.getItem("user-session")));
+var gfTracker       = new GameForestTracker (new Guid(localStorage.getItem("lobby-game")), new Guid(localStorage.getItem("user-session")));
 var chatWebSocket   = new WebSocket('ws://' + GameForestCloudUrl + ':8085/');
 
 $("#gfxButtonLeave").click(function ()
