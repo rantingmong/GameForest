@@ -130,21 +130,17 @@ namespace GameForestFE
                                                Path.Combine(basePath, "game", userId, inputGameName.Text),
                                                null);
 
-                    bool gfjsok = false;
                     bool gfmain = false;
 
                     // inspect the newly decompressed game
                     foreach (string file in Directory.GetFiles(Path.Combine(basePath, "game", userId, inputGameName.Text)))
                     {
-                        if (file.ToLower().Contains("gameforest.js"))
-                            gfjsok = true;
-
                         if (file.ToLower().Contains("index.html"))
                             gfmain = true;
                     }
 
                     // if something is missing or broken, delete the directory and inform the user
-                    if (!gfjsok || !gfmain)
+                    if (!gfmain)
                     {
                         alertDialogError.Style["display"]   = "normal";
                         alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
