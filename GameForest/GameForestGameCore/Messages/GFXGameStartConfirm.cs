@@ -73,12 +73,8 @@ namespace GameForestCoreWebSocket.Messages
                         var loginRow                = new List<GFXLoginRow>(server.LoginList.Select(string.Format("SessionId = '{0}'", player.SessionID), 1))[0];
                             loginRow.UserStatus     = GFXLoginStatus.GAME;
 
-                        var xcurrentPlayer          = player;
-                            xcurrentPlayer.Status   = 2;
-
-                        server.LoginList        .Update(string.Format("SessionId = '{0}'", player.SessionID),           loginRow);
-                        server.LobbySessionList .Update(string.Format("SessionId = '{0}'", xcurrentPlayer.SessionID),   xcurrentPlayer);
-
+                        server.LoginList.Update(string.Format("SessionId = '{0}'", player.SessionID), loginRow);
+                        
                         // then we send the associated events to the clients
                         server.WebSocketList[player.SessionID].webSocket.Send(JsonConvert.SerializeObject(new GFXSocketResponse
                             {

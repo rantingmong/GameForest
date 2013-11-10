@@ -28,7 +28,7 @@ namespace GameForestCoreWebSocket.Messages
                 // modify this user's status to 3, playing
                 GFXLobbySessionRow currentPlayer    = lobbySessions[0];
                 
-                currentPlayer.Status    = 3;
+                currentPlayer.Status    = 2;
                 currentPlayer.Order     = Convert.ToInt32(info.Message);
 
                 server.LobbySessionList.Update(string.Format("SessionId = '{0}'", currentPlayer.SessionID), currentPlayer);
@@ -38,7 +38,7 @@ namespace GameForestCoreWebSocket.Messages
 
                 foreach (var player in checkPlayers)
                 {
-                    if (player.Status != 3)
+                    if (player.Status != 2)
                     {
                         allOkay = false;
                     }
