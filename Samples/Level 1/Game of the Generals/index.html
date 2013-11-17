@@ -20,217 +20,235 @@
             display: none;
         }
 
-        td {
-            text-align: center;
+        .boardCell {
+            width: 100px;
+            height: 70px;
             vertical-align: middle;
+            background-size: contain;
+            background-repeat: no-repeat;
         }
 
-            td:hover {
-                background-color: rgba(255, 255, 255, 0.25);
+            .boardCell:hover {
+                background-color: gray;
             }
 
-        .selectCell {
-            width: 14.28%;
-            height: 60px;
-        }
-
-        .boardCell {
-            width: 11.11%;
-            height: 60px;
-        }
     </style>
 </head>
-<body onunload="unload()">
-
+<body>
     <!--This is where you will place your game-->
     <div id="gameForestGameWindow" style="display: none" class="container">
-        <div class="row">
+        <div id="gameHeader" class="container">
+            <a class="pull-right btn btn-info" style="margin-top: 18px" data-toggle="modal" data-target="#myModal">Help</a>
             <h2 style="text-align: center">Game of the Generals</h2>
-        </div>
-        <div class="row">
-            <div class="col-xs-4">
-                <h3 id="username1" style="text-align: center"><span id="username1pic" class="glyphicon glyphicon-play" style="display: none"></span> Name 1</h3>
+            <div class="col-sm-4 col-sm-offset-2">
+                <p id="usernaemOne"><b>Player 1: </b>username 1</p>
             </div>
-            <div class="col-xs-4">
-                <h3 style="text-align: center">versus</h3>
-            </div>
-            <div class="col-xs-4">
-                <h3 id="username2" style="text-align: center"><span id="username2pic" class="glyphicon glyphicon-play" style="display: none"></span>Name 2</h3>
+            <div class="col-sm-4 col-sm-offset-2">
+                <p id="usernameTwo"><b>Player 2: </b>username 2</p>
             </div>
         </div>
-        <div id="pickPanel" class="row" style="display: none">
-            <div class="col-sm-12">
-                <h3>Choose where to place your pieces:</h3>
-                <table id="tablePickDes" class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <td class="boardCell" id="pickcelldes_1_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_1_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="pickcelldes_2_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_2_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="pickcelldes_3_1" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_2" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_3" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_4" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_5" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_6" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_7" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_8" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                            <td class="boardCell" id="pickcelldes_3_9" draggable="true" data-info="0" ondragstart="pickDragStart(event)" ondragover="pickDragOver(event)" ondrop="pickDragDrop(event)"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table id="tablePickSrc" class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <td class="selectCell" id="pickcellsrc_1_1" draggable="true" data-info="1" ondragstart="pickDragStart(event)"><img src="img/general5star.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_2" draggable="true" data-info="2" ondragstart="pickDragStart(event)"><img src="img/general4star.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_3" draggable="true" data-info="3" ondragstart="pickDragStart(event)"><img src="img/general3star.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_4" draggable="true" data-info="4" ondragstart="pickDragStart(event)"><img src="img/general2star.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_5" draggable="true" data-info="5" ondragstart="pickDragStart(event)"><img src="img/general1star.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_6" draggable="true" data-info="6" ondragstart="pickDragStart(event)"><img src="img/colonel.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_1_7" draggable="true" data-info="7" ondragstart="pickDragStart(event)"><img src="img/ltcolonel.png" /></td>
-                        </tr>
-                        <tr>
-                            <td class="selectCell" id="pickcellsrc_2_1" draggable="true" data-info="8" ondragstart="pickDragStart(event)"><img src="img/major.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_2" draggable="true" data-info="9" ondragstart="pickDragStart(event)"><img src="img/captain.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_3" draggable="true" data-info="a" ondragstart="pickDragStart(event)"><img src="img/lieu1st.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_4" draggable="true" data-info="b" ondragstart="pickDragStart(event)"><img src="img/lieu2nd.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_5" draggable="true" data-info="c" ondragstart="pickDragStart(event)"><img src="img/sergeant.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_6" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_2_7" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                        </tr>
-                        <tr>
-                            <td class="selectCell" id="pickcellsrc_3_1" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_2" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_3" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_4" draggable="true" data-info="d" ondragstart="pickDragStart(event)"><img src="img/private.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_5" draggable="true" data-info="e" ondragstart="pickDragStart(event)"><img src="img/spy.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_6" draggable="true" data-info="e" ondragstart="pickDragStart(event)"><img src="img/spy.png" /></td>
-                            <td class="selectCell" id="pickcellsrc_3_7" draggable="true" data-info="f" ondragstart="pickDragStart(event)"><img src="img/flag.png" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <a id="buttonPiecePlacementConfirm" class="btn btn-success btn-lg" onclick="buttonConfirmPlaceClick(event)">Accept placement!</a>
+        <div id="gamePickTable" class="container" style="display: none">
+            <table id="tableChooseTarget" class="table table-bordered" style="width: auto; margin: 0 auto; margin-bottom: 10px">
+                <tr>
+                    <td id="target_1_1" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_2" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_3" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_4" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_5" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_6" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_7" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_8" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_1_9" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="target_2_1" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_2" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_3" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_4" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_5" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_6" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_7" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_8" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_2_9" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="target_3_1" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_2" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_3" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_4" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_5" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_6" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_7" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_8" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                    <td id="target_3_9" class="boardCell" onclick="clickChoosePlace()" data-piece=""></td>
+                </tr>
+            </table>
+            <table id="tableChooseSource" class="table table-bordered" style="width: auto; margin: 0 auto; margin-bottom: 10px">
+                <tr>
+                    <td id="source_1_1" class="boardCell" onclick="clickChoosePlace()" data-piece="0" style="background-image: url(img/general5star.png);"></td>
+                    <td id="source_1_2" class="boardCell" onclick="clickChoosePlace()" data-piece="1" style="background-image: url(img/general4star.png);"></td>
+                    <td id="source_1_3" class="boardCell" onclick="clickChoosePlace()" data-piece="2" style="background-image: url(img/general3star.png);"></td>
+                    <td id="source_1_4" class="boardCell" onclick="clickChoosePlace()" data-piece="3" style="background-image: url(img/general2star.png);"></td>
+                    <td id="source_1_5" class="boardCell" onclick="clickChoosePlace()" data-piece="4" style="background-image: url(img/general1star.png);"></td>
+                    <td id="source_1_6" class="boardCell" onclick="clickChoosePlace()" data-piece="5" style="background-image: url(img/colonel.png);"></td>
+                    <td id="source_1_7" class="boardCell" onclick="clickChoosePlace()" data-piece="6" style="background-image: url(img/ltcolonel.png);"></td>
+                </tr>
+                <tr>
+                    <td id="source_2_1" class="boardCell" onclick="clickChoosePlace()" data-piece="7" style="background-image: url(img/major.png);"></td>
+                    <td id="source_2_2" class="boardCell" onclick="clickChoosePlace()" data-piece="8" style="background-image: url(img/captain.png);"></td>
+                    <td id="source_2_3" class="boardCell" onclick="clickChoosePlace()" data-piece="9" style="background-image: url(img/lieu1st.png);"></td>
+                    <td id="source_2_4" class="boardCell" onclick="clickChoosePlace()" data-piece="a" style="background-image: url(img/lieu2nd.png);"></td>
+                    <td id="source_2_5" class="boardCell" onclick="clickChoosePlace()" data-piece="b" style="background-image: url(img/sergeant.png);"></td>
+                    <td id="source_2_6" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                    <td id="source_2_7" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                </tr>
+                <tr>
+                    <td id="source_3_1" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                    <td id="source_3_2" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                    <td id="source_3_3" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                    <td id="source_3_4" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                    <td id="source_3_5" class="boardCell" onclick="clickChoosePlace()" data-piece="d" style="background-image: url(img/spy.png);"></td>
+                    <td id="source_3_6" class="boardCell" onclick="clickChoosePlace()" data-piece="d" style="background-image: url(img/spy.png);"></td>
+                    <td id="source_3_7" class="boardCell" onclick="clickChoosePlace()" data-piece="e" style="background-image: url(img/flag.png);"></td>
+                </tr>
+            </table>
+            <div style="text-align:center">
+                <a class="btn btn-primary btn-lg" onclick="buttonAcceptClick()"><b>Accept placement</b></a>
             </div>
         </div>
-        <div id="mainPanel" class="row" style="display: none">
-            <div class="col-sm-12">
-                <table id="tableMain" class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <td class="boardCell" id="maincell_1_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_1_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_2_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_2_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_3_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_3_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_4_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_4_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_5_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_5_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_6_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_6_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_7_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_7_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                        <tr>
-                            <td class="boardCell" id="maincell_8_1" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_2" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_3" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_4" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_5" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_6" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_7" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_8" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                            <td class="boardCell" id="maincell_8_9" draggable="true" data-info="0" data-player="0" ondragstart="mainDragStart()" ondragover="mainDragOver()" ondrop="mainDragDrop()"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div id="gameWaitPanel" class="container">
+            <h2>Waiting for player (name) to finish placing his pieces.</h2>
         </div>
-        <div id="waitPanel" class="row" style="display: normal">
-            <div class="col-sm-12">
-                <h3 style="text-align: center">Waiting for <strong id="waitPanelUsername">&lt;username&gt;</strong></h3>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="myModalLabel">Game of the generals help</h3>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#basics" data-toggle="tab">Basics</a></li>
+                            <li><a href="#movmnt" data-toggle="tab">Movement</a></li>
+                            <li><a href="#winnng" data-toggle="tab">Winning</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="basics" class="tab-pane active">
+                                <h4>About Game of the Generals</h4>
+                                <p>Game of the generals was made by Sofronio H. Pasola Jr. during the 1970s. It is played with two players and an arbriter which checks whose piece won if there's any conflict between two pieces (In this version, of course the arbiter will be your browser).</p>
+                                <p>It is an educational strategy game wherin the players must defeat his opponent by killing all his pieces, managing to get the flag from his side to the side of the opponent, or killing the opponent's flag.</p>
+                                <br />
+                                <h4>Game pieces</h4>
+                                <p>For each player, there are a set of 21 pieces all of which corresponds to a military rank. A higher ranking piece will kill any lower ranking piece with the exception of the Spy, which eliminates all pieces except the Private. Additionally, only the Private can kill a Spy.</p>
+                                <p>The following pieces that the player has is shown below from the highest rank to the lowest rank:</p>
+                                <table class="table table-striped" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <td>Picture</td>
+                                            <td>Name</td>
+                                            <td>Pieces available</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><img src="img/general5star.png" /></td>
+                                            <td style="vertical-align: middle">5-star General</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/general4star.png" /></td>
+                                            <td style="vertical-align: middle">4-star General</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/general3star.png" /></td>
+                                            <td style="vertical-align: middle">3-star General</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/general2star.png" /></td>
+                                            <td style="vertical-align: middle">2-star General</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/general1star.png" /></td>
+                                            <td style="vertical-align: middle">1-star General</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/colonel.png" /></td>
+                                            <td style="vertical-align: middle">Colonel</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/ltcolonel.png" /></td>
+                                            <td style="vertical-align: middle">Lieutentant colonel</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/major.png" /></td>
+                                            <td style="vertical-align: middle">Major</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/captain.png" /></td>
+                                            <td style="vertical-align: middle">Captain</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/lieu1st.png" /></td>
+                                            <td style="vertical-align: middle">1st lieutentant</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/lieu2nd.png" /></td>
+                                            <td style="vertical-align: middle">2nd lieutentant</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/sergeant.png" /></td>
+                                            <td style="vertical-align: middle">Sergeant</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/private.png" /></td>
+                                            <td style="vertical-align: middle">Private</td>
+                                            <td style="vertical-align: middle">6</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/spy.png" /></td>
+                                            <td style="vertical-align: middle">Spy</td>
+                                            <td style="vertical-align: middle">2</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="img/flag.png" /></td>
+                                            <td style="vertical-align: middle">Flag</td>
+                                            <td style="vertical-align: middle">1</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="movmnt" class="tab-pane">
+                                <h4>Movement of pieces</h4>
+                                <p>Pieces are moved within a 9 by 8 grid. Pieces can only be moved adjacently and one space at a time.</p>
+                            </div>
+                            <div id="winnng" class="tab-pane">
+                                <h4>Winning the game</h4>
+                                <p>The game can be won by the following situations:</p>
+                                <ul>
+                                    <li><p>One of the player's Flag piece has moved to the side of the opposing player.</p></li>
+                                    <li><p>All of the opposing player's pieces are killed.</p></li>
+                                    <li><p>The player attacks the opposing player's flag.</p></li>
+                                    <li><p>If the player's Flag piece manages to attack the opposing player's flag. The opposing player will lose the game.</p></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -304,8 +322,8 @@
     <script src="http://game-forest.cloudapp.net:46069/dev/api/GameForestTracking.js"></script>
 
     <script src="Bootstrap/js/bootstrap.min.js"></script>
-    <script src="GameLogic.js"></script>
 
     <script src="http://game-forest.cloudapp.net:46069/dev/api/indexLogic.js"></script>
+    <script src="GameLogic.js"></script>
 </body>
 </html>

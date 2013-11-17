@@ -1,0 +1,337 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Game of the Generals</title>
+
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+
+    <style>
+        .boardCell {
+            width:              100px;
+            height:             70px;
+            vertical-align:     middle;
+            background-size:    contain;
+            background-repeat:  no-repeat;
+        }
+
+        .boardCell:hover {
+
+            background-color:   gray;
+        }
+    </style>
+
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/jquery.js"></script>
+    <script src="Bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <div id="gameHeader" class="container">
+        <a class="pull-right btn btn-info" style="margin-top: 18px" data-toggle="modal" data-target="#myModal">Help</a>
+        <h2 style="text-align: center">Game of the Generals</h2>
+        <div class="col-sm-4 col-sm-offset-2">
+            <p id="usernaemOne"><b>Player 1: </b>username 1</p>
+        </div>
+        <div class="col-sm-4 col-sm-offset-2">
+            <p id="usernameTwo"><b>Player 2: </b>username 2</p>
+        </div>
+    </div>
+    <div id="gamePickTable" class="container" style="">
+        <table id="tableChooseTarget" class="table table-bordered" style="width: auto; margin: 0 auto; margin-bottom: 10px">
+            <tr>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="0" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="1" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="2" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="3" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="4" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="5" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="6" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="7" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="0" data-col="8" data-piece=""></td>
+            </tr>
+            <tr>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="0" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="1" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="2" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="3" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="4" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="5" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="6" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="7" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="1" data-col="8" data-piece=""></td>
+            </tr>
+            <tr>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="0" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="1" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="2" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="3" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="4" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="5" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="6" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="7" data-piece=""></td>
+                <td class="boardCell" onclick="clickChoosePlace()" data-row="2" data-col="8" data-piece=""></td>
+            </tr>
+        </table>
+        <table id="tableChooseSource" class="table table-bordered" style="width: auto; margin: 0 auto; margin-bottom: 10px">
+            <tr>
+                <td id="source_1_1" class="boardCell" onclick="clickChoosePlace()" data-piece="0" style="background-image: url(img/general5star.png);"></td>
+                <td id="source_1_2" class="boardCell" onclick="clickChoosePlace()" data-piece="1" style="background-image: url(img/general4star.png);"></td>
+                <td id="source_1_3" class="boardCell" onclick="clickChoosePlace()" data-piece="2" style="background-image: url(img/general3star.png);"></td>
+                <td id="source_1_4" class="boardCell" onclick="clickChoosePlace()" data-piece="3" style="background-image: url(img/general2star.png);"></td>
+                <td id="source_1_5" class="boardCell" onclick="clickChoosePlace()" data-piece="4" style="background-image: url(img/general1star.png);"></td>
+                <td id="source_1_6" class="boardCell" onclick="clickChoosePlace()" data-piece="5" style="background-image: url(img/colonel.png);"></td>
+                <td id="source_1_7" class="boardCell" onclick="clickChoosePlace()" data-piece="6" style="background-image: url(img/ltcolonel.png);"></td>
+            </tr>
+            <tr>
+                <td id="source_2_1" class="boardCell" onclick="clickChoosePlace()" data-piece="7" style="background-image: url(img/major.png);"></td>
+                <td id="source_2_2" class="boardCell" onclick="clickChoosePlace()" data-piece="8" style="background-image: url(img/captain.png);"></td>
+                <td id="source_2_3" class="boardCell" onclick="clickChoosePlace()" data-piece="9" style="background-image: url(img/lieu1st.png);"></td>
+                <td id="source_2_4" class="boardCell" onclick="clickChoosePlace()" data-piece="a" style="background-image: url(img/lieu2nd.png);"></td>
+                <td id="source_2_5" class="boardCell" onclick="clickChoosePlace()" data-piece="b" style="background-image: url(img/sergeant.png);"></td>
+                <td id="source_2_6" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                <td id="source_2_7" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+            </tr>
+            <tr>
+                <td id="source_3_1" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                <td id="source_3_2" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                <td id="source_3_3" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                <td id="source_3_4" class="boardCell" onclick="clickChoosePlace()" data-piece="c" style="background-image: url(img/private.png);"></td>
+                <td id="source_3_5" class="boardCell" onclick="clickChoosePlace()" data-piece="d" style="background-image: url(img/spy.png);"></td>
+                <td id="source_3_6" class="boardCell" onclick="clickChoosePlace()" data-piece="d" style="background-image: url(img/spy.png);"></td>
+                <td id="source_3_7" class="boardCell" onclick="clickChoosePlace()" data-piece="e" style="background-image: url(img/flag.png);"></td>
+            </tr>
+        </table>
+        <div style="text-align:center">
+            <a class="btn btn-primary btn-lg" onclick="buttonAcceptClick()"><b>Accept placement</b></a>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="myModalLabel">Game of the generals help</h3>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#basics" data-toggle="tab">Basics</a></li>
+                        <li><a href="#movmnt" data-toggle="tab">Movement</a></li>
+                        <li><a href="#winnng" data-toggle="tab">Winning</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="basics" class="tab-pane active">
+                            <h4>About Game of the Generals</h4>
+                            <p>Game of the generals was made by Sofronio H. Pasola Jr. during the 1970s. It is played with two players and an arbriter which checks whose piece won if there's any conflict between two pieces (In this version, of course the arbiter will be your browser).</p>
+                            <p>It is an educational strategy game wherin the players must defeat his opponent by killing all his pieces, managing to get the flag from his side to the side of the opponent, or killing the opponent's flag.</p>
+                            <br />
+                            <h4>Game pieces</h4>
+                            <p>For each player, there are a set of 21 pieces all of which corresponds to a military rank. A higher ranking piece will kill any lower ranking piece with the exception of the Spy, which eliminates all pieces except the Private. Additionally, only the Private can kill a Spy.</p>
+                            <p>The following pieces that the player has is shown below from the highest rank to the lowest rank:</p>
+                            <table class="table table-striped" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <td>Picture</td>
+                                        <td>Name</td>
+                                        <td>Pieces available</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><img src="img/general5star.png" /></td>
+                                        <td style="vertical-align: middle">5-star General</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/general4star.png" /></td>
+                                        <td style="vertical-align: middle">4-star General</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/general3star.png" /></td>
+                                        <td style="vertical-align: middle">3-star General</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/general2star.png" /></td>
+                                        <td style="vertical-align: middle">2-star General</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/general1star.png" /></td>
+                                        <td style="vertical-align: middle">1-star General</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/colonel.png" /></td>
+                                        <td style="vertical-align: middle">Colonel</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/ltcolonel.png" /></td>
+                                        <td style="vertical-align: middle">Lieutentant colonel</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/major.png" /></td>
+                                        <td style="vertical-align: middle">Major</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/captain.png" /></td>
+                                        <td style="vertical-align: middle">Captain</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/lieu1st.png" /></td>
+                                        <td style="vertical-align: middle">1st lieutentant</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/lieu2nd.png" /></td>
+                                        <td style="vertical-align: middle">2nd lieutentant</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/sergeant.png" /></td>
+                                        <td style="vertical-align: middle">Sergeant</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/private.png" /></td>
+                                        <td style="vertical-align: middle">Private</td>
+                                        <td style="vertical-align: middle">6</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/spy.png" /></td>
+                                        <td style="vertical-align: middle">Spy</td>
+                                        <td style="vertical-align: middle">2</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="img/flag.png" /></td>
+                                        <td style="vertical-align: middle">Flag</td>
+                                        <td style="vertical-align: middle">1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="movmnt" class="tab-pane">
+                            <h4>Movement of pieces</h4>
+                            <p>Pieces are moved within a 9 by 8 grid. Pieces can only be moved adjacently and one space at a time.</p>
+                        </div>
+                        <div id="winnng" class="tab-pane">
+                            <h4>Winning the game</h4>
+                            <p>The game can be won by the following situations:</p>
+                            <ul>
+                                <li><p>One of the player's Flag piece has moved to the side of the opposing player.</p></li>
+                                <li><p>All of the opposing player's pieces are killed.</p></li>
+                                <li><p>The player attacks the opposing player's flag.</p></li>
+                                <li><p>If the player's Flag piece manages to attack the opposing player's flag. The opposing player will lose the game.</p></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        var choose      = '';
+
+        var targetCell  = null;
+        var sourceCell  = null;
+
+        var pickedUp    = false;
+
+        var imageUrls   = [
+
+            "general5star.png"  ,
+            "general4star.png"  ,
+            "general3star.png"  ,
+            "general2star.png"  ,
+            "general1star.png"  ,
+            "colonel.png"       ,
+            "ltcolonel.png"     ,
+            "major.png"         ,
+            "captain.png"       ,
+            "lieu1st.png"       ,
+            "lieu2nd.png"       ,
+            "sergeant.png"      ,
+            "private.png"       ,
+            "spy.png"           ,
+            "flag.png"
+        ];
+
+        function clickChoosePlace   ()
+        {
+            if (pickedUp)
+            {
+                pickedUp    = false;
+                targetCell  = event.target;
+
+                sourceCell.style.backgroundColor    = "";
+
+                var sourcePiece = sourceCell.dataset.piece;
+                var targetPiece = targetCell.dataset.piece;
+
+                var sourceImage = sourceCell.style.backgroundImage;
+                var targetImage = targetCell.style.backgroundImage;
+
+                targetCell.dataset.piece            = sourcePiece;
+                sourceCell.dataset.piece            = targetPiece;
+
+                targetCell.style.backgroundImage    = sourceImage;
+                sourceCell.style.backgroundImage    = targetImage;
+
+                targetCell = null;
+                sourceCell = null;
+            }
+            else
+            {
+                pickedUp    = true;
+                sourceCell  = event.target;
+
+                sourceCell.style.backgroundColor    = "gold";
+            }
+        }
+
+        function buttonAcceptClick  ()
+        {
+            var stopp = false;
+
+            for (var y = 1; y <= 3; y++)
+            {
+                for (var x = 1; x <= 7; x++)
+                {
+                    var ce = document.getElementById("source_" + y + "_" + x);
+                    var cp = ce.dataset.piece;
+
+                    console.log(cp);
+
+                    if (cp != "")
+                    {
+                        alert("Please fill up the board above.");
+
+                        stopp = true;
+                        break;
+                    }
+                }
+
+                if (stopp)
+                {
+                    break;
+                }
+            }
+
+            if (stopp == false)
+            {
+                alert("Placement accepted!");
+            }
+        }
+
+    </script>
+</body>
+</html>

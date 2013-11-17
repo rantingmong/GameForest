@@ -44,8 +44,7 @@ namespace GameForestCoreWebSocket
         private Timer                                   loginCheckTimer     = null; // timer for users logged in on game-forest
         private Timer                                   sessionCheckTimer   = null; // timer for users playing
         private Timer                                   pingTimer           = null; // timer for checking if the player is still alive
-        private Timer                                   lobbyCheckTimer     = null; // timer for checking for lobbies
-
+        
         private WebSocketServer                         server;
 
         private List<Guid>                              verifyList          = new List<Guid>();
@@ -130,15 +129,9 @@ namespace GameForestCoreWebSocket
                     CheckUserConnectedTick();
                 }));
 
-            lobbyCheckTimer = new Timer(new TimerCallback((o) =>
-                {
-
-                }));
-
             pingTimer           .Change(TimeSpan.FromSeconds(pingThreshold),        TimeSpan.FromSeconds(pingThreshold));
             loginCheckTimer     .Change(TimeSpan.FromSeconds(logoutThreshold),      TimeSpan.FromSeconds(logoutThreshold));
             sessionCheckTimer   .Change(TimeSpan.FromSeconds(disconnectThreshold),  TimeSpan.FromSeconds(disconnectThreshold));
-            lobbyCheckTimer     .Change(TimeSpan.FromSeconds(disconnectThreshold),  TimeSpan.FromSeconds(disconnectThreshold));
 
             server = new WebSocketServer("ws://" + ipAddress + ":8084");
 
@@ -159,11 +152,54 @@ namespace GameForestCoreWebSocket
                                     Subject         = INIT_CONNECTION
                                 }));
 
-                            Debug.WriteLine("Connection opened with " + socket.ConnectionInfo);
+                            Debug.WriteLine("Connection opened with " + socket.ConnectionInfo.ClientIpAddress);
                         };
                     socket.OnClose      = () =>
                         {
-                            Debug.WriteLine("Connection closed with " + socket.ConnectionInfo);
+                            Debug.WriteLine("Connection closed with " + socket.ConnectionInfo.ClientIpAddress);
+
+                            lock (webSocketList)
+                            {
+                                var key     = Guid.Empty;
+                                var entry   = new WebSocketEntry();
+
+                                foreach(var kvp in webSocketList)
+                                {
+                                    if (kvp.Value.webSocket == socket)
+                                    {
+                                        key     = kvp.Key;
+                                        entry   = kvp.Value;
+                                    }
+                                }
+
+                                if (key != Guid.Empty)
+                                {
+                                    webSocketList   .Remove(key);
+                                    connectionList  .Remove(key);
+
+                                    // remove the user from session database.
+                                    try
+                                    {
+                                        List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", key)));
+                                        lobbySessionList.Remove(string.Format("SessionId = '{0}'", key));
+
+                                        if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
+                                        {
+                                            lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
+                                        }
+
+                                        GFXLoginRow loginRow            = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", key), 1))[0];
+                                                    loginRow.UserStatus = GFXLoginStatus.MENU;
+
+                                        sessionList.Update(string.Format("SessionId = '{0}'", key), loginRow);
+
+                                    }
+                                    catch (Exception exp)
+                                    {
+                                        GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "Force Remove User", exp.Message);
+                                    }
+                                }
+                            }
                         };
 
                     socket.OnMessage    = message =>
@@ -412,12 +448,6 @@ namespace GameForestCoreWebSocket
                 {
                     GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "CheckUserConnectedTick", "Error! " + exp.Message + "\n" + exp.StackTrace);
                 }
-        }
-
-        private void                                    LobbyCheckTick          ()
-        {
-            // to know if users are playing in that lobby, for each lobby we check for users. for those users we check if they have
-            // a websocket connection. if not we remove the player from the lobby
         }
     }
 }

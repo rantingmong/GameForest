@@ -30,6 +30,11 @@ $('#buttonSendChat').on('click', function (e)
     console.log("Sending chat message!");
 });
 
+$(window).unload(function ()
+{
+    unload();
+});
+
 $(document).ready(function ()
 {
     var getLobbyRequest = $.ajax({
@@ -86,9 +91,9 @@ $(document).ready(function ()
 function unload             ()
 {
     $.ajax({
-        url: "http://" + GameForestCloudUrl + ":1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
-        type: "DELETE",
-        async: false
+        url:    "http://" + GameForestCloudUrl + ":1193/service/lobby/join?usersessionid=" + localStorage.getItem("user-session"),
+        type:   "DELETE",
+        async:  false
     });
 
     gf.stop();
