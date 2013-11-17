@@ -139,7 +139,7 @@ namespace GameForestCoreWebSocket
                 {
                     socket.OnOpen       = () =>
                         {
-                            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "WebSocket", "A client wants to connect!");
+                            GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "WebSocket", "Connection opened with " + socket.ConnectionInfo.ClientIpAddress);
 
                             // a client wants to connect! give it a new connection id
                             Guid guid = Guid.NewGuid();
@@ -152,11 +152,10 @@ namespace GameForestCoreWebSocket
                                     Subject         = INIT_CONNECTION
                                 }));
 
-                            Debug.WriteLine("Connection opened with " + socket.ConnectionInfo.ClientIpAddress);
                         };
                     socket.OnClose      = () =>
                         {
-                            Debug.WriteLine("Connection closed with " + socket.ConnectionInfo.ClientIpAddress);
+                            GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "WebSocket", "Connection closed with " + socket.ConnectionInfo.ClientIpAddress);
 
                             lock (webSocketList)
                             {
