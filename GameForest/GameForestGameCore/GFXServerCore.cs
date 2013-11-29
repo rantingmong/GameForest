@@ -35,8 +35,6 @@ namespace GameForestCoreWebSocket
         public static readonly string                   INIT_CONNECTION     = "GFX_INIT_CONNECTION";
         public static readonly string                   STOP_CONNECTION     = "GFX_STOP_CONNECTION";
 
-        private int                                     modChecker          = 0;
-
         private double                                  pingThreshold       = 10D;
         private double                                  disconnectThreshold = 30D;
         private double                                  logoutThreshold     = 300D;
@@ -151,7 +149,6 @@ namespace GameForestCoreWebSocket
                                     ResponseCode    = GFXResponseType.Normal,
                                     Subject         = INIT_CONNECTION
                                 }));
-
                         };
                     socket.OnClose      = () =>
                         {
@@ -173,30 +170,7 @@ namespace GameForestCoreWebSocket
 
                                 if (key != Guid.Empty)
                                 {
-                                    webSocketList   .Remove(key);
-                                    connectionList  .Remove(key);
-
-                                    // remove the user from session database.
-                                    try
-                                    {
-                                        List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", key)));
-                                        lobbySessionList.Remove(string.Format("SessionId = '{0}'", key));
-
-                                        if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
-                                        {
-                                            lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
-                                        }
-
-                                        GFXLoginRow loginRow            = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", key), 1))[0];
-                                                    loginRow.UserStatus = GFXLoginStatus.MENU;
-
-                                        sessionList.Update(string.Format("SessionId = '{0}'", key), loginRow);
-
-                                    }
-                                    catch (Exception exp)
-                                    {
-                                        GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "Force Remove User", exp.Message);
-                                    }
+                                    RemoveUserFromLobby(key);
                                 }
                             }
                         };
@@ -222,7 +196,7 @@ namespace GameForestCoreWebSocket
                                                 lastPing    = DateTime.Now,
                                                 pingSent    = false
                                             };
-                                    
+
                                         // and remove the key from verify list (for safety purposes :) )
                                         verifyList.Remove(info.ConnectionId);
                                     }
@@ -243,6 +217,8 @@ namespace GameForestCoreWebSocket
                                 {
                                     webSocketList.Remove(info.SessionId);
                                     connectionList.Remove(info.SessionId);
+
+                                    RemoveUserFromLobby(info.SessionId);
                                 }
                             }
                             else
@@ -447,6 +423,33 @@ namespace GameForestCoreWebSocket
                 {
                     GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "CheckUserConnectedTick", "Error! " + exp.Message + "\n" + exp.StackTrace);
                 }
+        }
+
+        private void                                    RemoveUserFromLobby     (Guid key)
+        {
+            webSocketList.  Remove(key);
+            connectionList. Remove(key);
+
+            // remove the user from session database.
+            try
+            {
+                List<GFXLobbySessionRow> result = new List<GFXLobbySessionRow>(lobbySessionList.Select(string.Format("SessionId = '{0}'", key)));
+                lobbySessionList.Remove(string.Format("SessionId = '{0}'", key));
+
+                if (lobbySessionList.Count(string.Format("LobbyId = '{0}'", result[0].LobbyID)) == 0)
+                {
+                    lobbyList.Remove(string.Format("LobbyId = '{0}'", result[0].LobbyID));
+                }
+
+                GFXLoginRow loginRow = new List<GFXLoginRow>(sessionList.Select(string.Format("SessionId = '{0}'", key), 1))[0];
+                loginRow.UserStatus = GFXLoginStatus.MENU;
+
+                sessionList.Update(string.Format("SessionId = '{0}'", key), loginRow);
+            }
+            catch (Exception exp)
+            {
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.FATAL, "Force Remove User", exp.Message);
+            }
         }
     }
 }

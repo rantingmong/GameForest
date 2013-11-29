@@ -2,6 +2,8 @@
 
 <html lang="en">
 <head>
+    <meta data-version="11191258" />
+
     <meta charset="utf-8" />
     <title>Game of the Generals</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
@@ -9,23 +11,23 @@
 
     <style type="text/css">
         #gameForestDisconnectWindow {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            width: 100%;
-            height: 100%;
-            z-index: 10000;
-            background: rgba(1, 1, 1, 0.5);
-            text-align: center;
-            display: none;
+            position:           absolute;
+            left:               0px;
+            top:                0px;
+            width:              100%;
+            height:             100%;
+            z-index:            10000;
+            background:         rgba(1, 1, 1, 0.5);
+            text-align:         center;
+            display:            none;
         }
 
         .boardCell {
-            width: 100px;
-            height: 70px;
-            vertical-align: middle;
-            background-size: contain;
-            background-repeat: no-repeat;
+            width:              100px;
+            height:             70px;
+            vertical-align:     middle;
+            background-size:    contain;
+            background-repeat:  no-repeat;
         }
 
             .boardCell:hover {
@@ -41,7 +43,7 @@
             <a class="pull-right btn btn-info" style="margin-top: 18px" data-toggle="modal" data-target="#myModal">Help</a>
             <h2 style="text-align: center">Game of the Generals</h2>
             <div class="col-sm-4 col-sm-offset-2">
-                <p id="usernaemOne"><b>Player 1: </b>username 1</p>
+                <p id="usernameOne"><b>Player 1: </b>username 1</p>
             </div>
             <div class="col-sm-4 col-sm-offset-2">
                 <p id="usernameTwo"><b>Player 2: </b>username 2</p>
@@ -116,9 +118,108 @@
                 <a class="btn btn-primary btn-lg" onclick="buttonAcceptClick()"><b>Accept placement</b></a>
             </div>
         </div>
-        <div id="gameWaitPanel" class="container">
-            <h2>Waiting for player (name) to finish placing his pieces.</h2>
+        <div id="gameGameTable" class="container" style="display: none">
+            <table id="tableChooseTarget" class="table table-bordered" style="width: auto; margin: 0 auto; margin-bottom: 10px">
+                <tr>
+                    <td id="game_1_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_1_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_2_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_2_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_3_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_3_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_4_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_4_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_5_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_5_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_6_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_6_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_7_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_7_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+                <tr>
+                    <td id="game_8_1" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_2" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_3" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_4" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_5" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_6" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_7" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_8" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                    <td id="game_8_9" class="boardCell" onclick="clickGamePlace()" data-piece=""></td>
+                </tr>
+            </table>
         </div>
+        <div id="gameWaitPanel" class="container">
+            <h2>Waiting for player <b id="usernameWait"></b> to finish placing his pieces.</h2>
+        </div>
+        <div id="gameDonePanel" class="container" style="display: none; text-align: center">
+            <br/>
+            <h1><b id="winningPlayer"></b> won the game!</h1>
+            <br/>
+            <a class="btn btn-primary btn-lg" onclick="returnToGameList()">Return to GameForest lobby</a>
+        </div>
+        <br />
         <!-- Modal -->
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -286,7 +387,7 @@
         </div>
         <div class="row">
             <br>
-            <div class="col-sm-6">
+            <div class="col-sm-12">
                 <h3>User list:</h3>
                 <div class="panel panel-default" id="gfxUserList">
                 </div>
@@ -296,7 +397,7 @@
     <!--Chat window-->
     <div id="gameForestChatWindow" class="container">
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-6 col-sm-offset-3">
                 <div class="well">
                     <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
                     <br>

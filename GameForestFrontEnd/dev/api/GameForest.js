@@ -842,7 +842,12 @@ GameForest.prototype.onGameChoose           = function ()
 // method to override when its the player's time to change his/her order
 GameForest.prototype.onTurnSelect           = function (originalTurn)
 {
-    gf.confirmTurn(originalTurn);
+    setTimeout(function()
+    {
+        // 500 millisecond delay so that we won't get any sync issues.
+        gf.confirmTurn(originalTurn);
+
+    }, 500);
 };
 
 // method to override when a player (not this player) is disconnected

@@ -137,15 +137,30 @@ namespace GameForestCoreWebSocket
                             userName    = userInfo.Username
                         };
 
-                        clientList.Add(Guid.Parse(name), newEntry);
+                        if (clientList.ContainsKey(Guid.Parse(name)))
+                        {
+                            clientList[Guid.Parse(name)] = newEntry;
+                            
+                            Dictionary<string, object> sendMessage = new Dictionary<string, object>();
 
-                        Dictionary<string, object> sendMessage = new Dictionary<string, object>();
+                            sendMessage["Message"]  = "open";
+                            sendMessage["Value"]    = "updating client data";
 
-                        sendMessage["Message"]  = "open";
-                        sendMessage["Value"]    = "okay";
+                            // we inform the client the server accepted the connection
+                            socket.Send(JsonConvert.SerializeObject(sendMessage));
+                        }
+                        else
+                        {
+                            clientList.Add(Guid.Parse(name), newEntry);
 
-                        // we inform the client the server accepted the connection
-                        socket.Send(JsonConvert.SerializeObject(sendMessage));
+                            Dictionary<string, object> sendMessage = new Dictionary<string, object>();
+
+                            sendMessage["Message"]  = "open";
+                            sendMessage["Value"]    = "okay";
+
+                            // we inform the client the server accepted the connection
+                            socket.Send(JsonConvert.SerializeObject(sendMessage));
+                        }
                     }
                     break;
                 case "chat":
