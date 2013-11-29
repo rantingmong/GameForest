@@ -893,7 +893,11 @@ GameForest.prototype.onGameDisconnected     = function ()
             else
             {
                 connected = true;
+
                 // we are connected!
+                clearInterval(interval);
+
+                $("#gameForestPlayerDisconnected").hide();
             }
         });
 
@@ -903,6 +907,8 @@ GameForest.prototype.onGameDisconnected     = function ()
             clearInterval(interval);
 
             // inform the user he is disconnected and cannot be brought back to the game
+            $("#gameForestPlayerKilled").show();
+            $("#gameForestPlayerDisconnected").hide();
         }
 
     }, 1000);
