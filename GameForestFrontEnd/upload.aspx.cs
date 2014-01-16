@@ -10,12 +10,12 @@ namespace GameForestFE
 {
     public partial class upload : Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        protected void  Page_Load           (object sender, EventArgs e)
         {
             inputUserId.Attributes.Add("readonly", "readonly");
             inputSessionId.Attributes.Add("readonly", "readonly");
         }
-        protected void ButtonSubmit_Click(object sender, EventArgs e)
+        protected void  ButtonSubmit_Click  (object sender, EventArgs e)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace GameForestFE
             }
         }
 
-        private bool findIndexHTML(string basePath)
+        private bool    findIndexHTML       (string basePath)
         {
             // from root, check if there's an index.html file
             foreach (string file in Directory.GetFiles(basePath))
