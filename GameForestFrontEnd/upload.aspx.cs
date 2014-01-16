@@ -149,7 +149,7 @@ namespace GameForestFE
 
             foreach (string dir in Directory.GetDirectories(basePath))
             {
-                if (findIndexHTML(basePath))
+                if (findIndexHTML(dir))
                 {
                     indexHTMLFound = true;
                     break;
