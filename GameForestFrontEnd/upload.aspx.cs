@@ -73,7 +73,6 @@ namespace GameForestFE
                         string finalPath = "";
                         bool   gfmain    = findIndexHTML(extractedThings, out finalPath);
 
-                        // if something is missing or broken, delete the directory and inform the user
                         if (!gfmain)
                         {
                             alertDialogError.Style["display"]   = "normal";
@@ -86,8 +85,10 @@ namespace GameForestFE
                             Directory.Move(finalPath, targetPath);
                         }
 
+                        /*
                         Directory.Delete(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName));
                         Directory.Delete(extractedThings);
+                        */
                     }
                     catch (ZipException)
                     {
