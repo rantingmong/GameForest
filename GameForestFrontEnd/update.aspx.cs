@@ -124,25 +124,29 @@ namespace GameForestFE
                 try
                 {
                     FastZip zipFile         = new FastZip();
-                    string  extractedThings = Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text);
+                    string  extractedThings = Path.Combine(basePath, "game", userId, inputGameName.Text);
 
-                    zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName),
+                    zipFile.ExtractZip(Path.Combine(basePath, "temp", userId, fileUpload.FileName),
                                         extractedThings,
                                         null);
-
                     // check for the folder that has index.html
-                    bool gfmain = findIndexHTML(extractedThings);
+                    string finalPath = "";
+                    bool gfmain = findIndexHTML(extractedThings, out finalPath);
 
                     // if something is missing or broken, delete the directory and inform the user
                     if (!gfmain)
                     {
-                        alertDialogError.Style["display"]   = "normal";
-                        alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
+                        alertDialogError.Style["display"] = "normal";
+                        alertDangerText.InnerHtml = "Your zip file does not contain the required gameforest files.";
 
                         Directory.Delete(extractedThings);
-                        File.Delete     (Path.Combine(basePath, "temp", fileUpload.FileName));
+                        File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
 
                         return;
+                    }
+                    else
+                    {
+                        Directory.Move(finalPath, extractedThings);
                     }
                 }
                 catch (ZipException)
@@ -188,31 +192,32 @@ namespace GameForestFE
             }
         }
 
-        private bool    findIndexHTML       (string basePath)
+        private bool findIndexHTML(string basePath, out string outpath)
         {
             // from root, check if there's an index.html file
             foreach (string file in Directory.GetFiles(basePath))
             {
                 if (Path.GetFileName(file).ToLower() == "index.html")
                 {
+                    outpath = file;
+
                     return true;
                 }
             }
 
             // get this directory's folders and search for an index.html there
-
-            bool indexHTMLFound = false;
-
             foreach (string dir in Directory.GetDirectories(basePath))
             {
-                if (findIndexHTML(dir))
+                if (findIndexHTML(dir, out outpath))
                 {
-                    indexHTMLFound = true;
-                    break;
+                    outpath = dir;
+                    return true;
                 }
             }
 
-            return indexHTMLFound;
+            outpath = "";
+
+            return false;
         }
     }
 }
