@@ -62,10 +62,11 @@ namespace GameForestFE
                     try
                     {
                         FastZip zipFile         = new FastZip();
-                        string  extractedThings = Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text);
+                        string  targetPath      = Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text);
+                        string  extractedThings = Path.Combine(basePath, "temp_extract", inputUserId.Text, fileUpload.FileName);
 
-                        zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName),
-                                           extractedThings,
+                        zipFile.ExtractZip(Path.Combine(basePath, "temp",         inputUserId.Text, fileUpload.FileName),
+                                           Path.Combine(basePath, "temp_extract", inputUserId.Text, fileUpload.FileName),
                                            null);
 
                         // check for the folder that has index.html
@@ -78,15 +79,15 @@ namespace GameForestFE
                             alertDialogError.Style["display"]   = "normal";
                             alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
 
-                            Directory.Delete(extractedThings);
-                            File.Delete     (Path.Combine(basePath, "temp", fileUpload.FileName));
-
                             return;
                         }
                         else
                         {
-                            Directory.Move(finalPath, extractedThings);
+                            Directory.Move(finalPath, targetPath);
                         }
+
+                        Directory.Delete(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName));
+                        Directory.Delete(extractedThings);
                     }
                     catch (ZipException)
                     {

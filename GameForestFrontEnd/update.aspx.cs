@@ -124,30 +124,32 @@ namespace GameForestFE
                 try
                 {
                     FastZip zipFile         = new FastZip();
-                    string  extractedThings = Path.Combine(basePath, "game", userId, inputGameName.Text);
+                    string  targetPath      = Path.Combine(basePath, "game",         userId, inputGameName.Text);
+                    string  extractedThings = Path.Combine(basePath, "temp_extract", userId, fileUpload.FileName);
 
-                    zipFile.ExtractZip(Path.Combine(basePath, "temp", userId, fileUpload.FileName),
-                                        extractedThings,
-                                        null);
+                    zipFile.ExtractZip(Path.Combine(basePath, "temp",         userId, fileUpload.FileName),
+                                       Path.Combine(basePath, "temp_extract", userId, fileUpload.FileName),
+                                       null);
+
                     // check for the folder that has index.html
                     string finalPath = "";
-                    bool gfmain = findIndexHTML(extractedThings, out finalPath);
+                    bool   gfmain    = findIndexHTML(extractedThings, out finalPath);
 
                     // if something is missing or broken, delete the directory and inform the user
                     if (!gfmain)
                     {
-                        alertDialogError.Style["display"] = "normal";
-                        alertDangerText.InnerHtml = "Your zip file does not contain the required gameforest files.";
-
-                        Directory.Delete(extractedThings);
-                        File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
+                        alertDialogError.Style["display"]   = "normal";
+                        alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
 
                         return;
                     }
                     else
                     {
-                        Directory.Move(finalPath, extractedThings);
+                        Directory.Move(finalPath, targetPath);
                     }
+
+                    Directory.Delete(Path.Combine(basePath, "temp", userId, fileUpload.FileName));
+                    Directory.Delete(extractedThings);
                 }
                 catch (ZipException)
                 {
