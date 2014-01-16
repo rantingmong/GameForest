@@ -137,17 +137,6 @@ namespace GameForestCoreWebSocket
                 {
                     socket.OnOpen       = () =>
                         {
-                            foreach(var item in webSocketList)
-                            {
-                                if (item.Value.webSocket.ConnectionInfo.ClientIpAddress == socket.ConnectionInfo.ClientIpAddress &&
-                                    item.Value.webSocket.ConnectionInfo.ClientPort == socket.ConnectionInfo.ClientPort)
-                                {
-                                    GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "WebSocket", "Connection with " + socket.ConnectionInfo.ClientIpAddress + " already exists!");
-
-                                    return;
-                                }
-                            }
-
                             GFXLogger.GetInstance().Log(GFXLoggerLevel.WARN, "WebSocket", "Connection opened with " + socket.ConnectionInfo.ClientIpAddress);
 
                             // a client wants to connect! give it a new connection id

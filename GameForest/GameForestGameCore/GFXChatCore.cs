@@ -123,7 +123,12 @@ namespace GameForestCoreWebSocket
             string  message = packet["Message"] as string;
             string  value   = packet["Value"]   as string;
 
-            var userSession = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", name)))[0];
+            var userSessionList = new List<GFXLoginRow>(loginTable.Select(string.Format("SessionId = '{0}'", name)));
+
+             if (userSessionList.Count <= 0)
+                return;
+
+            var userSession = userSessionList[0];
             var userInfo    = new List<GFXUserRow>(userTable.Select(string.Format("UserId = '{0}'", userSession.UserId)))[0];
 
             switch (message)
