@@ -24,5 +24,4 @@ namespace GameForestFE
         public GFXResponseType  ResponseType    { get; set; }
         public object           AdditionalData  { get; set; }
     }
-
 }

@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Game Forest game</title><!--Change this to your game's title.-->
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" type="text/css" />
+
+    <style type="text/css">
+        #gameForestDisconnectWindow {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: rgba(1, 1, 1, 0.5);
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body onunload="unload();">
+
+    <!--This is where you will place your game-->
+    <div id="gameForestGameWindow" style="display: none" class="container">
+        <div style="text-align: center">
+            <h1>Game Forest load tester</h1>
+            <br/>
+            <h4>Current status: <b id="gameStatus"></b></h4>
+            <h3>Roundabout time: <b id="roundAboutTime"></b></h3>
+            <br/>
+            <ul id="playerList">
+            </ul>
+        </div>
+    </div>
+    <!--Disconnection window. Do not customize unless you know what you're doing.-->
+    <div id="gameForestDisconnectWindow">
+        <div style="margin: auto; width: 400px; margin-top: 30px" class="well well-lg">
+            <div id="gameForestClientDisconnected" style="display: none">
+                <h3 id="gameForestDisconnectedPlayer">&lt;client&gt; was disconnected!</h3>
+                <p>Waiting for the client to reconnect...</p>
+            </div>
+            <div id="gameForestPlayerDisconnected" style="display: none">
+                <h3>You are disconnected from the game.</h3>
+                <p>You will be kicked out in<b id="gameForestCountdownKill">(n)</b> seconds.</p>
+            </div>
+            <div id="gameForestPlayerKilled" style="display: none">
+                <h3>You are disconnected from the game.</h3>
+                <p>We're sorry but we cannot reconnect you to the server.</p>
+                <a style="text-align: center" href="../../../games.html">Go back to GameForest</a>
+            </div>
+        </div>
+    </div>
+    <!--GameForest stuff. Do not customize unless you know what you're doing.-->
+    <div id="gameForestLobbyWindow" class="container" style="display: normal">
+        <div class="page-header">
+            <h1>Lobby <small id="gameForestLobbyName">Game 1</small></h1>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="gfxButtonStart" disabled>Start game</button>
+                    <button type="button" class="btn btn-warning" id="gfxButtonLeave">Leave lobby</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <div class="col-sm-6">
+                <h3>User list:</h3>
+                <div class="panel panel-default" id="gfxUserList">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="well">
+                    <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chattext" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit" id="buttonSendChat">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Chat window-->
+    <div id="gameForestChatWindow" class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="well">
+                    <textarea id="chatbox" class="form-control chat" rows="8"></textarea>
+                    <br>
+                    <form>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chattext" placeholder="Chat">
+                            <span class="input-group-btn">
+                                <a class="btn btn-default" id="buttonSendChat">Send</a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="http://game-forest.cloudapp.net:46069/js/gameforestip.js"></script>
+
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/guid.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/jquery.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/promise.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/gameforest.js"></script>
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/GameForestTracking.js"></script>
+
+    <script src="Bootstrap/js/bootstrap.min.js"></script>
+    <script src="GameLogic.js"></script>
+
+    <script src="http://game-forest.cloudapp.net:46069/dev/api/indexLogic.js"></script>
+</body>
+</html>

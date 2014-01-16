@@ -51,15 +51,20 @@
                             <button id="buttonSignIn" class="btn btn-primary" onclick="fbLogin(event)">Login in with Facebook</button>
                             <br />
                         </div>
-                        <h3>Or login the usual way...</h3>
-                        <div class="form-group">
-                            <input type="email" class="form-control" id="inputUsername" placeholder="Email" />
+                        <div id="fb-waiting" style="display: none">
+                            <h5>Logging in with Facebook, please wait...</h5>
                         </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" />
-                        </div>
-                        <div class="form-group">
-                            <button id="buttonSignIn" class="btn btn-primary" onclick="normLogin(event)">Login</button>
+                        <div id="norm-login-pane">
+                            <h3>Or login the usual way...</h3>
+                            <div class="form-group">
+                                <input type="email" class="form-control" id="inputUsername" placeholder="Email" />
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="inputPassword" placeholder="Password" />
+                            </div>
+                            <div class="form-group">
+                                <button id="buttonSignIn" class="btn btn-primary" onclick="normLogin(event)">Login</button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -185,7 +190,10 @@
             console.log("Im going to use this to log you in to GameForest!");
 
             $("#fb-login-button").hide();
+            $("#norm-login-pane").hide();
 
+            $("#fb-waiting").show();
+            
             FB.api("/me", function (response)
             {
                 // do gameforest rest api call for fblogin
@@ -206,6 +214,11 @@
                     else
                     {
                         alert("Cannot log you in to GameForest!");
+
+                        $("#fb-login-button").show();
+                        $("#norm-login-pane").show();
+
+                        $("#fb-waiting").hide();
                     }
                 });
             });

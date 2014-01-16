@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Web.UI;
@@ -60,20 +61,15 @@ namespace GameForestFE
                     // process zip file and place to games folder
                     try
                     {
-                        FastZip zipFile = new FastZip();
+                        FastZip zipFile         = new FastZip();
+                        string  extractedThings = Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text);
 
                         zipFile.ExtractZip(Path.Combine(basePath, "temp", inputUserId.Text, fileUpload.FileName),
-                                           Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text),
+                                           extractedThings,
                                            null);
 
-                        bool gfmain = false;
-
-                        // inspect the newly decompressed game
-                        foreach (string file in Directory.GetFiles(Path.Combine(basePath, "game", inputUserId.Text, inputGameName.Text)))
-                        {
-                            if (file.ToLower().Contains("index.html"))
-                                gfmain = true;
-                        }
+                        // check for the folder that has index.html
+                        bool gfmain = findIndexHTML(extractedThings);
 
                         // if something is missing or broken, delete the directory and inform the user
                         if (!gfmain)
@@ -81,8 +77,8 @@ namespace GameForestFE
                             alertDialogError.Style["display"]   = "normal";
                             alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
 
-                            Directory.Delete(Path.Combine("games", inputUserId.Text, inputGameName.Text));
-                            File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
+                            Directory.Delete(extractedThings);
+                            File.Delete     (Path.Combine(basePath, "temp", fileUpload.FileName));
 
                             return;
                         }
@@ -134,6 +130,33 @@ namespace GameForestFE
                 alertDialogError.Style["display"]   = "normal";
                 alertDangerText.InnerHtml           = "FATAL ERROR! " + exp.Message + "<br/>" + exp.StackTrace;
             }
+        }
+
+        private bool findIndexHTML(string basePath)
+        {
+            // from root, check if there's an index.html file
+            foreach (string file in Directory.GetFiles(basePath))
+            {
+                if (Path.GetFileName(file).ToLower() == "index.html")
+                {
+                    return true;
+                }
+            }
+
+            // get this directory's folders and search for an index.html there
+
+            bool indexHTMLFound = false;
+
+            foreach (string dir in Directory.GetDirectories(basePath))
+            {
+                if (findIndexHTML(basePath))
+                {
+                    indexHTMLFound = true;
+                    break;
+                }
+            }
+
+            return indexHTMLFound;
         }
     }
 }
