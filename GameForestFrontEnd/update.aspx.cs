@@ -10,6 +10,12 @@ namespace GameForestFE
 {
     public partial class update : Page
     {
+        private String basePath;
+
+        private String downloadTempPath;
+        private String extractsTempPath;
+        private String usrDirectoryPath;
+
         private string  sessionId           = "";
         private string  gameId              = "";
 
@@ -54,11 +60,16 @@ namespace GameForestFE
         }
         protected void  ButtonSubmit_Click  (object sender, EventArgs e)
         {
-            var sessId      = this.sessionId;
-            var userId      = "";
+            var     sessId      = this.sessionId;
+            var     userId      = "";
 
-            var error       = false;
-            var basePath    = AppDomain.CurrentDomain.BaseDirectory;
+            Guid    fileId      = Guid.Parse(gameId);
+
+            String  filePath    = "";
+            String  extrPath    = "";
+            String  gamePath    = "";
+
+            String  htmlPath    = "";
 
             HttpWebRequest userInfoFromSess = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/user/session/" + sessId));
 
@@ -72,8 +83,6 @@ namespace GameForestFE
 
             if (data.ResponseType != GFXResponseType.Normal)
             {
-                error = true;
-
                 alertDialogError.Style["display"]   = "normal";
                 alertDangerText.InnerHtml           = "There was something wrong with the server.";
 
@@ -81,90 +90,69 @@ namespace GameForestFE
             }
 
             var userInfo    = JsonConvert.DeserializeObject<Dictionary<string, object>>((string)data.AdditionalData);
+                userId      = (string)userInfo["UserId"];
 
-            userId          = (string)userInfo["UserId"];
-
-            if (fileUpload.HasFile)
+            try
             {
-                string ext = Path.GetExtension(fileUpload.FileName);
+                createPaths(userId);
+                createDirectories();
 
-                if (ext.Contains("zip"))
-                {
-                    if (!Directory.Exists(Path.Combine(basePath, "temp")))
-                    {
-                        Directory.CreateDirectory(Path.Combine(basePath, "temp"));
-                    }
-
-                    if (!Directory.Exists(Path.Combine(basePath, "temp", userId)))
-                    {
-                        Directory.CreateDirectory(Path.Combine(basePath, "temp", userId));
-                    }
-
-                    fileUpload.SaveAs(Path.Combine(basePath, "temp", userId, fileUpload.FileName));
-                }
-                else
-                {
-                    error = true;
-                    
-                    alertDialogError.Style["display"]   = "normal";
-                    alertDangerText.InnerHtml           = "File specified is not a zip file.";
-                }
-            }
-            else
-            {
-                error = true;
-                
-                alertDialogError.Style["display"]   = "normal";
-                alertDangerText.InnerHtml           = "Please specify your file (in zip format) for upload.";
-            }
-
-            if (error == false)
-            {
-                // process zip file and place to games folder
-                try
-                {
-                    FastZip zipFile         = new FastZip();
-                    string  targetPath      = Path.Combine(basePath, "game",         userId, inputGameName.Text);
-                    string  extractedThings = Path.Combine(basePath, "temp_extract", userId, fileUpload.FileName);
-
-                    zipFile.ExtractZip(Path.Combine(basePath, "temp",         userId, fileUpload.FileName),
-                                       Path.Combine(basePath, "temp_extract", userId, fileUpload.FileName),
-                                       null);
-
-                    // check for the folder that has index.html
-                    string finalPath = "";
-                    bool   gfmain    = findIndexHTML(extractedThings, out finalPath);
-
-                    // if something is missing or broken, delete the directory and inform the user
-                    if (!gfmain)
-                    {
-                        alertDialogError.Style["display"]   = "normal";
-                        alertDangerText.InnerHtml           = "Your zip file does not contain the required gameforest files.";
-
-                        return;
-                    }
-                    else
-                    {
-                        Directory.Move(finalPath, targetPath);
-                    }
-
-                    Directory.Delete(Path.Combine(basePath, "temp", userId, fileUpload.FileName));
-                    Directory.Delete(extractedThings);
-                }
-                catch (ZipException)
+                // check if file uploader has files to be saved
+                if (fileUpload.HasFile == false)
                 {
                     alertDialogError.Style["display"]   = "normal";
-                    alertDangerText.InnerHtml           = "Zip file decompression failed. Please check if your the file is a valid zip file.";
-
-                    if (File.Exists(Path.Combine(basePath, "temp", fileUpload.FileName)))
-                        File.Delete(Path.Combine(basePath, "temp", fileUpload.FileName));
+                    alertDangerText.InnerHtml           = "You haven't specified anything to upload.";
 
                     return;
                 }
 
-                // replace this to update
+                // first get file extension
+                if (Path.GetExtension(fileUpload.FileName) != "zip")
+                {
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "File specified is not a zip file.";
 
-                // send REST request to server
+                    return;
+                }
+
+                filePath = Path.Combine(downloadTempPath, fileId.ToString() + ".zip");
+                extrPath = Path.Combine(extractsTempPath, fileId.ToString());
+                gamePath = Path.Combine(usrDirectoryPath, fileId.ToString());
+
+                htmlPath = "";
+
+                // save file
+                fileUpload.SaveAs(filePath);
+
+                // process zip file and place it in extractsTempPath/fileId
+                new FastZip().ExtractZip(filePath, extrPath, null);
+
+                // check the extracted files for correctness
+                if (findIndexHTML(extrPath, out htmlPath) == false)
+                {
+                    alertDialogError.Style["display"]   = "normal";
+                    alertDangerText.InnerHtml           = "There is no index.html specified in the zip file you uploaded.";
+
+                    Directory.Delete(extrPath);
+                    File.Delete(filePath);
+
+                    return;
+                }
+
+                // move files from extrPath to userDirectoryPath/fileId
+
+                if (Directory.Exists(gamePath))
+                {
+                    Directory.Delete(gamePath);
+                    Directory.CreateDirectory(gamePath);
+                }
+
+                Directory.CreateDirectory(gamePath);
+                Directory.Move(extrPath, gamePath);
+
+                // delete downloaded file awhile ago
+                File.Delete(filePath);
+
                 HttpWebRequest newGameRequest = (HttpWebRequest)WebRequest.Create(string.Format("http://" + gameforestip.gameForestIP + ":1193/service/game?name={0}&description={1}&minplayers={2}&maxplayers={3}&usersessionid={4}&gameid={5}",
                                                                                                 inputGameName.Text,
                                                                                                 inputGameDescription.Text,
@@ -190,11 +178,60 @@ namespace GameForestFE
                 {
                     alertDialogError.Style["display"]   = "normal";
                     alertDangerText.InnerHtml           = "Game creation was not successful.";
+
+                    Directory.Delete(gamePath);
                 }
+            }
+            catch (ZipException)
+            {
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "Zip file decompression failed. Please check if your the file is a valid zip file.";
+
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+
+                if (Directory.Exists(extrPath))
+                    Directory.Delete(extrPath);
+            }
+            catch (Exception exp)
+            {
+                alertDialogError.Style["display"]   = "normal";
+                alertDangerText.InnerHtml           = "GameForest encountered a serious error. Server-side message: " + exp.Message;
+
+                Directory.Delete(gamePath);
             }
         }
 
-        private bool findIndexHTML(string basePath, out string outpath)
+        private void    createPaths         (string userId)
+        {
+            basePath            = AppDomain.CurrentDomain.BaseDirectory;
+
+            downloadTempPath    = Path.Combine(basePath, "downloadtemp");
+            extractsTempPath    = Path.Combine(basePath, "extractstemp");
+            usrDirectoryPath    = Path.Combine(basePath, "gamdirectory", userId);
+        }
+        private void    createDirectories   ()
+        {
+            // check if base directory for the downloaded files is available
+            if (Directory.Exists(downloadTempPath) == false)
+            {
+                Directory.CreateDirectory(downloadTempPath);
+            }
+
+            // check if base directory for extracted files is available
+            if (Directory.Exists(extractsTempPath) == false)
+            {
+                Directory.CreateDirectory(extractsTempPath);
+            }
+
+            // check if user's directory is available
+            if (Directory.Exists(usrDirectoryPath) == false)
+            {
+                Directory.CreateDirectory(usrDirectoryPath);
+            }
+        }
+
+        private bool    findIndexHTML       (string basePath, out string outpath)
         {
             // from root, check if there's an index.html file
             foreach (string file in Directory.GetFiles(basePath))

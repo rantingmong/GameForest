@@ -98,7 +98,7 @@ namespace GameForestCore.Services
             }
         }
 
-        public GFXRestResponse                  CreateGame          (string name, string description, int minPlayers, int maxPlayers, string usersessionid)
+        public GFXRestResponse                  CreateGame          (string name, string description, int minPlayers, int maxPlayers, string usersessionid, string fileId)
         {
             GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "CreateGame", "Creating game...");
 
@@ -113,11 +113,11 @@ namespace GameForestCore.Services
                 {
                     Creator         = getUserId(usersessionid),
                     Description     = description,
-                    GameID          = Guid.NewGuid(),
+                    GameID          = Guid.Parse(fileId),
                     MaxPlayers      = maxPlayers,
                     MinPlayers      = minPlayers,
                     Name            = name,
-                    RelativeLink    = "game/" + getUserId(usersessionid) + "/" + name
+                    RelativeLink    = "gamdirectory/" + getUserId(usersessionid) + "/" + fileId
                 };
 
                 gameTable.Insert(newGame);

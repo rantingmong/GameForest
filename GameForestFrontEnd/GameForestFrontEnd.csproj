@@ -70,6 +70,7 @@
     <Content Include="dev\api\promise.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="games.html" />
+    <Content Include="img\load.gif" />
     <Content Include="index.html" />
     <Content Include="js\angular.js" />
     <Content Include="js\bootstrap.js" />

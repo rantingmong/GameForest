@@ -301,7 +301,7 @@ namespace GameForestCoreWebSocket
 
             var dtNow       = DateTime.Now;
 
-            Console.WriteLine("Removing inactive users...");
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Core", "Removing inactive users...");
 
             foreach (var item in sessionList)
             {
@@ -310,7 +310,7 @@ namespace GameForestCoreWebSocket
                     // remove this user from the login list
                     this.sessionList.Remove(string.Format("SessionId = '{0}'", item.SessionId));
 
-                    Console.WriteLine("Logged out user with session " + item.SessionId);
+                    GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Core", "Logged out user with session " + item.SessionId);
                 }
             }
         }

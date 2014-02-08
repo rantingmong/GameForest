@@ -114,7 +114,7 @@ namespace GameForestCoreWebSocket
 
         public void                     processMessage  (IWebSocketConnection socket, String msg)
         {
-            Console.Write(msg);
+            GFXLogger.GetInstance().Log(GFXLoggerLevel.INFO, "Chat", msg);
 
             var     packet  = JsonConvert.DeserializeObject<Dictionary<string, object>>(msg);
 

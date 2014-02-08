@@ -16,8 +16,8 @@ namespace GameForestCore.Services
         [OperationContract, WebInvoke(UriTemplate = "/{gameId}", ResponseFormat = WebMessageFormat.Json, Method = "GET")]
         GFXRestResponse GetGameInfo     (string gameId);
 
-        [OperationContract, WebInvoke(UriTemplate = "?name={name}&description={description}&minplayers={minPlayers}&maxplayers={maxPlayers}&usersessionid={usersessionid}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
-        GFXRestResponse CreateGame      (string name, string description, int minPlayers, int maxPlayers, string usersessionid);
+        [OperationContract, WebInvoke(UriTemplate = "?name={name}&description={description}&minplayers={minPlayers}&maxplayers={maxPlayers}&usersessionid={usersessionid}&fileid={fileId}", ResponseFormat = WebMessageFormat.Json, Method = "POST")]
+        GFXRestResponse CreateGame      (string name, string description, int minPlayers, int maxPlayers, string usersessionid, string fileId);
 
         [OperationContract, WebInvoke(UriTemplate = "?name={name}&description={description}&minplayers={minPlayers}&maxplayers={maxPlayers}&usersessionid={usersessionid}&gameid={gameid}", ResponseFormat = WebMessageFormat.Json, Method = "PUT")]
         GFXRestResponse UpdateGame      (string name, string description, int minPlayers, int maxPlayers, string usersessionid, string gameid);

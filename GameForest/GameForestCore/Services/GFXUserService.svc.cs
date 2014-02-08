@@ -45,7 +45,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|GetUserInfo] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | GetUserInfo", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -65,7 +65,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|GetUserInfoFromSession] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | GetUserInfoFromSession", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -108,7 +108,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|SetUserInfo] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | SetUserInfo", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -144,7 +144,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Register] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Register", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -169,7 +169,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Unregister] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Unregister", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -203,7 +203,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Register] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Register", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -237,7 +237,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Login] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Login", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -294,7 +294,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Logout] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Logout", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -322,7 +322,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|Heartbeat] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | Heartbeat", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }
@@ -354,7 +354,7 @@ namespace GameForestCore.Services
             }
             catch (Exception exp)
             {
-                Console.Error.WriteLine("[User|ChangePassword] " + exp.Message);
+                GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "User | ChangePassword", exp.Message);
 
                 return constructResponse(GFXResponseType.RuntimeError, exp.Message);
             }

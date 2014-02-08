@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MySql.Data.MySqlClient;
+using GameForestDatabaseConnector.Logger;
 
 namespace GameForestCore.Database
 {
@@ -112,8 +113,7 @@ namespace GameForestCore.Database
                     }
                     catch (Exception exp)
                     {
-                        // TODO: log the exception
-                        Console.WriteLine(exp.Message);
+                        GFXLogger.GetInstance().Log(GFXLoggerLevel.ERROR, "Database", exp.Message);
 
                         return null;
                     }

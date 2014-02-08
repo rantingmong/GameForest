@@ -11,24 +11,21 @@ namespace GameForest
         {
             GFXLogger.GetInstance().OnLogged += (entry) =>
             {
-                string message = string.Format("[{0}] ({1}) {2}", entry.Category, entry.LoggerLevel, entry.Message);
+                string message = string.Format("[{0}] ({1}) {2}", 
+                                               entry.LoggerLevel,
+                                               entry.Category,
+                                               entry.Message);
 
                 switch (entry.LoggerLevel)
                 {
                     case GFXLoggerLevel.ERROR:
                     case GFXLoggerLevel.FATAL:
+
                         Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-                    case GFXLoggerLevel.INFO:
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-                    case GFXLoggerLevel.WARN:
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.WriteLine(message);
+                        Console.ForegroundColor = ConsoleColor.White;
                         break;
                 }
-
-                Console.WriteLine(message);
-                Console.ForegroundColor = ConsoleColor.White;
             };
 
             string username = "";
