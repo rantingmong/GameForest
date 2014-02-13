@@ -50,7 +50,7 @@ namespace GameForestFE
                 }
 
                 // first get file extension
-                if (Path.GetExtension(fileUpload.FileName) != "zip")
+                if (Path.GetExtension(fileUpload.FileName) != ".zip")
                 {
                     alertDialogError.Style["display"]   = "normal";
                     alertDangerText.InnerHtml           = "File specified is not a zip file.";
@@ -83,8 +83,6 @@ namespace GameForestFE
                 }
 
                 // move files from extrPath to userDirectoryPath/fileId
-
-                Directory.CreateDirectory   (gamePath);
                 Directory.Move              (extrPath, gamePath);
 
                 // delete downloaded file awhile ago
@@ -110,8 +108,7 @@ namespace GameForestFE
                 if (respose.ResponseType == GFXResponseType.Normal)
                 {
                     // inform user we are done processing
-                    alertDialogAllOk.Style["display"]   = "normal";
-                    alertDialogAllOk.InnerHtml          = " Game creation succesful! The page will now go back to the games page.";
+                    Response.Redirect("uploadsuccess.html");
                 }
                 else
                 {
@@ -137,7 +134,7 @@ namespace GameForestFE
             catch (Exception exp)
             {
                 alertDialogError.Style["display"]   = "normal";
-                alertDangerText.InnerHtml           = "GameForest encountered a serious error. Server-side message: " + exp.Message;
+                alertDangerText.InnerHtml           = "GameForest encountered a serious error. Server-side message: " + exp.Message + "<br/>Stack trace:<br/>" + exp.StackTrace;
 
                 Directory.Delete(gamePath);
             }

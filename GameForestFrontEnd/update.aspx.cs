@@ -107,7 +107,7 @@ namespace GameForestFE
                 }
 
                 // first get file extension
-                if (Path.GetExtension(fileUpload.FileName) != "zip")
+                if (Path.GetExtension(fileUpload.FileName) != ".zip")
                 {
                     alertDialogError.Style["display"]   = "normal";
                     alertDangerText.InnerHtml           = "File specified is not a zip file.";
@@ -142,12 +142,8 @@ namespace GameForestFE
                 // move files from extrPath to userDirectoryPath/fileId
 
                 if (Directory.Exists(gamePath))
-                {
-                    Directory.Delete(gamePath);
-                    Directory.CreateDirectory(gamePath);
-                }
+                    Directory.Delete(gamePath); // move method wants to make the directory, not us... >:T
 
-                Directory.CreateDirectory(gamePath);
                 Directory.Move(extrPath, gamePath);
 
                 // delete downloaded file awhile ago
@@ -171,8 +167,7 @@ namespace GameForestFE
 
                 if (respose.ResponseType == GFXResponseType.Normal)
                 {
-                    alertDialogAllOk.Style["display"]   = "normal";
-                    alertAllOkText.InnerHtml            = "Game creation succesful! The page will now go back to the games page.";
+                    Response.Redirect("uploadsuccess.html");
                 }
                 else
                 {

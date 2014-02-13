@@ -12,8 +12,8 @@ namespace GameForestFE
 {
     public partial class delete : System.Web.UI.Page
     {
-        private string sessionId = "";
-        private string gameId = "";
+        private string sessionId    = "";
+        private string gameId       = "";
 
         protected void Page_Load(object sender, EventArgs e)
         {

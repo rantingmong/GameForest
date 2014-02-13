@@ -1,1 +1,1 @@
-var gameForestIP = "game-forest.cloudapp.net";
+ var gameForestIP = "game-forest.cloudapp.net";
